@@ -16,6 +16,7 @@ jobs:
         environment:
             - MYSQL_USER=test
             - MYSQL_PASSWORD=test
+            - MYSQL_DATABASE=testdb
 
     working_directory: ~/repo
 
