@@ -46,7 +46,8 @@ public class SqlBuilder {
     }
 
     public void addFileConfig() {
-        sb.append("CHARACTER SET UTF8 ").append("FIELDS TERMINATED BY '").append(FIELD_TERMINATED_CHAR).append("' ")
+        sb.append("CHARACTER SET UTF8 ")
+          .append("FIELDS TERMINATED BY '").append(FIELD_TERMINATED_CHAR).append("' ")
           .append("ENCLOSED BY '' ")
           .append("ESCAPED BY '").append(ESCAPED_BY_CHAR).append(ESCAPED_BY_CHAR).append("' ")
           .append("LINES TERMINATED BY '").append(LINE_TERMINATED_CHAR).append("' ")

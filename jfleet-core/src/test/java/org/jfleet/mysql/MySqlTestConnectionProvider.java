@@ -16,39 +16,13 @@
 package org.jfleet.mysql;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.function.Supplier;
 
-public class MySqlTestConnectionProvider implements Supplier<Connection> {
+import org.jfleet.DataBaseTestConnectionProvider;
 
-	private Properties prop;
+public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
 
 	public MySqlTestConnectionProvider() throws IOException {
-		this("mysql-test.properties");
-	}
-
-	public MySqlTestConnectionProvider(String propertiesName) throws IOException {
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream(propertiesName);
-		Properties p = new Properties();
-		p.load(is);
-		prop = p;
-	}
-
-	@Override
-	public Connection get() {
-		try {
-			Class.forName(prop.getProperty("driver")).newInstance();
-			Connection conn = DriverManager.getConnection(prop.getProperty("urlConnection"), prop.getProperty("user"), prop.getProperty("password"));
-			return conn;
-		} catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-			throw new RuntimeException("Can not instantiate a MySql driver", ex);
-		} catch (SQLException ex) {
-			throw new RuntimeException("Can not connect to database", ex);
-		}
+		super("mysql-test.properties");
 	}
 
 }
