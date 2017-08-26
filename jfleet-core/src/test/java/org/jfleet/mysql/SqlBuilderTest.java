@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
-import org.jfleet.mysql.SqlBuilder;
 import org.junit.Test;
 
 public class SqlBuilderTest {
@@ -45,7 +44,7 @@ public class SqlBuilderTest {
 		sqlBuilder.addLoadDataIntoTable();
 
 		String sql = sqlBuilder.getSql();
-		assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE simple_table ", sql);
+		assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` ", sql);
 	}
 
 	@Test
@@ -72,8 +71,8 @@ public class SqlBuilderTest {
 		SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
 
 		String sql = sqlBuilder.build();
-		String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE simple_table "
-				+ "CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' " 
+		String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` "
+				+ "CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' "
 				+ "(`column1`, `column2`)";
 		assertEquals(expectedSql, sql);
 	}

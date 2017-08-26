@@ -42,7 +42,7 @@ public class SqlBuilder {
 
     public void addLoadDataIntoTable() {
         sb.append("LOAD DATA LOCAL INFILE '' INTO TABLE ");
-        sb.append(entityInfo.getTableName()).append(" ");
+        sb.append("`").append(entityInfo.getTableName()).append("` ");
     }
 
     public void addFileConfig() {
