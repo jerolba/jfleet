@@ -26,6 +26,7 @@ import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
+import org.jfleet.common.TransactionPolicy;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
@@ -54,21 +55,28 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
         CopyManager copyMng = getCopyManager(conn);
         try {
-            stream.forEach(element -> {
-                contentBuilder.add(element);
-                if (contentBuilder.getContentSize() > BATCH_SIZE) {
-                    logger.debug("Writing content");
-                    writeContent(copyMng, contentBuilder);
-                }
-            });
-            logger.debug("Flushing content");
-            writeContent(copyMng, contentBuilder);
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+            try {
+                stream.forEach(element -> {
+                    contentBuilder.add(element);
+                    if (contentBuilder.getContentSize() > BATCH_SIZE) {
+                        logger.debug("Writing content");
+                        writeContent(txPolicy, copyMng, contentBuilder);
+                    }
+                });
+                logger.debug("Flushing content");
+                writeContent(txPolicy, copyMng, contentBuilder);
+            } finally {
+                txPolicy.close();
+            }
+        } catch (SQLException e) {
+            throw new JFleetException(e);
         } catch (WrappedException e) {
             e.rethrow();
         }
     }
 
-    private void writeContent(CopyManager copyManager, StdInContentBuilder contentBuilder) {
+    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder) {
         if (contentBuilder.getContentSize() > 0) {
             try {
                 long init = System.nanoTime();
@@ -77,6 +85,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
                 logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
                         contentBuilder.getContentSize(), contentBuilder.getRecords());
                 contentBuilder.reset();
+                txPolicy.commit();
             } catch (SQLException | IOException e) {
                 throw new WrappedException(e);
             }

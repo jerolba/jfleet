@@ -35,6 +35,7 @@ import org.jfleet.FieldInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
+import org.jfleet.common.TransactionPolicy;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
@@ -84,29 +85,31 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
         try {
-            conn.setAutoCommit(false);
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
             try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-                BatchInsert statementCount = new BatchInsert(conn, pstmt);
+                BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
                 stream.forEach(statementCount::add);
                 statementCount.finish();
-            } catch (WrappedException e) {
-                e.rethrow();
             } finally {
-                conn.setAutoCommit(true);
+                txPolicy.close();
             }
         } catch (SQLException e) {
             throw new JFleetException(e);
+        } catch (WrappedException e) {
+            e.rethrow();
         }
     }
 
     private class BatchInsert {
 
         private final Connection connection;
+        private final TransactionPolicy txPolicy;
         private final PreparedStatement pstmt;
         private int count = 0;
 
-        BatchInsert(Connection connection, PreparedStatement pstmt) throws SQLException {
+        BatchInsert(Connection connection, TransactionPolicy txPolicy, PreparedStatement pstmt) throws SQLException {
             this.connection = connection;
+            this.txPolicy = txPolicy;
             this.pstmt = pstmt;
         }
 
@@ -132,7 +135,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
         private void flush() throws SQLException {
             int[] result = pstmt.executeBatch();
-            connection.commit();
+            txPolicy.commit();
         }
 
     }
