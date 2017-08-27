@@ -67,7 +67,7 @@ public class PostgresDDLHelper implements DDLHelper {
         case CHAR:
             return "CHAR";
         case DOUBLE:
-            return "DOUBLE";
+            return "FLOAT";
         case FLOAT:
             return "REAL";
         case INT:
