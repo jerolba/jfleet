@@ -13,11 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.util;
 
-import org.jfleet.common.BaseTypeSerializer;
+import org.jfleet.EntityInfo;
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+public enum Dialect {
 
+    Mysql(new MysqlDDLHelper()), Postgres(new PostgresDDLHelper());
 
+    private DDLHelper ddlHelper;
+
+    private Dialect(DDLHelper ddlHelper) {
+        this.ddlHelper = ddlHelper;
+    }
+
+    public DDLHelper getDDLHelper() {
+        return ddlHelper;
+    }
+
+    public interface DDLHelper {
+
+        String createTableSentence(EntityInfo entityInfo);
+
+        String dropTableSentence(EntityInfo entityInfo);
+    }
 }

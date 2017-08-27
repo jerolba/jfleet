@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,30 +35,30 @@ import org.junit.Test;
 
 public class SimpleEntityPersistenceTest {
 
-    @Test
-    public void canPersistCollectionOfEntities() throws JFleetException, SQLException, IOException {
+	@Test
+	public void canPersistCollectionOfEntities() throws JFleetException, SQLException, IOException {
         int times = 1000;
 
-        BulkInsert<SimpleEntity> insert = new LoadDataBulkInsert<>(SimpleEntity.class);
-        Stream<SimpleEntity> stream = IntStream.range(0, times)
+		BulkInsert<SimpleEntity> insert = new PgCopyBulkInsert<>(SimpleEntity.class);
+		Stream<SimpleEntity> stream = IntStream.range(0, times)
                 .mapToObj(i -> new SimpleEntity("name_" + i, i % 2 == 0, i));
 
-        Supplier<Connection> connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
-            SqlUtil.createTableForEntity(conn, SimpleEntity.class);
-            insert.insertAll(conn, stream);
+		Supplier<Connection> connectionProvider = new PostgresTestConnectionProvider();
+		try (Connection conn = connectionProvider.get()) {
+			SqlUtil.createTableForEntity(conn, SimpleEntity.class);
+			insert.insertAll(conn, stream);
 
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("SELECT name, active, age FROM simple_table ORDER BY age ASC")) {
-                    for (int i = 0; i < times; i++) {
-                        assertTrue(rs.next());
-                        assertEquals("name_" + i, rs.getString(1));
-                        assertEquals((i + 1) % 2, rs.getInt(2));
-                        assertEquals(i, rs.getInt(3));
-                    }
-                }
-            }
-        }
-    }
+			try (Statement stmt = conn.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery("SELECT name, active, age FROM simple_table ORDER BY age ASC")) {
+					for (int i = 0; i < times; i++) {
+						assertTrue(rs.next());
+						assertEquals("name_"+i,rs.getString(1));
+						assertEquals((i+1) % 2 == 1,rs.getBoolean(2));
+						assertEquals(i,rs.getInt(3));
+					}
+				}
+			}
+		}
+	}
 
 }

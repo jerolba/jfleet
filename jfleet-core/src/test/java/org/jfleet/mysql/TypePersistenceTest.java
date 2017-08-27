@@ -28,13 +28,15 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.common.EntityWithBasicTypes;
+import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
 public class TypePersistenceTest {
-	
+
 	@Test
-	public void persistAllTypes() throws SQLException, IOException {
+	public void persistAllTypes() throws JFleetException, SQLException, IOException {
 		EntityWithBasicTypes entity = new EntityWithBasicTypes();
 		entity.setBooleanObject(true);
 		entity.setByteObject((byte) 42);
@@ -77,9 +79,9 @@ public class TypePersistenceTest {
 			}
 		}
 	}
-	
+
 	@Test
-	public void persistNullValues() throws SQLException, IOException {
+	public void persistNullValues() throws JFleetException, SQLException, IOException {
 		EntityWithBasicTypes entity = new EntityWithBasicTypes();
 		entity.setBooleanObject(null);
 		entity.setByteObject(null);
@@ -99,7 +101,7 @@ public class TypePersistenceTest {
 			SqlUtil.createTableForEntity(conn, EntityWithBasicTypes.class);
 			insert.insertAll(conn, list);
 
-			try (Statement stmt = (Statement) conn.createStatement()) {
+			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
 						+ " doubleObject, floatObject, intObject, longObject, shortObject, string"
 						+ " FROM table_with_basic_types")) {

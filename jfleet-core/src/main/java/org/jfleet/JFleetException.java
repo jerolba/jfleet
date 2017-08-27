@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet;
 
-import org.jfleet.common.BaseTypeSerializer;
+public class JFleetException extends Exception {
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+    private static final long serialVersionUID = 4556414648060404490L;
 
+    public JFleetException(Throwable e) {
+        super(e.getMessage(), e);
+    }
 
 }

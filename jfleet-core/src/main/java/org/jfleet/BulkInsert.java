@@ -16,16 +16,15 @@
 package org.jfleet;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.stream.Stream;
 
 public interface BulkInsert<T> {
 
-    default void insertAll(Connection conn, Collection<T> collection) throws SQLException {
+    default void insertAll(Connection conn, Collection<T> collection) throws JFleetException {
         insertAll(conn, collection.stream());
     }
 
-    void insertAll(Connection conn, Stream<T> stream) throws SQLException;
+    void insertAll(Connection conn, Stream<T> stream) throws JFleetException;
 
 }

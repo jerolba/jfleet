@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
-import org.jfleet.common.BaseTypeSerializer;
+import java.io.IOException;
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+import org.jfleet.util.DataBaseTestConnectionProvider;
 
+public class PostgresTestConnectionProvider extends DataBaseTestConnectionProvider {
+
+	public PostgresTestConnectionProvider() throws IOException {
+		super("postgres-test.properties");
+	}
 
 }

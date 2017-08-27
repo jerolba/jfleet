@@ -28,18 +28,19 @@ import java.util.stream.Stream;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
 public class SpecialCharsPersistenceTest {
-	
+
 	@Entity
 	@Table(name ="table_with_strings")
 	class EnityWithStrings {
-		
+
 		private String foo;
 		private String bar;
-		
+
 		public String getFoo() {
 			return foo;
 		}
@@ -52,10 +53,10 @@ public class SpecialCharsPersistenceTest {
 		public void setBar(String bar) {
 			this.bar = bar;
 		}
-		
+
 	}
-	
-	public void testWithString(String text) throws SQLException, IOException {
+
+	public void testWithString(String text) throws JFleetException, SQLException, IOException {
 		EnityWithStrings entity = new EnityWithStrings();
 		entity.setFoo("Some text");
 		entity.setBar(text);
@@ -76,25 +77,25 @@ public class SpecialCharsPersistenceTest {
 			}
 		}
 	}
-	
+
 	@Test
-	public void persistTab() throws SQLException, IOException {
+	public void persistTab() throws JFleetException, SQLException, IOException {
 		testWithString("A text with a tab \t char inside \t");
 	}
-	
+
 	@Test
-	public void persistReturn() throws SQLException, IOException {
+	public void persistReturn() throws JFleetException, SQLException, IOException {
 		testWithString("A text with a return \n char \n");
 		testWithString("A text with a return \n char \n\r");
 	}
-	
+
 	@Test
-	public void persistWithEscapeChar() throws SQLException, IOException {
+	public void persistWithEscapeChar() throws JFleetException, SQLException, IOException {
 		testWithString("A text with \\ a escape \\");
 	}
 
 	@Test
-	public void persistMixChars() throws SQLException, IOException {
+	public void persistMixChars() throws JFleetException, SQLException, IOException {
 		testWithString("A text all \\ types \t of \n escape chars\n\r");
 	}
 }

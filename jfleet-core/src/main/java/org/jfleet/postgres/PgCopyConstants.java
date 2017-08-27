@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
-import org.jfleet.common.BaseTypeSerializer;
+public class PgCopyConstants {
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+    public static final char ESCAPE_CHAR = '\\';
+    public static final char EOL_CHAR = '\n';
+    public static final char DELIMITER_CHAR = '\t';
 
+    private PgCopyConstants() {
+    }
 
 }

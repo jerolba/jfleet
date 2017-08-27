@@ -29,13 +29,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.common.EntityWithDateTypes;
+import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
 public class DateTypePersistenceTest {
 
 	@Test
-	public void persistAllDateTypes() throws SQLException, IOException {
+	public void persistAllDateTypes() throws JFleetException, SQLException, IOException {
 		EntityWithDateTypes entity = new EntityWithDateTypes();
 		entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));
 		entity.setDate(getDate("24/01/2012 23:12:48"));
@@ -55,7 +57,7 @@ public class DateTypePersistenceTest {
 
 			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
-						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp " 
+						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp "
 						+ "FROM table_with_date_types")) {
 					assertTrue(rs.next());
 					assertEquals(getDate("24/01/2012 23:12:48"), rs.getTimestamp("nonAnnotatedDate"));
@@ -71,7 +73,7 @@ public class DateTypePersistenceTest {
 	}
 
 	@Test
-	public void persistNullDateTypes() throws SQLException, IOException {
+	public void persistNullDateTypes() throws JFleetException, SQLException, IOException {
 		EntityWithDateTypes entity = new EntityWithDateTypes();
 		entity.setNonAnnotatedDate(null);
 		entity.setDate(null);
@@ -89,9 +91,9 @@ public class DateTypePersistenceTest {
 			SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
 			insert.insertAll(conn, list);
 
-			try (Statement stmt = (Statement) conn.createStatement()) {
+			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
-						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp " 
+						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp "
 						+ "FROM table_with_date_types")) {
 					assertTrue(rs.next());
 					assertEquals(null, rs.getTimestamp("nonAnnotatedDate"));

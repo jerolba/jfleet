@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
 import org.jfleet.MySqlTestConnectionProvider;
 import org.jfleet.mysql.LoadDataBulkInsert;
 
@@ -48,7 +49,7 @@ public class CitiBikeNycStreaming {
         reader.forEachCsvInZip(trips -> {
             try {
                 bulkInsert.insertAll(connection, trips);
-            } catch (SQLException e) {
+            } catch (JFleetException e) {
                 e.printStackTrace();
             }
         });

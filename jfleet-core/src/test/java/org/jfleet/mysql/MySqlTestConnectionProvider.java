@@ -17,7 +17,7 @@ package org.jfleet.mysql;
 
 import java.io.IOException;
 
-import org.jfleet.DataBaseTestConnectionProvider;
+import org.jfleet.util.DataBaseTestConnectionProvider;
 
 public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
 

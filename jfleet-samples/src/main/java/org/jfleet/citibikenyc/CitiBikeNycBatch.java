@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
 import org.jfleet.MySqlTestConnectionProvider;
 import org.jfleet.mysql.LoadDataBulkInsert;
 
@@ -37,7 +38,7 @@ import org.jfleet.mysql.LoadDataBulkInsert;
  */
 public class CitiBikeNycBatch {
 
-	public static void main(String[] args) throws IOException, SQLException {
+	public static void main(String[] args) throws JFleetException, IOException, SQLException {
 		MySqlTestConnectionProvider connectionSuplier = new MySqlTestConnectionProvider();
 		Connection connection = connectionSuplier.get();
 

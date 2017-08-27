@@ -13,11 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.common.BaseTypeSerializer;
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+public class PostgrestTypeSerializer extends BaseTypeSerializer{
 
+    public PostgrestTypeSerializer() {
+        super();
+        add(FieldTypeEnum.BOOLEAN, FROM_BOOLEAN);
+    }
+
+    private static final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "true" : "false";
 
 }

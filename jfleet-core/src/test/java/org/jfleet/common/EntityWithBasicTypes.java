@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.common;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

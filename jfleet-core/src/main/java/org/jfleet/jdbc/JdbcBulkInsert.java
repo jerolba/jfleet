@@ -32,7 +32,9 @@ import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
+import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
+import org.jfleet.WrappedException;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
@@ -80,16 +82,20 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     @Override
-    public void insertAll(Connection conn, Stream<T> stream) throws SQLException {
-        conn.setAutoCommit(false);
-        try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-            BatchInsert statementCount = new BatchInsert(conn, pstmt);
-            stream.forEach(statementCount::add);
-            statementCount.finish();
-        } catch (WrappedSQLException e) {
-            throw e.getSQLException();
-        } finally {
-            conn.setAutoCommit(true);
+    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+        try {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                BatchInsert statementCount = new BatchInsert(conn, pstmt);
+                stream.forEach(statementCount::add);
+                statementCount.finish();
+            } catch (WrappedException e) {
+                e.rethrow();
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new JFleetException(e);
         }
     }
 
@@ -114,7 +120,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
                     count = 0;
                 }
             } catch (SQLException e) {
-                throw new WrappedSQLException(e);
+                throw new WrappedException(e);
             }
         }
 
@@ -184,19 +190,6 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             } else {
                 throw new RuntimeException("No type mapper for " + parameterObj.getClass());
             }
-        }
-    }
-
-    private static class WrappedSQLException extends RuntimeException {
-
-        private static final long serialVersionUID = 3733123280122720289L;
-
-        WrappedSQLException(SQLException e) {
-            super(e);
-        }
-
-        public SQLException getSQLException() {
-            return (SQLException) this.getCause();
         }
     }
 

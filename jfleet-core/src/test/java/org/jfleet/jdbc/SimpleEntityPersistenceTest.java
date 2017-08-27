@@ -23,94 +23,43 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
+import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.common.SimpleEntity;
 import org.jfleet.mysql.MySqlTestConnectionProvider;
-import org.jfleet.mysql.SqlUtil;
+import org.jfleet.util.SqlUtil;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SimpleEntityPersistenceTest {
 
-	private static Logger logger = LoggerFactory.getLogger(SimpleEntityPersistenceTest.class);
-	
-	@Entity
-	@Table(name = "simple_table")
-	public static class SimpleEntity {
+    @Test
+    public void canPersistCollectionOfEntities() throws JFleetException, SQLException, IOException {
+        int times = 1000;
 
-		private String name;
-		private boolean active;
-		private int age;
+        BulkInsert<SimpleEntity> insert = new JdbcBulkInsert<>(SimpleEntity.class);
+        Stream<SimpleEntity> stream = IntStream.range(0, times)
+                .mapToObj(i -> new SimpleEntity("name_" + i, i % 2 == 0, i));
 
-		public SimpleEntity(String name, boolean active, int age) {
-			this.name = name;
-			this.active = active;
-			this.age = age;
-		}
+        Supplier<Connection> connectionProvider = new MySqlTestConnectionProvider();
+        try (Connection conn = connectionProvider.get()) {
+            SqlUtil.createTableForEntity(conn, SimpleEntity.class);
+            insert.insertAll(conn, stream);
 
-		public String getName() {
-			return name;
-		}
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT name, active, age FROM simple_table ORDER BY age ASC")) {
+                    for (int i = 0; i < times; i++) {
+                        assertTrue(rs.next());
+                        assertEquals("name_" + i, rs.getString(1));
+                        assertEquals((i + 1) % 2, rs.getInt(2));
+                        assertEquals(i, rs.getInt(3));
+                    }
+                }
+            }
+        }
+    }
 
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public boolean isActive() {
-			return active;
-		}
-
-		public void setActive(boolean active) {
-			this.active = active;
-		}
-
-		public int getAge() {
-			return age;
-		}
-
-		public void setAge(int age) {
-			this.age = age;
-		}
-
-	}
-
-	@Test
-	public void canPersistCollectionOfEntities() throws SQLException, IOException {
-		int times = 1000;
-
-		JdbcBulkInsert<SimpleEntity> insert = new JdbcBulkInsert<>(SimpleEntity.class);
-		Stream<SimpleEntity> stream = IntStream.range(0, times).mapToObj(i -> new SimpleEntity("name_" + leftPad(i), i % 2 == 0, i));
-
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
-			SqlUtil.createTableForEntity(conn, SimpleEntity.class);
-			long before = System.nanoTime();
-			insert.insertAll(conn, stream);
-			logger.info("Time "+((System.nanoTime()-before))/1_000_000+" ms");
-
-			try (Statement stmt = conn.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery("SELECT name, active, age FROM simple_table ORDER BY name ASC")) {
-					for (int i = 0; i < times; i++) {
-						assertTrue(rs.next());
-						assertEquals("name_"+leftPad(i),rs.getString(1));
-						assertEquals((i+1) % 2,rs.getInt(2));
-						assertEquals(i,rs.getInt(3));
-					}
-				}
-			}
-		}
-	}
-	
-	private String leftPad(int i) {
-		String str = Integer.toString(i);
-		while(str.length()<10) {
-			str="0"+str;
-		}
-		return str;
-	}
 }

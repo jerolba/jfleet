@@ -33,9 +33,8 @@ import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.jfleet.mysql.LoadDataBulkInsert;
-import org.jfleet.mysql.MySqlTestConnectionProvider;
-import org.jfleet.mysql.SqlUtil;
+import org.jfleet.JFleetException;
+import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
 public class EncodingTest {
@@ -63,7 +62,7 @@ public class EncodingTest {
 	}
 
 	@Test
-	public void persistAllTypes() throws SQLException, IOException {
+	public void persistAllTypes() throws JFleetException, SQLException, IOException {
 		List<EncodingUtf8Entity> values = fetchTestValues();
 		LoadDataBulkInsert<EncodingUtf8Entity> insert = new LoadDataBulkInsert<>(EncodingUtf8Entity.class);
 
