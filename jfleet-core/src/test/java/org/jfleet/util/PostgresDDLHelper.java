@@ -28,14 +28,14 @@ public class PostgresDDLHelper implements DDLHelper {
     @Override
     public String dropTableSentence(EntityInfo entityInfo) {
         StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ");
-        sb.append('"').append(entityInfo.getTableName()).append('"');
+        sb.append(entityInfo.getTableName());
         return sb.toString();
     }
 
     @Override
     public String createTableSentence(EntityInfo entityInfo) {
         StringBuilder sb = new StringBuilder("CREATE TABLE ");
-        sb.append('"').append(entityInfo.getTableName()).append('"');
+        sb.append(entityInfo.getTableName());
         sb.append(" (");
         List<FieldInfo> fields = entityInfo.getFields();
         for (int i = 0; i < fields.size(); i++) {
@@ -44,7 +44,7 @@ public class PostgresDDLHelper implements DDLHelper {
             if (dbType == null) {
                 throw new RuntimeException("Type not found for " + fieldInfo.getFieldType().getFieldType().name());
             }
-            sb.append('"').append(fieldInfo.getColumnName()).append("\" ");
+            sb.append(fieldInfo.getColumnName()).append(" ");
             sb.append(dbType);
             if (fieldInfo.getFieldType().isPrimitive()) {
                 sb.append(" NOT NULL");
@@ -87,7 +87,7 @@ public class PostgresDDLHelper implements DDLHelper {
         case TIME:
             return "TIME";
         case TIMESTAMP:
-            return "DATETIME";
+            return "TIMESTAMPTZ";
         }
         return null;
 

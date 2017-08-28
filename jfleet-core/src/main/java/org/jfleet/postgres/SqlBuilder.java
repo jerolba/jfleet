@@ -37,7 +37,7 @@ public class SqlBuilder {
     }
 
     public void addCopyTable() {
-        sb.append("COPY \"").append(entityInfo.getTableName()).append("\" ");
+        sb.append("COPY ").append(entityInfo.getTableName()).append(" ");
     }
 
     public void addColumnNames() {
@@ -45,7 +45,7 @@ public class SqlBuilder {
         List<FieldInfo> fields = entityInfo.getFields();
         for (int i = 0; i < fields.size(); i++) {
             FieldInfo fieldInfo = fields.get(i);
-            sb.append('"').append(fieldInfo.getColumnName()).append('"');
+            sb.append(fieldInfo.getColumnName());
             if (i < fields.size() - 1) {
                 sb.append(", ");
             }
