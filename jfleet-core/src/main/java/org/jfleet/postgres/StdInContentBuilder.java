@@ -16,7 +16,7 @@
 package org.jfleet.postgres;
 
 import static org.jfleet.postgres.PgCopyConstants.DELIMITER_CHAR;
-import static org.jfleet.postgres.PgCopyConstants.EOL_CHAR;
+import static org.jfleet.postgres.PgCopyConstants.NEWLINE_CHAR;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class StdInContentBuilder {
                 sb.append(DELIMITER_CHAR);
             }
         }
-        sb.append(EOL_CHAR);
+        sb.append(NEWLINE_CHAR);
         records++;
     }
 

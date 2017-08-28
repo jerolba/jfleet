@@ -55,7 +55,8 @@ public class PgCopyEscaper {
     public boolean isEscapable(char character) {
         switch (character) {
         case PgCopyConstants.DELIMITER_CHAR:
-        case PgCopyConstants.EOL_CHAR:
+        case PgCopyConstants.NEWLINE_CHAR:
+        case PgCopyConstants.CARRIAGE_RETURN_CHAR:
         case PgCopyConstants.ESCAPE_CHAR:
             return true;
         default:
