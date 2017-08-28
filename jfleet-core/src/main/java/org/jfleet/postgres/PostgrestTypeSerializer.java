@@ -15,6 +15,8 @@
  */
 package org.jfleet.postgres;
 
+import java.text.SimpleDateFormat;
+
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.common.BaseTypeSerializer;
 
@@ -23,8 +25,16 @@ public class PostgrestTypeSerializer extends BaseTypeSerializer{
     public PostgrestTypeSerializer() {
         super();
         add(FieldTypeEnum.BOOLEAN, FROM_BOOLEAN);
+        add(FieldTypeEnum.TIMESTAMP, FROM_TIMESTAMP);
     }
 
     private static final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "true" : "false";
 
+    private static final Mapper FROM_TIMESTAMP = (obj) -> {
+        if (obj instanceof java.util.Date) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            return sdf.format((java.util.Date) obj);
+        }
+        return null;
+    };
 }
