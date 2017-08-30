@@ -19,5 +19,4 @@ import org.jfleet.common.BaseTypeSerializer;
 
 public class MySqlTypeSerializer extends BaseTypeSerializer{
 
-
 }

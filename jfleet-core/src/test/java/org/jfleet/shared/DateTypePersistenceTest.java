@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,16 +25,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.stream.Stream;
 
+import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.common.EntityWithDateTypes;
+import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
-public class DateTypePersistenceTest {
+public class DateTypePersistenceTest extends AllDatabasesBaseTest {
 
 	@Test
 	public void persistAllDateTypes() throws JFleetException, SQLException, IOException {
@@ -47,13 +47,11 @@ public class DateTypePersistenceTest {
 		entity.setSqlTime(java.sql.Time.valueOf("09:13:23"));
 		entity.setSqlTimeStamp(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"));
 
-		LoadDataBulkInsert<EntityWithDateTypes> insert = new LoadDataBulkInsert<>(EntityWithDateTypes.class);
-		List<EntityWithDateTypes> list = Arrays.asList(entity);
+		BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
+		try (Connection conn = database.getConnection()) {
 			SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
-			insert.insertAll(conn, list);
+			insert.insertAll(conn, Stream.of(entity));
 
 			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
@@ -83,13 +81,11 @@ public class DateTypePersistenceTest {
 		entity.setSqlTime(null);
 		entity.setSqlTimeStamp(null);
 
-		LoadDataBulkInsert<EntityWithDateTypes> insert = new LoadDataBulkInsert<>(EntityWithDateTypes.class);
-		List<EntityWithDateTypes> list = Arrays.asList(entity);
+		BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
+		try (Connection conn = database.getConnection()) {
 			SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
-			insert.insertAll(conn, list);
+			insert.insertAll(conn, Stream.of(entity));
 
 			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "

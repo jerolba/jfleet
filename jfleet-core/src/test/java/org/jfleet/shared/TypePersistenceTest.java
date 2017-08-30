@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,15 +25,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
+import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.common.EntityWithBasicTypes;
+import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
-public class TypePersistenceTest {
+public class TypePersistenceTest extends AllDatabasesBaseTest {
 
 	@Test
 	public void persistAllTypes() throws JFleetException, SQLException, IOException {
@@ -50,13 +50,11 @@ public class TypePersistenceTest {
 		entity.setBigInteger(new BigInteger("1234567890"));
 		entity.setString("some string");
 
-		LoadDataBulkInsert<EntityWithBasicTypes> insert = new LoadDataBulkInsert<>(EntityWithBasicTypes.class);
-		List<EntityWithBasicTypes> list = Arrays.asList(entity);
+		BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
 
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
+		try (Connection conn = database.getConnection()) {
 			SqlUtil.createTableForEntity(conn, EntityWithBasicTypes.class);
-			insert.insertAll(conn, list);
+			insert.insertAll(conn, Stream.of(entity));
 
 			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
@@ -64,7 +62,7 @@ public class TypePersistenceTest {
 						+ " bigDecimal, bigInteger"
 						+ " FROM table_with_basic_types")) {
 					assertTrue(rs.next());
-					assertEquals(1, rs.getInt("booleanObject"));
+					assertEquals(true, rs.getBoolean("booleanObject"));
 					assertEquals(42, rs.getByte("byteObject"));
 					assertEquals("A", rs.getString("charObject"));
 					assertEquals(1.2, rs.getDouble("doubleObject"), 0.001);
@@ -93,20 +91,18 @@ public class TypePersistenceTest {
 		entity.setShortObject(null);
 		entity.setString(null);
 
-		LoadDataBulkInsert<EntityWithBasicTypes> insert = new LoadDataBulkInsert<>(EntityWithBasicTypes.class);
-		List<EntityWithBasicTypes> list = Arrays.asList(entity);
+		BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
 
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
+		try (Connection conn = database.getConnection()) {
 			SqlUtil.createTableForEntity(conn, EntityWithBasicTypes.class);
-			insert.insertAll(conn, list);
+			insert.insertAll(conn, Stream.of(entity));
 
 			try (Statement stmt = conn.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
 						+ " doubleObject, floatObject, intObject, longObject, shortObject, string"
 						+ " FROM table_with_basic_types")) {
 					assertTrue(rs.next());
-					assertEquals(0, rs.getInt("booleanObject"));
+					assertEquals(false, rs.getBoolean("booleanObject"));
 					assertTrue(rs.wasNull());
 					assertEquals(0, rs.getByte("byteObject"));
 					assertTrue(rs.wasNull());

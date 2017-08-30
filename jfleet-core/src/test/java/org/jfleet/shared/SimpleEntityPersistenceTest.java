@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,28 +23,55 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.common.SimpleEntity;
 import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
-public class SimpleEntityPersistenceTest {
+public class SimpleEntityPersistenceTest extends AllDatabasesBaseTest {
+
+    @Entity
+    @Table(name = "simple_table")
+    public class SimpleEntity {
+
+        private String name;
+        private boolean active;
+        private int age;
+
+        public SimpleEntity(String name, boolean active, int age) {
+            this.name = name;
+            this.active = active;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+    }
 
     @Test
     public void canPersistCollectionOfEntities() throws JFleetException, SQLException, IOException {
         int times = 1000;
-
-        BulkInsert<SimpleEntity> insert = new LoadDataBulkInsert<>(SimpleEntity.class);
+        BulkInsert<SimpleEntity> insert = database.getBulkInsert(SimpleEntity.class);
         Stream<SimpleEntity> stream = IntStream.range(0, times)
                 .mapToObj(i -> new SimpleEntity("name_" + i, i % 2 == 0, i));
 
-        Supplier<Connection> connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
+        try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, SimpleEntity.class);
             insert.insertAll(conn, stream);
 
@@ -52,9 +79,9 @@ public class SimpleEntityPersistenceTest {
                 try (ResultSet rs = stmt.executeQuery("SELECT name, active, age FROM simple_table ORDER BY age ASC")) {
                     for (int i = 0; i < times; i++) {
                         assertTrue(rs.next());
-                        assertEquals("name_" + i, rs.getString(1));
-                        assertEquals((i + 1) % 2, rs.getInt(2));
-                        assertEquals(i, rs.getInt(3));
+                        assertEquals("name_" + i, rs.getString("name"));
+                        assertEquals(i % 2 == 0, rs.getBoolean("active"));
+                        assertEquals(i, rs.getInt("age"));
                     }
                 }
             }

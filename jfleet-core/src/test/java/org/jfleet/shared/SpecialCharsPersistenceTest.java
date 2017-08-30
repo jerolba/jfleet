@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,11 +28,12 @@ import java.util.stream.Stream;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
-public class SpecialCharsPersistenceTest {
+public class SpecialCharsPersistenceTest extends AllDatabasesBaseTest {
 
 	@Entity
 	@Table(name ="table_with_strings")
@@ -61,10 +62,9 @@ public class SpecialCharsPersistenceTest {
 		entity.setFoo("Some text");
 		entity.setBar(text);
 
-		LoadDataBulkInsert<EnityWithStrings> insert = new LoadDataBulkInsert<>(EnityWithStrings.class);
+		BulkInsert<EnityWithStrings> insert = database.getBulkInsert(EnityWithStrings.class);
 
-		MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-		try (Connection conn = connectionProvider.get()) {
+		try (Connection conn = database.getConnection()) {
 			SqlUtil.createTableForEntity(conn, EnityWithStrings.class);
 			insert.insertAll(conn, Stream.of(entity));
 
