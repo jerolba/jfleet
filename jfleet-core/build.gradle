@@ -1,3 +1,7 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
 apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'checkstyle'
@@ -15,14 +19,45 @@ dependencies {
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-        		groupId 'org.jfleet'
-            artifactId 'jfleet'
-            version '0.5'
             from components.java
+            artifact sourceJar
+            artifact javadocJar
+            artifactId 'jfleet'
+            version version
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    publications = ['mavenJava'] 
+    pkg {
+        repo = 'JFleet'
+        name = 'jfleet'
+        desc = 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
+        websiteUrl = 'https://github.com/jerolba/jfleet'
+        issueTrackerUrl = 'https://github.com/jerolba/jfleet/issues'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/jerolba/jfleet.git'
+        labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
+        version {
+            name = version
+            desc = 'First release with MySql and Postgres'
+            released  = new Date()
         }
     }
 }
