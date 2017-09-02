@@ -23,7 +23,7 @@ public enum Dialect {
 
     private DDLHelper ddlHelper;
 
-    private Dialect(DDLHelper ddlHelper) {
+    Dialect(DDLHelper ddlHelper) {
         this.ddlHelper = ddlHelper;
     }
 

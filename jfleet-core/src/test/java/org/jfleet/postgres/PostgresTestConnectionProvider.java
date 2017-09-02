@@ -21,8 +21,8 @@ import org.jfleet.util.DataBaseTestConnectionProvider;
 
 public class PostgresTestConnectionProvider extends DataBaseTestConnectionProvider {
 
-	public PostgresTestConnectionProvider() throws IOException {
-		super("postgres-test.properties");
-	}
+    public PostgresTestConnectionProvider() throws IOException {
+        super("postgres-test.properties");
+    }
 
 }

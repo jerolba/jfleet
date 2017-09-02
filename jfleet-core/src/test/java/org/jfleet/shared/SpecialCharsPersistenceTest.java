@@ -35,67 +35,70 @@ import org.junit.Test;
 
 public class SpecialCharsPersistenceTest extends AllDatabasesBaseTest {
 
-	@Entity
-	@Table(name ="table_with_strings")
-	class EnityWithStrings {
+    @Entity
+    @Table(name = "table_with_strings")
+    class EnityWithStrings {
 
-		private String foo;
-		private String bar;
+        private String foo;
+        private String bar;
 
-		public String getFoo() {
-			return foo;
-		}
-		public void setFoo(String foo) {
-			this.foo = foo;
-		}
-		public String getBar() {
-			return bar;
-		}
-		public void setBar(String bar) {
-			this.bar = bar;
-		}
+        public String getFoo() {
+            return foo;
+        }
 
-	}
+        public void setFoo(String foo) {
+            this.foo = foo;
+        }
 
-	public void testWithString(String text) throws JFleetException, SQLException, IOException {
-		EnityWithStrings entity = new EnityWithStrings();
-		entity.setFoo("Some text");
-		entity.setBar(text);
+        public String getBar() {
+            return bar;
+        }
 
-		BulkInsert<EnityWithStrings> insert = database.getBulkInsert(EnityWithStrings.class);
+        public void setBar(String bar) {
+            this.bar = bar;
+        }
 
-		try (Connection conn = database.getConnection()) {
-			SqlUtil.createTableForEntity(conn, EnityWithStrings.class);
-			insert.insertAll(conn, Stream.of(entity));
+    }
 
-			try (Statement stmt = conn.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery("SELECT foo, bar FROM table_with_strings")) {
-					assertTrue(rs.next());
-					assertEquals("Some text", rs.getString("foo"));
-					assertEquals(text, rs.getString("bar"));
-				}
-			}
-		}
-	}
+    public void testWithString(String text) throws JFleetException, SQLException, IOException {
+        EnityWithStrings entity = new EnityWithStrings();
+        entity.setFoo("Some text");
+        entity.setBar(text);
 
-	@Test
-	public void persistTab() throws JFleetException, SQLException, IOException {
-		testWithString("A text with a tab \t char inside \t");
-	}
+        BulkInsert<EnityWithStrings> insert = database.getBulkInsert(EnityWithStrings.class);
 
-	@Test
-	public void persistReturn() throws JFleetException, SQLException, IOException {
-		testWithString("A text with a return \n char \n");
-		testWithString("A text with a return \n char \n\r");
-	}
+        try (Connection conn = database.getConnection()) {
+            SqlUtil.createTableForEntity(conn, EnityWithStrings.class);
+            insert.insertAll(conn, Stream.of(entity));
 
-	@Test
-	public void persistWithEscapeChar() throws JFleetException, SQLException, IOException {
-		testWithString("A text with \\ a escape \\");
-	}
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT foo, bar FROM table_with_strings")) {
+                    assertTrue(rs.next());
+                    assertEquals("Some text", rs.getString("foo"));
+                    assertEquals(text, rs.getString("bar"));
+                }
+            }
+        }
+    }
 
-	@Test
-	public void persistMixChars() throws JFleetException, SQLException, IOException {
-		testWithString("A text all \\ types \t of \n escape chars\n\r");
-	}
+    @Test
+    public void persistTab() throws JFleetException, SQLException, IOException {
+        testWithString("A text with a tab \t char inside \t");
+    }
+
+    @Test
+    public void persistReturn() throws JFleetException, SQLException, IOException {
+        testWithString("A text with a return \n char \n");
+        testWithString("A text with a return \n char \n\r");
+    }
+
+    @Test
+    public void persistWithEscapeChar() throws JFleetException, SQLException, IOException {
+        testWithString("A text with \\ a escape \\");
+    }
+
+    @Test
+    public void persistMixChars() throws JFleetException, SQLException, IOException {
+        testWithString("A text all \\ types \t of \n escape chars\n\r");
+    }
 }

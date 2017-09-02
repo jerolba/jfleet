@@ -26,71 +26,71 @@ import javax.persistence.TemporalType;
 @Table(name = "table_with_date_types")
 public class EntityWithDateTypes {
 
-	private Date nonAnnotatedDate;
-	@Temporal(TemporalType.DATE)
-	private Date date;
-	@Temporal(TemporalType.TIME)
-	private Date time;
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date timeStamp;
-	private java.sql.Date sqlDate;
-	private java.sql.Time sqlTime;
-	private java.sql.Timestamp sqlTimeStamp;
+    private Date nonAnnotatedDate;
+    @Temporal(TemporalType.DATE)
+    private Date date;
+    @Temporal(TemporalType.TIME)
+    private Date time;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeStamp;
+    private java.sql.Date sqlDate;
+    private java.sql.Time sqlTime;
+    private java.sql.Timestamp sqlTimeStamp;
 
-	public Date getNonAnnotatedDate() {
-		return nonAnnotatedDate;
-	}
+    public Date getNonAnnotatedDate() {
+        return nonAnnotatedDate;
+    }
 
-	public void setNonAnnotatedDate(Date nonAnnotatedDate) {
-		this.nonAnnotatedDate = nonAnnotatedDate;
-	}
+    public void setNonAnnotatedDate(Date nonAnnotatedDate) {
+        this.nonAnnotatedDate = nonAnnotatedDate;
+    }
 
-	public Date getDate() {
-		return date;
-	}
+    public Date getDate() {
+        return date;
+    }
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
-	public Date getTime() {
-		return time;
-	}
+    public Date getTime() {
+        return time;
+    }
 
-	public void setTime(Date time) {
-		this.time = time;
-	}
+    public void setTime(Date time) {
+        this.time = time;
+    }
 
-	public Date getTimeStamp() {
-		return timeStamp;
-	}
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
 
-	public void setTimeStamp(Date timeStamp) {
-		this.timeStamp = timeStamp;
-	}
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 
-	public java.sql.Date getSqlDate() {
-		return sqlDate;
-	}
+    public java.sql.Date getSqlDate() {
+        return sqlDate;
+    }
 
-	public void setSqlDate(java.sql.Date sqlDate) {
-		this.sqlDate = sqlDate;
-	}
+    public void setSqlDate(java.sql.Date sqlDate) {
+        this.sqlDate = sqlDate;
+    }
 
-	public java.sql.Time getSqlTime() {
-		return sqlTime;
-	}
+    public java.sql.Time getSqlTime() {
+        return sqlTime;
+    }
 
-	public void setSqlTime(java.sql.Time sqlTime) {
-		this.sqlTime = sqlTime;
-	}
+    public void setSqlTime(java.sql.Time sqlTime) {
+        this.sqlTime = sqlTime;
+    }
 
-	public java.sql.Timestamp getSqlTimeStamp() {
-		return sqlTimeStamp;
-	}
+    public java.sql.Timestamp getSqlTimeStamp() {
+        return sqlTimeStamp;
+    }
 
-	public void setSqlTimeStamp(java.sql.Timestamp sqlTimeStamp) {
-		this.sqlTimeStamp = sqlTimeStamp;
-	}
+    public void setSqlTimeStamp(java.sql.Timestamp sqlTimeStamp) {
+        this.sqlTimeStamp = sqlTimeStamp;
+    }
 
 }

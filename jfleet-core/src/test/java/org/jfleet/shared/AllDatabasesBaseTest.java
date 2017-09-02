@@ -33,10 +33,10 @@ public abstract class AllDatabasesBaseTest {
     @Parameters(name = "Database {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
-               {"MySql", new MySqlDatabase()},
-               {"Postgres", new PostgresDatabase()},
-               {"Jdbc", new JdbcPostgresDatabase()}
-               });
+            {"MySql", new MySqlDatabase()},
+            {"Postgres", new PostgresDatabase()},
+            {"Jdbc", new JdbcPostgresDatabase()}
+        });
     }
 
     @Parameter(0)

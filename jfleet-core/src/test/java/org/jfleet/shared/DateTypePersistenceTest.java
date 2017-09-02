@@ -36,89 +36,87 @@ import org.junit.Test;
 
 public class DateTypePersistenceTest extends AllDatabasesBaseTest {
 
-	@Test
-	public void persistAllDateTypes() throws JFleetException, SQLException, IOException {
-		EntityWithDateTypes entity = new EntityWithDateTypes();
-		entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));
-		entity.setDate(getDate("24/01/2012 23:12:48"));
-		entity.setTime(getDate("24/01/2012 23:12:48"));
-		entity.setTimeStamp(getDate("24/01/2012 23:12:48"));
-		entity.setSqlDate(java.sql.Date.valueOf("2017-08-02"));
-		entity.setSqlTime(java.sql.Time.valueOf("09:13:23"));
-		entity.setSqlTimeStamp(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"));
+    @Test
+    public void persistAllDateTypes() throws JFleetException, SQLException, IOException {
+        EntityWithDateTypes entity = new EntityWithDateTypes();
+        entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));
+        entity.setDate(getDate("24/01/2012 23:12:48"));
+        entity.setTime(getDate("24/01/2012 23:12:48"));
+        entity.setTimeStamp(getDate("24/01/2012 23:12:48"));
+        entity.setSqlDate(java.sql.Date.valueOf("2017-08-02"));
+        entity.setSqlTime(java.sql.Time.valueOf("09:13:23"));
+        entity.setSqlTimeStamp(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"));
 
-		BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
+        BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-		try (Connection conn = database.getConnection()) {
-			SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
-			insert.insertAll(conn, Stream.of(entity));
+        try (Connection conn = database.getConnection()) {
+            SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
+            insert.insertAll(conn, Stream.of(entity));
 
-			try (Statement stmt = conn.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
-						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp "
-						+ "FROM table_with_date_types")) {
-					assertTrue(rs.next());
-					assertEquals(getDate("24/01/2012 23:12:48"), rs.getTimestamp("nonAnnotatedDate"));
-					assertEquals(java.sql.Date.valueOf("2012-1-24"), rs.getDate("date"));
-					assertEquals(java.sql.Time.valueOf("23:12:48"), rs.getTime("time"));
-					assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48"), rs.getTimestamp("timeStamp"));
-					assertEquals(java.sql.Date.valueOf("2017-08-02"), rs.getDate("sqlDate"));
-					assertEquals(java.sql.Time.valueOf("09:13:23"), rs.getTime("sqlTime"));
-					assertEquals(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"), rs.getTimestamp("sqlTimeStamp"));
-				}
-			}
-		}
-	}
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
+                        + "timeStamp, sqlDate, sqlTime, sqlTimeStamp " + "FROM table_with_date_types")) {
+                    assertTrue(rs.next());
+                    assertEquals(getDate("24/01/2012 23:12:48"), rs.getTimestamp("nonAnnotatedDate"));
+                    assertEquals(java.sql.Date.valueOf("2012-1-24"), rs.getDate("date"));
+                    assertEquals(java.sql.Time.valueOf("23:12:48"), rs.getTime("time"));
+                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48"), rs.getTimestamp("timeStamp"));
+                    assertEquals(java.sql.Date.valueOf("2017-08-02"), rs.getDate("sqlDate"));
+                    assertEquals(java.sql.Time.valueOf("09:13:23"), rs.getTime("sqlTime"));
+                    assertEquals(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"), rs.getTimestamp("sqlTimeStamp"));
+                }
+            }
+        }
+    }
 
-	@Test
-	public void persistNullDateTypes() throws JFleetException, SQLException, IOException {
-		EntityWithDateTypes entity = new EntityWithDateTypes();
-		entity.setNonAnnotatedDate(null);
-		entity.setDate(null);
-		entity.setTime(null);
-		entity.setTimeStamp(null);
-		entity.setSqlDate(null);
-		entity.setSqlTime(null);
-		entity.setSqlTimeStamp(null);
+    @Test
+    public void persistNullDateTypes() throws JFleetException, SQLException, IOException {
+        EntityWithDateTypes entity = new EntityWithDateTypes();
+        entity.setNonAnnotatedDate(null);
+        entity.setDate(null);
+        entity.setTime(null);
+        entity.setTimeStamp(null);
+        entity.setSqlDate(null);
+        entity.setSqlTime(null);
+        entity.setSqlTimeStamp(null);
 
-		BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
+        BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-		try (Connection conn = database.getConnection()) {
-			SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
-			insert.insertAll(conn, Stream.of(entity));
+        try (Connection conn = database.getConnection()) {
+            SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
+            insert.insertAll(conn, Stream.of(entity));
 
-			try (Statement stmt = conn.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
-						+ "timeStamp, sqlDate, sqlTime, sqlTimeStamp "
-						+ "FROM table_with_date_types")) {
-					assertTrue(rs.next());
-					assertEquals(null, rs.getTimestamp("nonAnnotatedDate"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getDate("date"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getTime("time"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getTimestamp("timeStamp"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getDate("sqlDate"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getTime("sqlTime"));
-					assertTrue(rs.wasNull());
-					assertEquals(null, rs.getTimestamp("sqlTimeStamp"));
-					assertTrue(rs.wasNull());
-				}
-			}
-		}
-	}
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
+                        + "timeStamp, sqlDate, sqlTime, sqlTimeStamp " + "FROM table_with_date_types")) {
+                    assertTrue(rs.next());
+                    assertEquals(null, rs.getTimestamp("nonAnnotatedDate"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getDate("date"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getTime("time"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getTimestamp("timeStamp"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getDate("sqlDate"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getTime("sqlTime"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getTimestamp("sqlTimeStamp"));
+                    assertTrue(rs.wasNull());
+                }
+            }
+        }
+    }
 
-	private Date getDate(String str) {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		try {
-			return sdf.parse(str);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private Date getDate(String str) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        try {
+            return sdf.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

@@ -63,7 +63,7 @@ public class StdInContentBuilder {
             } else {
                 sb.append("\\N");
             }
-            if (i<fields.size()-1) {
+            if (i < fields.size() - 1) {
                 sb.append(DELIMITER_CHAR);
             }
         }

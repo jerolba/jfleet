@@ -63,7 +63,7 @@ public class PostgresDDLHelper implements DDLHelper {
         case BOOLEAN:
             return "BOOLEAN";
         case BYTE:
-            return "SMALLINT"; //No byte type found
+            return "SMALLINT"; // No byte type found
         case CHAR:
             return "CHAR";
         case DOUBLE:

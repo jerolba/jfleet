@@ -25,104 +25,104 @@ import javax.persistence.Table;
 @Table(name = "table_with_basic_types")
 public class EntityWithBasicTypes {
 
-	private Boolean booleanObject;
-	private Byte byteObject;
-	private Short shortObject;
-	private Integer intObject;
-	private Long longObject;
-	private Character charObject;
-	private Float floatObject;
-	private Double doubleObject;
-	private BigDecimal bigDecimal;
-	private BigInteger bigInteger;
-	private String string;
+    private Boolean booleanObject;
+    private Byte byteObject;
+    private Short shortObject;
+    private Integer intObject;
+    private Long longObject;
+    private Character charObject;
+    private Float floatObject;
+    private Double doubleObject;
+    private BigDecimal bigDecimal;
+    private BigInteger bigInteger;
+    private String string;
 
-	public Boolean getBooleanObject() {
-		return booleanObject;
-	}
+    public Boolean getBooleanObject() {
+        return booleanObject;
+    }
 
-	public void setBooleanObject(Boolean booleanObject) {
-		this.booleanObject = booleanObject;
-	}
+    public void setBooleanObject(Boolean booleanObject) {
+        this.booleanObject = booleanObject;
+    }
 
-	public Byte getByteObject() {
-		return byteObject;
-	}
+    public Byte getByteObject() {
+        return byteObject;
+    }
 
-	public void setByteObject(Byte byteObject) {
-		this.byteObject = byteObject;
-	}
+    public void setByteObject(Byte byteObject) {
+        this.byteObject = byteObject;
+    }
 
-	public Short getShortObject() {
-		return shortObject;
-	}
+    public Short getShortObject() {
+        return shortObject;
+    }
 
-	public void setShortObject(Short shortObject) {
-		this.shortObject = shortObject;
-	}
+    public void setShortObject(Short shortObject) {
+        this.shortObject = shortObject;
+    }
 
-	public Integer getIntObject() {
-		return intObject;
-	}
+    public Integer getIntObject() {
+        return intObject;
+    }
 
-	public void setIntObject(Integer intObject) {
-		this.intObject = intObject;
-	}
+    public void setIntObject(Integer intObject) {
+        this.intObject = intObject;
+    }
 
-	public Long getLongObject() {
-		return longObject;
-	}
+    public Long getLongObject() {
+        return longObject;
+    }
 
-	public void setLongObject(Long longObject) {
-		this.longObject = longObject;
-	}
+    public void setLongObject(Long longObject) {
+        this.longObject = longObject;
+    }
 
-	public Character getCharObject() {
-		return charObject;
-	}
+    public Character getCharObject() {
+        return charObject;
+    }
 
-	public void setCharObject(Character charObject) {
-		this.charObject = charObject;
-	}
+    public void setCharObject(Character charObject) {
+        this.charObject = charObject;
+    }
 
-	public Float getFloatObject() {
-		return floatObject;
-	}
+    public Float getFloatObject() {
+        return floatObject;
+    }
 
-	public void setFloatObject(Float floatObject) {
-		this.floatObject = floatObject;
-	}
+    public void setFloatObject(Float floatObject) {
+        this.floatObject = floatObject;
+    }
 
-	public Double getDoubleObject() {
-		return doubleObject;
-	}
+    public Double getDoubleObject() {
+        return doubleObject;
+    }
 
-	public void setDoubleObject(Double doubleObject) {
-		this.doubleObject = doubleObject;
-	}
+    public void setDoubleObject(Double doubleObject) {
+        this.doubleObject = doubleObject;
+    }
 
-	public BigDecimal getBigDecimal() {
-		return bigDecimal;
-	}
+    public BigDecimal getBigDecimal() {
+        return bigDecimal;
+    }
 
-	public void setBigDecimal(BigDecimal bigDecimal) {
-		this.bigDecimal = bigDecimal;
-	}
+    public void setBigDecimal(BigDecimal bigDecimal) {
+        this.bigDecimal = bigDecimal;
+    }
 
-	public BigInteger getBigInteger() {
-		return bigInteger;
-	}
+    public BigInteger getBigInteger() {
+        return bigInteger;
+    }
 
-	public void setBigInteger(BigInteger bigInteger) {
-		this.bigInteger = bigInteger;
-	}
+    public void setBigInteger(BigInteger bigInteger) {
+        this.bigInteger = bigInteger;
+    }
 
-	public String getString() {
-		return string;
-	}
+    public String getString() {
+        return string;
+    }
 
-	public void setString(String string) {
-		this.string = string;
-	}
+    public void setString(String string) {
+        this.string = string;
+    }
 
 }

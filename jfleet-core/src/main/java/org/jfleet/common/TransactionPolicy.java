@@ -20,7 +20,7 @@ import java.sql.SQLException;
 
 public interface TransactionPolicy {
 
-    public static TransactionPolicy getTransactionPolicy(Connection connection, boolean longTransaction)
+    static TransactionPolicy getTransactionPolicy(Connection connection, boolean longTransaction)
             throws SQLException {
         if (longTransaction) {
             return new LongTransaction();
@@ -28,18 +28,18 @@ public interface TransactionPolicy {
         return new BatchTransaction(connection);
     }
 
-    public default void commit() throws SQLException {
+    default void commit() throws SQLException {
     }
 
-    public default void close() throws SQLException {
-
-    }
-
-    public static class LongTransaction implements TransactionPolicy {
+    default void close() throws SQLException {
 
     }
 
-    public static class BatchTransaction implements TransactionPolicy {
+    class LongTransaction implements TransactionPolicy {
+
+    }
+
+    class BatchTransaction implements TransactionPolicy {
 
         private final Connection connection;
         private final boolean autocommit;

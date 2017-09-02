@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.common.BaseTypeSerializer;
 
-public class PostgrestTypeSerializer extends BaseTypeSerializer{
+public class PostgrestTypeSerializer extends BaseTypeSerializer {
 
     public PostgrestTypeSerializer() {
         super();

@@ -34,18 +34,18 @@ import org.postgresql.jdbc.PgConnection;
 
 public class ConnectionTest {
 
-	@Test
-	public void canConnectToTestDB() throws SQLException, IOException {
-		PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-		try (java.sql.Connection conn = connectionProvider.get()){
-			assertNotNull(conn);
-		}
-	}
+    @Test
+    public void canConnectToTestDB() throws SQLException, IOException {
+        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
+        try (java.sql.Connection conn = connectionProvider.get()) {
+            assertNotNull(conn);
+        }
+    }
 
-	@Test
-	public void canExecuteCopy() throws SQLException, IOException {
-		int someValue = 12345;
-		String otherValue = "foobar";
+    @Test
+    public void canExecuteCopy() throws SQLException, IOException {
+        int someValue = 12345;
+        String otherValue = "foobar";
 
         PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
         try (Connection conn = connectionProvider.get()) {
@@ -57,8 +57,7 @@ public class ConnectionTest {
                 CopyManager copyManager = unwrapped.getCopyAPI();
 
                 String sql = "COPY simple_table (some_column, other_column) FROM STDIN WITH ("
-                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false"
-                        + ")";
+                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false" + ")";
                 String someData = someValue + "\t" + otherValue + "\n";
 
                 StringBuilder sb = new StringBuilder(someData);
@@ -72,35 +71,33 @@ public class ConnectionTest {
                 }
             }
         }
-	}
+    }
 
-	@Test
+    @Test
     public void canExecuteLoadDataWithNullValues() throws SQLException, IOException {
-	    int someValue = 12345;
+        int someValue = 12345;
         String otherValue = "foobar";
 
         PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()){
-            try(Statement stmt = conn.createStatement()) {
+        try (Connection conn = connectionProvider.get()) {
+            try (Statement stmt = conn.createStatement()) {
                 PgConnection unwrapped = conn.unwrap(PgConnection.class);
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
                 stmt.execute("CREATE TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");
 
                 CopyManager copyManager = unwrapped.getCopyAPI();
 
-                String sql ="COPY simple_table (some_column, other_column) FROM STDIN WITH ("
-                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false"
-                        + ")";
+                String sql = "COPY simple_table (some_column, other_column) FROM STDIN WITH ("
+                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false" + ")";
 
-                //Empty string, without "" identify a null value
-                String row1 = someValue+"\t\\N\n";
-                String row2 = "\\N\t"+otherValue+"\n";
+                // Empty string, without "" identify a null value
+                String row1 = someValue + "\t\\N\n";
+                String row2 = "\\N\t" + otherValue + "\n";
                 StringBuilder sb = new StringBuilder(row1).append(row2);
                 Reader reader = new StringBuilderReader(sb);
                 copyManager.copyIn(sql, reader);
 
-
-                try(ResultSet rs = stmt.executeQuery("SELECT some_column, other_column FROM simple_table")) {
+                try (ResultSet rs = stmt.executeQuery("SELECT some_column, other_column FROM simple_table")) {
                     assertTrue(rs.next());
                     assertEquals(someValue, rs.getInt(1));
                     assertEquals(null, rs.getString(2));

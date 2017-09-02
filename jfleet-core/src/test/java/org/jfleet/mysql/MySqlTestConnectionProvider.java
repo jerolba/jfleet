@@ -21,8 +21,8 @@ import org.jfleet.util.DataBaseTestConnectionProvider;
 
 public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
 
-	public MySqlTestConnectionProvider() throws IOException {
-		super("mysql-test.properties");
-	}
+    public MySqlTestConnectionProvider() throws IOException {
+        super("mysql-test.properties");
+    }
 
 }

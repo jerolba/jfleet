@@ -25,27 +25,28 @@ import java.util.function.Supplier;
 
 public class DataBaseTestConnectionProvider implements Supplier<Connection> {
 
-	private Properties prop;
+    private Properties prop;
 
-	public DataBaseTestConnectionProvider(String propertiesName) throws IOException {
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream(propertiesName);
-		Properties p = new Properties();
-		p.load(is);
-		prop = p;
-	}
+    public DataBaseTestConnectionProvider(String propertiesName) throws IOException {
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(propertiesName);
+        Properties p = new Properties();
+        p.load(is);
+        prop = p;
+    }
 
-	@Override
-	public Connection get() {
-	    String driver = prop.getProperty("driver");
-		try {
-			Class.forName(driver).newInstance();
-			Connection conn = DriverManager.getConnection(prop.getProperty("urlConnection"), prop.getProperty("user"), prop.getProperty("password"));
-			return conn;
-		} catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-			throw new RuntimeException("Can not instantiate driver "+driver, ex);
-		} catch (SQLException ex) {
-			throw new RuntimeException("Can not connect to database", ex);
-		}
-	}
+    @Override
+    public Connection get() {
+        String driver = prop.getProperty("driver");
+        try {
+            Class.forName(driver).newInstance();
+            Connection conn = DriverManager.getConnection(prop.getProperty("urlConnection"), prop.getProperty("user"),
+                    prop.getProperty("password"));
+            return conn;
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+            throw new RuntimeException("Can not instantiate driver " + driver, ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException("Can not connect to database", ex);
+        }
+    }
 
 }

@@ -23,58 +23,59 @@ import org.junit.Test;
 
 public class SqlBuilderTest {
 
-	public EntityInfo buildEntity() {
-		EntityInfo entityInfo = new EntityInfo();
-		entityInfo.setTableName("simple_table");
+    public EntityInfo buildEntity() {
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setTableName("simple_table");
 
-		FieldInfo f1 = new FieldInfo();
-		f1.setColumnName("column1");
-		entityInfo.addField(f1);
+        FieldInfo f1 = new FieldInfo();
+        f1.setColumnName("column1");
+        entityInfo.addField(f1);
 
-		FieldInfo f2 = new FieldInfo();
-		f2.setColumnName("column2");
-		entityInfo.addField(f2);
+        FieldInfo f2 = new FieldInfo();
+        f2.setColumnName("column2");
+        entityInfo.addField(f2);
 
-		return entityInfo;
-	}
+        return entityInfo;
+    }
 
-	@Test
-	public void testLoadDataIntoTable() {
-		SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
-		sqlBuilder.addLoadDataIntoTable();
+    @Test
+    public void testLoadDataIntoTable() {
+        SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
+        sqlBuilder.addLoadDataIntoTable();
 
-		String sql = sqlBuilder.getSql();
-		assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` ", sql);
-	}
+        String sql = sqlBuilder.getSql();
+        assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` ", sql);
+    }
 
-	@Test
-	public void testFileConfig() {
-		SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
-		sqlBuilder.addFileConfig();
+    @Test
+    public void testFileConfig() {
+        SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
+        sqlBuilder.addFileConfig();
 
-		String sql = sqlBuilder.getSql();
-		// :( testing the same value
-		assertEquals("CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' ", sql);
-	}
+        String sql = sqlBuilder.getSql();
+        // :( testing the same value
+        assertEquals("CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' "
+                + "ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' ", sql);
+    }
 
-	@Test
-	public void testColumnNames() {
-		SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
-		sqlBuilder.addColumnNames();
+    @Test
+    public void testColumnNames() {
+        SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
+        sqlBuilder.addColumnNames();
 
-		String sql = sqlBuilder.getSql();
-		assertEquals("(`column1`, `column2`)", sql);
-	}
+        String sql = sqlBuilder.getSql();
+        assertEquals("(`column1`, `column2`)", sql);
+    }
 
-	@Test
-	public void testCompleteQuery() {
-		SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
+    @Test
+    public void testCompleteQuery() {
+        SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
 
-		String sql = sqlBuilder.build();
-		String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` "
-				+ "CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' "
-				+ "(`column1`, `column2`)";
-		assertEquals(expectedSql, sql);
-	}
+        String sql = sqlBuilder.build();
+        String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` "
+                + "CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' "
+                + "ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' " + "(`column1`, `column2`)";
+        assertEquals(expectedSql, sql);
+    }
 
 }

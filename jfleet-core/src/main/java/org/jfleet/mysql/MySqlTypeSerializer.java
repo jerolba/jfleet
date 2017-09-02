@@ -17,6 +17,6 @@ package org.jfleet.mysql;
 
 import org.jfleet.common.BaseTypeSerializer;
 
-public class MySqlTypeSerializer extends BaseTypeSerializer{
+public class MySqlTypeSerializer extends BaseTypeSerializer {
 
 }
