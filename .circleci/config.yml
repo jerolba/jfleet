@@ -17,6 +17,11 @@ jobs:
             - MYSQL_USER=test
             - MYSQL_PASSWORD=test
             - MYSQL_DATABASE=testdb
+      - image: circleci/postgres:9.6
+        environment:
+            - POSTGRES_USER=test
+            - POSTGRES_PASSWORD=test
+            - POSTGRES_DB=testdb
 
     working_directory: ~/repo
 

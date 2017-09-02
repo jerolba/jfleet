@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.stream.Stream;
@@ -27,21 +27,20 @@ import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
 import org.jfleet.common.TransactionPolicy;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mysql.jdbc.Statement;
+public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
-public class LoadDataBulkInsert<T> implements BulkInsert<T> {
-
-    private static Logger logger = LoggerFactory.getLogger(LoadDataBulkInsert.class);
+    private static Logger logger = LoggerFactory.getLogger(PgCopyBulkInsert.class);
 
     private final EntityInfo entityInfo;
     private final String mainSql;
-    private final Charset encoding = Charset.forName("UTF-8");
     private final long BATCH_SIZE = 50 * 1_024 * 1_024;
 
-    public LoadDataBulkInsert(Class<T> clazz) {
+    public PgCopyBulkInsert(Class<T> clazz) {
         JpaEntityInspector inspector = new JpaEntityInspector(clazz);
         this.entityInfo = inspector.inspect();
 
@@ -53,19 +52,20 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
+        CopyManager copyMng = getCopyManager(conn);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
-            FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
-            try (Statement stmt = getStatementForLoadLocal(conn)) {
+            try {
                 stream.forEach(element -> {
                     contentBuilder.add(element);
                     if (contentBuilder.getContentSize() > BATCH_SIZE) {
                         logger.debug("Writing content");
-                        writeContent(txPolicy, stmt, contentBuilder);
+                        writeContent(txPolicy, copyMng, contentBuilder);
                     }
                 });
                 logger.debug("Flushing content");
-                writeContent(txPolicy, stmt, contentBuilder);
+                writeContent(txPolicy, copyMng, contentBuilder);
             } finally {
                 txPolicy.close();
             }
@@ -76,32 +76,29 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder) {
+    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder) {
         if (contentBuilder.getContentSize() > 0) {
             try {
                 long init = System.nanoTime();
-                String content = contentBuilder.getContent();
-                stmt.setLocalInfileInputStream(new ByteArrayInputStream(content.getBytes(encoding)));
-                stmt.execute(mainSql);
+                Reader reader = new StringBuilderReader(contentBuilder.getContent());
+                copyManager.copyIn(mainSql, reader);
                 logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
                         contentBuilder.getContentSize(), contentBuilder.getRecords());
                 contentBuilder.reset();
                 txPolicy.commit();
-            } catch (SQLException e) {
+            } catch (SQLException | IOException e) {
                 throw new WrappedException(e);
             }
         }
     }
 
-    private Statement getStatementForLoadLocal(Connection conn) throws SQLException {
-        com.mysql.jdbc.Connection unwrapped = null;
+    private CopyManager getCopyManager(Connection conn) throws JFleetException {
         try {
-            unwrapped = conn.unwrap(com.mysql.jdbc.Connection.class);
-            unwrapped.setAllowLoadLocalInfile(true);
+            PgConnection unwrapped = conn.unwrap(PgConnection.class);
+            return unwrapped.getCopyAPI();
         } catch (SQLException e) {
-            throw new RuntimeException("Incorrect Connection type. Expected com.mysql.jdbc.Connection");
+            throw new JFleetException(e);
         }
-        return (Statement) unwrapped.createStatement();
     }
 
 }

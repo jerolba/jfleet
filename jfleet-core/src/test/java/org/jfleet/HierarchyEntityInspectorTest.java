@@ -22,129 +22,126 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
-import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
-import org.jfleet.JpaEntityInspector;
 import org.junit.Test;
 
 public class HierarchyEntityInspectorTest {
 
-	@Entity
-	public class BaseClass {
+    @Entity
+    public class BaseClass {
 
-		private String someField;
+        private String someField;
 
-		public String getSomeField() {
-			return someField;
-		}
+        public String getSomeField() {
+            return someField;
+        }
 
-		public void setSomeField(String someField) {
-			this.someField = someField;
-		}
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
 
-	}
+    }
 
-	@Entity
-	public class ChildClass extends BaseClass {
+    @Entity
+    public class ChildClass extends BaseClass {
 
-		private int otherField;
+        private int otherField;
 
-		public int getOtherField() {
-			return otherField;
-		}
+        public int getOtherField() {
+            return otherField;
+        }
 
-		public void setOtherField(int otherField) {
-			this.otherField = otherField;
-		}
+        public void setOtherField(int otherField) {
+            this.otherField = otherField;
+        }
 
-	}
+    }
 
-	@Test
-	public void inspectTableWithHierarchy() {
-		JpaEntityInspector inspector = new JpaEntityInspector(ChildClass.class);
-		EntityInfo entityInfo = inspector.inspect();
-		List<FieldInfo> fields = entityInfo.getFields();
-		assertEquals(2, fields.size());
-		assertEquals("otherField", fields.get(0).getFieldName());
-		assertEquals("someField", fields.get(1).getFieldName());
-	}
-	
-	@MappedSuperclass
-	public class BaseClassMapped {
+    @Test
+    public void inspectTableWithHierarchy() {
+        JpaEntityInspector inspector = new JpaEntityInspector(ChildClass.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        assertEquals("otherField", fields.get(0).getFieldName());
+        assertEquals("someField", fields.get(1).getFieldName());
+    }
 
-		private String someField;
+    @MappedSuperclass
+    public class BaseClassMapped {
 
-		public String getSomeField() {
-			return someField;
-		}
+        private String someField;
 
-		public void setSomeField(String someField) {
-			this.someField = someField;
-		}
+        public String getSomeField() {
+            return someField;
+        }
 
-	}
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
 
-	@Entity
-	public class ChildClassWithMapped extends BaseClassMapped {
+    }
 
-		private int otherField;
+    @Entity
+    public class ChildClassWithMapped extends BaseClassMapped {
 
-		public int getOtherField() {
-			return otherField;
-		}
+        private int otherField;
 
-		public void setOtherField(int otherField) {
-			this.otherField = otherField;
-		}
+        public int getOtherField() {
+            return otherField;
+        }
 
-	}
-	
-	@Test
-	public void inspectTableWithHierarchyMapped() {
-		JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithMapped.class);
-		EntityInfo entityInfo = inspector.inspect();
-		List<FieldInfo> fields = entityInfo.getFields();
-		assertEquals(2, fields.size());
-		assertEquals("otherField", fields.get(0).getFieldName());
-		assertEquals("someField", fields.get(1).getFieldName());
-	}
-	
-	public class BaseClassNonEntity {
+        public void setOtherField(int otherField) {
+            this.otherField = otherField;
+        }
 
-		private String someField;
+    }
 
-		public String getSomeField() {
-			return someField;
-		}
+    @Test
+    public void inspectTableWithHierarchyMapped() {
+        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithMapped.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        assertEquals("otherField", fields.get(0).getFieldName());
+        assertEquals("someField", fields.get(1).getFieldName());
+    }
 
-		public void setSomeField(String someField) {
-			this.someField = someField;
-		}
+    public class BaseClassNonEntity {
 
-	}
+        private String someField;
 
-	@Entity
-	public class ChildClassNonEntity extends BaseClassNonEntity {
+        public String getSomeField() {
+            return someField;
+        }
 
-		private int otherField;
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
 
-		public int getOtherField() {
-			return otherField;
-		}
+    }
 
-		public void setOtherField(int otherField) {
-			this.otherField = otherField;
-		}
+    @Entity
+    public class ChildClassNonEntity extends BaseClassNonEntity {
 
-	}
-	
-	@Test
-	public void inspectTableWithNonEntityParent() {
-		JpaEntityInspector inspector = new JpaEntityInspector(ChildClassNonEntity.class);
-		EntityInfo entityInfo = inspector.inspect();
-		List<FieldInfo> fields = entityInfo.getFields();
-		assertEquals(1, fields.size());
-		assertEquals("otherField", fields.get(0).getFieldName());
-	}
+        private int otherField;
+
+        public int getOtherField() {
+            return otherField;
+        }
+
+        public void setOtherField(int otherField) {
+            this.otherField = otherField;
+        }
+
+    }
+
+    @Test
+    public void inspectTableWithNonEntityParent() {
+        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassNonEntity.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(1, fields.size());
+        assertEquals("otherField", fields.get(0).getFieldName());
+    }
 
 }

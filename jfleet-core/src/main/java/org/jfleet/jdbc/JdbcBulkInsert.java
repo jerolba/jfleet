@@ -15,7 +15,6 @@
  */
 package org.jfleet.jdbc;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -32,7 +31,10 @@ import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
+import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
+import org.jfleet.WrappedException;
+import org.jfleet.common.TransactionPolicy;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
@@ -63,7 +65,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         List<FieldInfo> fields = entityInfo.getFields();
         for (int i = 0; i < fields.size(); i++) {
             FieldInfo fieldInfo = fields.get(i);
-            sb.append('`').append(fieldInfo.getColumnName()).append('`');
+            sb.append(fieldInfo.getColumnName());
             if (i < fields.size() - 1) {
                 sb.append(", ");
             }
@@ -80,27 +82,31 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     @Override
-    public void insertAll(Connection conn, Stream<T> stream) throws SQLException {
-        conn.setAutoCommit(false);
-        try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-            BatchInsert statementCount = new BatchInsert(conn, pstmt);
-            stream.forEach(statementCount::add);
-            statementCount.finish();
-        } catch (WrappedSQLException e) {
-            throw e.getSQLException();
-        } finally {
-            conn.setAutoCommit(true);
+    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+        try {
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
+                stream.forEach(statementCount::add);
+                statementCount.finish();
+            } finally {
+                txPolicy.close();
+            }
+        } catch (SQLException e) {
+            throw new JFleetException(e);
+        } catch (WrappedException e) {
+            e.rethrow();
         }
     }
 
     private class BatchInsert {
 
-        private final Connection connection;
+        private final TransactionPolicy txPolicy;
         private final PreparedStatement pstmt;
         private int count = 0;
 
-        BatchInsert(Connection connection, PreparedStatement pstmt) throws SQLException {
-            this.connection = connection;
+        BatchInsert(Connection connection, TransactionPolicy txPolicy, PreparedStatement pstmt) throws SQLException {
+            this.txPolicy = txPolicy;
             this.pstmt = pstmt;
         }
 
@@ -114,7 +120,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
                     count = 0;
                 }
             } catch (SQLException e) {
-                throw new WrappedSQLException(e);
+                throw new WrappedException(e);
             }
         }
 
@@ -126,7 +132,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
         private void flush() throws SQLException {
             int[] result = pstmt.executeBatch();
-            connection.commit();
+            txPolicy.commit();
         }
 
     }
@@ -143,60 +149,39 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         if (parameterObj == null) {
             pstmt.setNull(parameterIndex, java.sql.Types.OTHER);
         } else {
-            if (parameterObj instanceof Byte) {
-                pstmt.setInt(parameterIndex, ((Byte) parameterObj).intValue());
+            if (parameterObj instanceof Integer) {
+                pstmt.setInt(parameterIndex, ((Integer) parameterObj).intValue());
             } else if (parameterObj instanceof String) {
                 pstmt.setString(parameterIndex, (String) parameterObj);
-            } else if (parameterObj instanceof Character) {
-                pstmt.setString(parameterIndex, ((Character) parameterObj).toString());
-            } else if (parameterObj instanceof BigDecimal) {
-                pstmt.setBigDecimal(parameterIndex, (BigDecimal) parameterObj);
-            } else if (parameterObj instanceof Short) {
-                pstmt.setShort(parameterIndex, ((Short) parameterObj).shortValue());
-            } else if (parameterObj instanceof Integer) {
-                pstmt.setInt(parameterIndex, ((Integer) parameterObj).intValue());
             } else if (parameterObj instanceof Long) {
                 pstmt.setLong(parameterIndex, ((Long) parameterObj).longValue());
+            } else if (parameterObj instanceof Boolean) {
+                pstmt.setBoolean(parameterIndex, ((Boolean) parameterObj).booleanValue());
+            } else if (parameterObj instanceof java.util.Date) {
+                pstmt.setTimestamp(parameterIndex, new Timestamp(((java.util.Date) parameterObj).getTime()));
+            } else if (parameterObj instanceof BigDecimal) {
+                pstmt.setBigDecimal(parameterIndex, (BigDecimal) parameterObj);
+            } else if (parameterObj instanceof Byte) {
+                pstmt.setInt(parameterIndex, ((Byte) parameterObj).intValue());
+            } else if (parameterObj instanceof Character) {
+                pstmt.setString(parameterIndex, ((Character) parameterObj).toString());
+            } else if (parameterObj instanceof Short) {
+                pstmt.setShort(parameterIndex, ((Short) parameterObj).shortValue());
             } else if (parameterObj instanceof Float) {
                 pstmt.setFloat(parameterIndex, ((Float) parameterObj).floatValue());
             } else if (parameterObj instanceof Double) {
                 pstmt.setDouble(parameterIndex, ((Double) parameterObj).doubleValue());
-            } else if (parameterObj instanceof byte[]) {
-                pstmt.setBytes(parameterIndex, (byte[]) parameterObj);
             } else if (parameterObj instanceof java.sql.Date) {
                 pstmt.setDate(parameterIndex, (java.sql.Date) parameterObj);
             } else if (parameterObj instanceof Time) {
                 pstmt.setTime(parameterIndex, (Time) parameterObj);
             } else if (parameterObj instanceof Timestamp) {
                 pstmt.setTimestamp(parameterIndex, (Timestamp) parameterObj);
-            } else if (parameterObj instanceof Boolean) {
-                pstmt.setBoolean(parameterIndex, ((Boolean) parameterObj).booleanValue());
-            } else if (parameterObj instanceof InputStream) {
-                pstmt.setBinaryStream(parameterIndex, (InputStream) parameterObj, -1);
-            } else if (parameterObj instanceof java.sql.Blob) {
-                pstmt.setBlob(parameterIndex, (java.sql.Blob) parameterObj);
-            } else if (parameterObj instanceof java.sql.Clob) {
-                pstmt.setClob(parameterIndex, (java.sql.Clob) parameterObj);
-            } else if (parameterObj instanceof java.util.Date) {
-                pstmt.setTimestamp(parameterIndex, new Timestamp(((java.util.Date) parameterObj).getTime()));
             } else if (parameterObj instanceof BigInteger) {
-                pstmt.setString(parameterIndex, parameterObj.toString());
+                pstmt.setObject(parameterIndex, parameterObj);
             } else {
                 throw new RuntimeException("No type mapper for " + parameterObj.getClass());
             }
-        }
-    }
-
-    private static class WrappedSQLException extends RuntimeException {
-
-        private static final long serialVersionUID = 3733123280122720289L;
-
-        WrappedSQLException(SQLException e) {
-            super(e);
-        }
-
-        public SQLException getSQLException() {
-            return (SQLException) this.getCause();
         }
     }
 

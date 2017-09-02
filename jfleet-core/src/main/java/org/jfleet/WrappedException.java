@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet;
 
-import java.io.IOException;
+public class WrappedException extends RuntimeException {
 
-import org.jfleet.util.DataBaseTestConnectionProvider;
+    private static final long serialVersionUID = 5687915465143634780L;
 
-public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
+    public WrappedException(Exception e) {
+        super(e);
+    }
 
-    public MySqlTestConnectionProvider() throws IOException {
-        super("mysql-test.properties");
+    public void rethrow() throws JFleetException {
+        throw new JFleetException(this.getCause());
     }
 
 }

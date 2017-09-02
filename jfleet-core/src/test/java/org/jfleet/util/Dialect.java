@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.util;
 
-import java.io.IOException;
+import org.jfleet.EntityInfo;
 
-import org.jfleet.util.DataBaseTestConnectionProvider;
+public enum Dialect {
 
-public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
+    Mysql(new MysqlDDLHelper()), Postgres(new PostgresDDLHelper());
 
-    public MySqlTestConnectionProvider() throws IOException {
-        super("mysql-test.properties");
+    private DDLHelper ddlHelper;
+
+    Dialect(DDLHelper ddlHelper) {
+        this.ddlHelper = ddlHelper;
     }
 
+    public DDLHelper getDDLHelper() {
+        return ddlHelper;
+    }
+
+    public interface DDLHelper {
+
+        String createTableSentence(EntityInfo entityInfo);
+
+        String dropTableSentence(EntityInfo entityInfo);
+    }
 }

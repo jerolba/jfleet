@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.parameterized;
 
 import java.io.IOException;
+import java.sql.Connection;
 
+import org.jfleet.BulkInsert;
 import org.jfleet.util.DataBaseTestConnectionProvider;
 
-public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
+public abstract class Database {
 
-    public MySqlTestConnectionProvider() throws IOException {
-        super("mysql-test.properties");
+    private String properties;
+
+    public Database(String properties) {
+        this.properties = properties;
+    }
+
+    public String getProperties() {
+        return properties;
+    }
+
+    public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
+
+    public Connection getConnection() throws IOException {
+        return new DataBaseTestConnectionProvider(getProperties()).get();
     }
 
 }

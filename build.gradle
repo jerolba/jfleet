@@ -9,7 +9,7 @@ allprojects {
     exclude "**/*.properties"
     exclude "**/*.txt"
   }
-
+  
   repositories {
     jcenter()
   }

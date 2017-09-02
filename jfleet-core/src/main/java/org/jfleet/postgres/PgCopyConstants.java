@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.postgres;
 
-import java.io.IOException;
+public class PgCopyConstants {
 
-import org.jfleet.util.DataBaseTestConnectionProvider;
+    public static final char ESCAPE_CHAR = '\\';
+    public static final char NEWLINE_CHAR = '\n';
+    public static final char CARRIAGE_RETURN_CHAR = '\r';
+    public static final char DELIMITER_CHAR = '\t';
 
-public class MySqlTestConnectionProvider extends DataBaseTestConnectionProvider {
-
-    public MySqlTestConnectionProvider() throws IOException {
-        super("mysql-test.properties");
+    private PgCopyConstants() {
     }
 
 }
