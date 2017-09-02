@@ -41,23 +41,27 @@ publishing {
     }
 }
 
-bintray {
-    user = bintrayUser
-    key = bintrayKey
-    publications = ['mavenJava'] 
-    pkg {
-        repo = 'JFleet'
-        name = 'jfleet'
-        desc = 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
-        websiteUrl = 'https://github.com/jerolba/jfleet'
-        issueTrackerUrl = 'https://github.com/jerolba/jfleet/issues'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/jerolba/jfleet.git'
-        labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
-        version {
-            name = version
-            desc = 'First release with MySql and Postgres'
-            released  = new Date()
+if (project.hasProperty('bintrayUser')){
+    bintray {
+        user = bintrayUser
+        key = bintrayKey
+        publications = ['mavenJava'] 
+        pkg {
+            repo = 'JFleet'
+            name = 'jfleet'
+            desc = 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
+            websiteUrl = 'https://github.com/jerolba/jfleet'
+            issueTrackerUrl = 'https://github.com/jerolba/jfleet/issues'
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/jerolba/jfleet.git'
+            labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
+            version {
+                name = version
+                desc = 'First release with MySql and Postgres'
+                released  = new Date()
+            }
         }
     }
+}else {
+    println 'No bintray configuration found. Expected bintray user and API key at $HOME/.gradle/gradle.properties file.'
 }
