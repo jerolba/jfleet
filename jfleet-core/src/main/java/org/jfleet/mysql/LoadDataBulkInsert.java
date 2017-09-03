@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -53,17 +54,18 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
-            FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
             try (Statement stmt = getStatementForLoadLocal(conn)) {
-                stream.forEach(element -> {
-                    contentBuilder.add(element);
+                Iterator<T> it = stream.iterator();
+                while (it.hasNext()) {
+                    contentBuilder.add(it.next());
                     if (contentBuilder.getContentSize() > BATCH_SIZE) {
                         logger.debug("Writing content");
                         writeContent(txPolicy, stmt, contentBuilder);
                     }
-                });
+                }
                 logger.debug("Flushing content");
                 writeContent(txPolicy, stmt, contentBuilder);
             } finally {
@@ -76,20 +78,16 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder) {
+    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder) throws SQLException {
         if (contentBuilder.getContentSize() > 0) {
-            try {
-                long init = System.nanoTime();
-                String content = contentBuilder.getContent();
-                stmt.setLocalInfileInputStream(new ByteArrayInputStream(content.getBytes(encoding)));
-                stmt.execute(mainSql);
-                logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                        contentBuilder.getContentSize(), contentBuilder.getRecords());
-                contentBuilder.reset();
-                txPolicy.commit();
-            } catch (SQLException e) {
-                throw new WrappedException(e);
-            }
+            long init = System.nanoTime();
+            String content = contentBuilder.getContent();
+            stmt.setLocalInfileInputStream(new ByteArrayInputStream(content.getBytes(encoding)));
+            stmt.execute(mainSql);
+            logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
+                    contentBuilder.getContentSize(), contentBuilder.getRecords());
+            contentBuilder.reset();
+            txPolicy.commit();
         }
     }
 

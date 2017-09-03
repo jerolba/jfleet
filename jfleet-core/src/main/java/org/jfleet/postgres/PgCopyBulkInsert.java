@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -57,13 +58,14 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
             try {
-                stream.forEach(element -> {
-                    contentBuilder.add(element);
+                Iterator<T> it = stream.iterator();
+                while (it.hasNext()) {
+                    contentBuilder.add(it.next());
                     if (contentBuilder.getContentSize() > BATCH_SIZE) {
                         logger.debug("Writing content");
                         writeContent(txPolicy, copyMng, contentBuilder);
                     }
-                });
+                }
                 logger.debug("Flushing content");
                 writeContent(txPolicy, copyMng, contentBuilder);
             } finally {
