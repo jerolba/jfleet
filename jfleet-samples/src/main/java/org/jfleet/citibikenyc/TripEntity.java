@@ -19,58 +19,61 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="bike_trip")
 public class TripEntity {
-	
+
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 
 	@Column(name="tripduration")
 	private int tripduration;
-	
+
 	@Column(name="starttime")
 	private Date starttime;
-	
+
 	@Column(name="stoptime")
 	private Date stoptime;
-	
+
 	@Column(name="start_station_id")
 	private int startStationId;
-	
+
 	@Column(name="start_station_name")
 	private String startStationName;
-	
+
 	@Column(name="start_station_latitude")
 	private double startStationLatitude;
-	
+
 	@Column(name="start_station_longitude")
 	private double startStationLongitude;
-	
+
 	@Column(name="end_station_id")
 	private int endStationId;
-	
+
 	@Column(name="end_station_name")
 	private String endStationName;
-	
+
 	@Column(name="end_station_latitude")
 	private double endStationLatitude;
-	
+
 	@Column(name="end_station_longitude")
 	private double endStationLongitude;
-	
+
 	@Column(name="bike_id")
 	private long bikeId;
 
 	@Column(name="user_type")
 	private String userType;
-	
+
 	@Column(name="birth_year")
 	private Integer birthYear;
-	
+
 	@Column(name="gender")
 	private Character gender;
 
@@ -201,5 +204,5 @@ public class TripEntity {
 	public void setGender(Character gender) {
 		this.gender = gender;
 	}
-	
+
 }

@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.MySqlTestConnectionProvider;
 import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.util.MySqlTestConnectionProvider;
 
 /*
  * This example works with the dataset provided by Citi Bike NYC about each trip with their bikes.
