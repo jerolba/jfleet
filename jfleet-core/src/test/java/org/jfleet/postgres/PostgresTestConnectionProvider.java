@@ -17,9 +17,9 @@ package org.jfleet.postgres;
 
 import java.io.IOException;
 
-import org.jfleet.util.DataBaseTestConnectionProvider;
+import org.jfleet.util.DatabaseTestConnectionProvider;
 
-public class PostgresTestConnectionProvider extends DataBaseTestConnectionProvider {
+public class PostgresTestConnectionProvider extends DatabaseTestConnectionProvider {
 
     public PostgresTestConnectionProvider() throws IOException {
         super("postgres-test.properties");

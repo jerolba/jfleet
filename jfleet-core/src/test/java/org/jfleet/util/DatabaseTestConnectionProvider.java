@@ -23,11 +23,11 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-public class DataBaseTestConnectionProvider implements Supplier<Connection> {
+public class DatabaseTestConnectionProvider implements Supplier<Connection> {
 
     private Properties prop;
 
-    public DataBaseTestConnectionProvider(String propertiesName) throws IOException {
+    public DatabaseTestConnectionProvider(String propertiesName) throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(propertiesName);
         Properties p = new Properties();
         p.load(is);

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.sql.Connection;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.util.DataBaseTestConnectionProvider;
+import org.jfleet.util.DatabaseTestConnectionProvider;
 
 public abstract class Database {
 
@@ -36,7 +36,7 @@ public abstract class Database {
     public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
 
     public Connection getConnection() throws IOException {
-        return new DataBaseTestConnectionProvider(getProperties()).get();
+        return new DatabaseTestConnectionProvider(getProperties()).get();
     }
 
 }
