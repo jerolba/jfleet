@@ -19,7 +19,7 @@ import static org.jfleet.mysql.LoadDataConstants.ESCAPED_BY_CHAR;
 import static org.jfleet.mysql.LoadDataConstants.FIELD_TERMINATED_CHAR;
 import static org.jfleet.mysql.LoadDataConstants.LINE_TERMINATED_CHAR;
 
-public class Escaper {
+public class LoadDataEscaper {
 
     public String escapeForLoadFile(String text) {
         if (text == null) {

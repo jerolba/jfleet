@@ -21,15 +21,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EscaperTest {
+public class LoadDataEscaperTest {
 
-    private static Logger logger = LoggerFactory.getLogger(EscaperTest.class);
+    private static Logger logger = LoggerFactory.getLogger(LoadDataEscaperTest.class);
 
     private static final char ESCAPED_BY_CHAR = '\\';
     private static final char LINE_TERMINATED_CHAR = '\n';
     private static final char FIELD_TERMINATED_CHAR = '\t';
 
-    private Escaper escaper = new Escaper();
+    private LoadDataEscaper escaper = new LoadDataEscaper();
 
     @Test
     public void testNoEscapeNeeded() {

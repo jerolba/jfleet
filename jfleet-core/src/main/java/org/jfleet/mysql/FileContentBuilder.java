@@ -28,7 +28,7 @@ import org.jfleet.FieldInfo;
 
 public class FileContentBuilder {
 
-    private final Escaper escaper = new Escaper();
+    private final LoadDataEscaper escaper = new LoadDataEscaper();
     private final MySqlTypeSerializer typeSerializer = new MySqlTypeSerializer();
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
