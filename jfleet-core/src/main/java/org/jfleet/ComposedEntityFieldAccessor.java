@@ -2,29 +2,34 @@ package org.jfleet;
 
 public class ComposedEntityFieldAccessor implements EntityFieldAccessor {
 
-    private EntityFieldAccessor baseAccessor;
-    private ComposedEntityFieldAccessor thenAccessor;
+    private final EntityFieldAccessor baseAccessor;
+    private EntityFieldAccessor nextAccessor;
 
-    public ComposedEntityFieldAccessor(EntityFieldAccessor accessor) {
-        this.baseAccessor = accessor;
+    public ComposedEntityFieldAccessor() {
+        this(EntityFieldAccessor.identity());
+    }
+
+    private ComposedEntityFieldAccessor(EntityFieldAccessor baseAccessor) {
+        this.baseAccessor = baseAccessor;
     }
 
     @Override
     public Object getValue(Object obj) {
         Object value = baseAccessor.getValue(obj);
         if (value != null) {
-            if (thenAccessor != null) {
-                Object next = thenAccessor.getValue(value);
-                return next;
-            }
-            return value;
+            return nextAccessor.getValue(value);
         }
         return null;
     }
 
     public ComposedEntityFieldAccessor andThen(EntityFieldAccessor then) {
-        this.thenAccessor = new ComposedEntityFieldAccessor(then);
-        return thenAccessor;
+        ComposedEntityFieldAccessor composed = new ComposedEntityFieldAccessor(then);
+        this.nextAccessor = composed;
+        return composed;
+    }
+
+    public void andFinally(EntityFieldAccessor accessor) {
+        this.nextAccessor = accessor;
     }
 
 }

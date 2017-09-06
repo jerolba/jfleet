@@ -41,22 +41,19 @@ public class EntityFieldAccesorFactory {
         return getComposedAccessor(entityClass, fieldName);
     }
 
-    private static final EntityFieldAccessor empty = new EntityFieldAccessor() {
-
-        @Override
-        public Object getValue(Object obj) {
-            return obj;
-        }
-
-    };
-
     private EntityFieldAccessor getComposedAccessor(Class<?> entityClass, String fieldNameSeq) {
         String[] fieldSeq = fieldNameSeq.split("\\.");
-        ComposedEntityFieldAccessor head = new ComposedEntityFieldAccessor(empty);
+        ComposedEntityFieldAccessor head = new ComposedEntityFieldAccessor();
         ComposedEntityFieldAccessor composed = head;
-        for (String fieldName : fieldSeq) {
-            composed = composed.andThen(getAccessor(entityClass, fieldName));
-            entityClass = getAccessorTarget(entityClass, fieldName);
+        for (int i = 0; i < fieldSeq.length; i++) {
+            String fieldName = fieldSeq[i];
+            EntityFieldAccessor accessor = getAccessor(entityClass, fieldName);
+            if (i<fieldSeq.length-1) {
+                composed = composed.andThen(accessor);
+                entityClass = getAccessorTarget(entityClass, fieldName);
+            }else {
+                composed.andFinally(accessor);
+            }
         }
         return head;
     }
@@ -84,20 +81,15 @@ public class EntityFieldAccesorFactory {
             PropertyDescriptor objPropertyDescriptor = new PropertyDescriptor(fieldName, entityClass);
             Method readMethod = objPropertyDescriptor.getReadMethod();
             readMethod.setAccessible(true);
-            EntityFieldAccessor accesor = new EntityFieldAccessor() {
-
-                @Override
-                public Object getValue(Object obj) {
-                    try {
-                        return readMethod.invoke(obj);
-                    } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-                        logger.error("Can not access to field getter: " + fieldName + " on class "
-                                + entityClass.getName() + ": " + e.getMessage());
-                        return null;
-                    }
+            return Optional.of(obj -> {
+                try {
+                    return readMethod.invoke(obj);
+                } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+                    logger.error("Can not access to field getter: " + fieldName + " on class " + entityClass.getName()
+                            + ": " + e.getMessage());
+                    return null;
                 }
-            };
-            return Optional.of(accesor);
+            });
         } catch (IntrospectionException e) {
             return Optional.empty();
         }
@@ -130,16 +122,12 @@ public class EntityFieldAccesorFactory {
     }
 
     private Optional<EntityFieldAccessor> newAccessorByField(Field field) {
-        return Optional.of(new EntityFieldAccessor() {
-
-            @Override
-            public Object getValue(Object obj) {
-                try {
-                    return field.get(obj);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    traceError(field.getName(), field.getDeclaringClass(), e);
-                    return null;
-                }
+        return Optional.of(obj -> {
+            try {
+                return field.get(obj);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                traceError(field.getName(), field.getDeclaringClass(), e);
+                return null;
             }
         });
     }
