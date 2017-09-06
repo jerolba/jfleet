@@ -73,7 +73,7 @@ public class FieldTypeInspectorTest {
 
     }
 
-    private static EntityInfo entityInfo = new JpaEntityInspector(EntityWithTypes.class).inspect();
+    private EntityInfo entityInfo = new JpaEntityInspector(EntityWithTypes.class).inspect();
 
     @Test
     public void booleanPrimitiveTest() {

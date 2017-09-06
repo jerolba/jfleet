@@ -78,7 +78,8 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder) throws SQLException {
+    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder)
+            throws SQLException {
         if (contentBuilder.getContentSize() > 0) {
             long init = System.nanoTime();
             String content = contentBuilder.getContent();

@@ -33,7 +33,7 @@ public class EntityFieldAccesorFactory {
 
     private static Logger logger = LoggerFactory.getLogger(EntityFieldAccesorFactory.class);
 
-    public EntityFieldAccessor getAccesor(Class<?> entityClass, FieldInfo fieldInfo) {
+    public EntityFieldAccessor getAccessor(Class<?> entityClass, FieldInfo fieldInfo) {
         String fieldName = fieldInfo.getFieldName();
         return getAccessorByPublicField(entityClass, fieldName)
                 .orElseGet(() -> getAccessorByPropertyDescriptor(entityClass, fieldName)
@@ -84,8 +84,12 @@ public class EntityFieldAccesorFactory {
             field.setAccessible(true);
             return newAccessorByField(field);
         } catch (NoSuchFieldException | SecurityException e) {
-            logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
-                    + e.getMessage());
+            if (entityClass.getSuperclass() == Object.class) {
+                logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
+                        + e.getMessage());
+            } else {
+                return getAccessorByPrivateField(entityClass.getSuperclass(), fieldName);
+            }
         }
         return Optional.empty();
     }
