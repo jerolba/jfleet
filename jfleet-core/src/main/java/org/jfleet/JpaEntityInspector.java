@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
@@ -82,10 +84,10 @@ public class JpaEntityInspector {
             return parentClassFields;
         }
 
-        FieldsCollection currentClassFields = new FieldsCollection(
-                Stream.of(entityClass.getDeclaredFields()).map(FieldInspector::new).flatMap(i -> i.inspect().stream()));
+        FieldsCollection currentClassFields = new FieldsCollection(Stream.of(entityClass.getDeclaredFields())
+                .map(FieldInspector::new).map(FieldInspector::inspect).flatMap(List::stream));
 
-        currentClassFields.addAll(parentClassFields.stream().filter(f -> !currentClassFields.isPresent(f)));
+        currentClassFields.addNotPresent(parentClassFields);
         return currentClassFields;
     }
 
@@ -113,6 +115,13 @@ public class JpaEntityInspector {
             if (isSkippable()) {
                 return Collections.emptyList();
             }
+            Embedded embedded = field.getAnnotation(Embedded.class);
+            if (embedded != null) {
+                EmbeddedInspector embeddedInspector = new EmbeddedInspector(field);
+                List<FieldInfo> embeddedFields = embeddedInspector.getFields();
+                return embeddedFields;
+            }
+
             // TODO: manage Embedded classes
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setColumnName(getColumnName());
@@ -225,15 +234,15 @@ public class JpaEntityInspector {
         }
 
         FieldsCollection(Stream<FieldInfo> fieldsStream) {
-            addAll(fieldsStream);
-        }
-
-        public void addAll(Stream<FieldInfo> fieldsStream) {
             fieldsStream.forEach(this::add);
         }
 
+        public void addNotPresent(FieldsCollection fields) {
+            fields.stream().filter(field -> !this.isPresent(field)).forEach(this::add);
+        }
+
         // TODO: review how to deal with repeated fields or columns
-        public boolean isPresent(FieldInfo field) {
+        private boolean isPresent(FieldInfo field) {
             String columnName = field.getColumnName();
             String fieldName = field.getFieldName();
             for (FieldInfo f : this) {
@@ -246,4 +255,31 @@ public class JpaEntityInspector {
 
     }
 
+    private class EmbeddedInspector {
+
+        private Field field;
+
+        EmbeddedInspector(Field field) {
+            this.field = field;
+        }
+
+        public List<FieldInfo> getFields() {
+            String name = field.getName();
+            Class<?> javaType = field.getType();
+            FieldsCollection currentClassFields = getFieldsFromClass(javaType);
+            return currentClassFields.stream().map(field -> field.prepend(name)).collect(Collectors.toList());
+        }
+
+        private FieldsCollection getFieldsFromClass(Class<?> entityClass) {
+            if (entityClass == Object.class) {
+                return EMPTY_FIELD_COLLECTION;
+            }
+            FieldsCollection parentClassFields = getFieldsFromClass(entityClass.getSuperclass());
+            FieldsCollection currentClassFields = new FieldsCollection(Stream.of(entityClass.getDeclaredFields())
+                    .map(FieldInspector::new).map(FieldInspector::inspect).flatMap(List::stream));
+
+            currentClassFields.addNotPresent(parentClassFields);
+            return currentClassFields;
+        }
+    }
 }

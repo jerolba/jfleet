@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -45,6 +45,14 @@ public class FieldInfo {
         this.fieldType = fieldType;
     }
 
+    public FieldInfo prepend(String name) {
+        FieldInfo newOne = new FieldInfo();
+        newOne.fieldType = fieldType;
+        newOne.columnName = columnName;
+        newOne.fieldName = name + "." + fieldName;
+        return newOne;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

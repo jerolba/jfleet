@@ -35,10 +35,48 @@ public class EntityFieldAccesorFactory {
 
     public EntityFieldAccessor getAccessor(Class<?> entityClass, FieldInfo fieldInfo) {
         String fieldName = fieldInfo.getFieldName();
+        if (!fieldName.contains(".")) {
+            return getAccessor(entityClass, fieldName);
+        }
+        return getComposedAccessor(entityClass, fieldName);
+    }
+
+    private static final EntityFieldAccessor empty = new EntityFieldAccessor() {
+
+        @Override
+        public Object getValue(Object obj) {
+            return obj;
+        }
+
+    };
+
+    private EntityFieldAccessor getComposedAccessor(Class<?> entityClass, String fieldNameSeq) {
+        String[] fieldSeq = fieldNameSeq.split("\\.");
+        ComposedEntityFieldAccessor head = new ComposedEntityFieldAccessor(empty);
+        ComposedEntityFieldAccessor composed = head;
+        for (String fieldName : fieldSeq) {
+            composed = composed.andThen(getAccessor(entityClass, fieldName));
+            entityClass = getAccessorTarget(entityClass, fieldName);
+        }
+        return head;
+    }
+
+    private EntityFieldAccessor getAccessor(Class<?> entityClass, String fieldName) {
         return getAccessorByPublicField(entityClass, fieldName)
                 .orElseGet(() -> getAccessorByPropertyDescriptor(entityClass, fieldName)
                         .orElseGet(() -> getAccessorByPrivateField(entityClass, fieldName).orElse(null)));
+    }
 
+    private Class<?> getAccessorTarget(Class<?> entityClass, String fieldName) {
+        try {
+            return entityClass.getDeclaredField(fieldName).getType();
+        } catch (NoSuchFieldException | SecurityException e) {
+            if (entityClass.getSuperclass() != Object.class) {
+                return getAccessorTarget(entityClass.getSuperclass(), fieldName);
+            }
+            traceError(fieldName, entityClass, e);
+            return null;
+        }
     }
 
     private Optional<EntityFieldAccessor> getAccessorByPropertyDescriptor(Class<?> entityClass, String fieldName) {
@@ -72,8 +110,7 @@ public class EntityFieldAccesorFactory {
                 return newAccessorByField(field);
             }
         } catch (NoSuchFieldException | SecurityException e) {
-            logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
-                    + e.getMessage());
+            traceError(fieldName, entityClass, e);
         }
         return Optional.empty();
     }
@@ -84,12 +121,10 @@ public class EntityFieldAccesorFactory {
             field.setAccessible(true);
             return newAccessorByField(field);
         } catch (NoSuchFieldException | SecurityException e) {
-            if (entityClass.getSuperclass() == Object.class) {
-                logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
-                        + e.getMessage());
-            } else {
+            if (entityClass.getSuperclass() != Object.class) {
                 return getAccessorByPrivateField(entityClass.getSuperclass(), fieldName);
             }
+            traceError(fieldName, entityClass, e);
         }
         return Optional.empty();
     }
@@ -102,12 +137,16 @@ public class EntityFieldAccesorFactory {
                 try {
                     return field.get(obj);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
-                    logger.error("Can not access to field \"" + field.getName() + "\" on class "
-                            + field.getDeclaringClass().getName() + ": " + e.getMessage());
+                    traceError(field.getName(), field.getDeclaringClass(), e);
                     return null;
                 }
             }
         });
+    }
+
+    private void traceError(String fieldName, Class<?> entityClass, Exception e) {
+        logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
+                + e.getMessage());
     }
 
 }
