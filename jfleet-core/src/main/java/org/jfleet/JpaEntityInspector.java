@@ -24,10 +24,14 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -253,6 +257,22 @@ public class JpaEntityInspector {
             return false;
         }
 
+        public FieldsCollection overrideAtttributes(Map<String, String> mapping) {
+            if (mapping.size() == 0) {
+                return this;
+            }
+            FieldsCollection newCollection = new FieldsCollection();
+            for (FieldInfo field : this) {
+                String name = field.getFieldName();
+                if (mapping.containsKey(name)) {
+                    newCollection.add(field.withColumnName(mapping.get(name)));
+                } else {
+                    newCollection.add(field);
+                }
+            }
+            return newCollection;
+        }
+
     }
 
     private class EmbeddedInspector {
@@ -276,10 +296,36 @@ public class JpaEntityInspector {
             }
             FieldsCollection parentClassFields = getFieldsFromClass(entityClass.getSuperclass());
             FieldsCollection currentClassFields = new FieldsCollection(Stream.of(entityClass.getDeclaredFields())
-                    .map(FieldInspector::new).map(FieldInspector::inspect).flatMap(List::stream));
+                    .map(FieldInspector::new)
+                    .map(FieldInspector::inspect)
+                    .flatMap(List::stream)
+            );
 
             currentClassFields.addNotPresent(parentClassFields);
-            return currentClassFields;
+            Map<String, String> overrideAttrs = getMappingOverride(field);
+            FieldsCollection override = currentClassFields.overrideAtttributes(overrideAttrs);
+            return override;
+        }
+
+        private Map<String, String> getMappingOverride(Field field) {
+            AttributeOverrides annotation = field.getAnnotation(AttributeOverrides.class);
+            if (annotation == null) {
+                return Collections.emptyMap();
+            }
+            AttributeOverride[] overrides = annotation.value();
+            if (overrides.length == 0) {
+                return Collections.emptyMap();
+            }
+            Map<String, String> map = new HashMap<>();
+            for (AttributeOverride attr : overrides) {
+                String fieldName = attr.name();
+                String columnName = attr.column().name();
+                if (fieldName != null && columnName != null) {
+                    map.put(fieldName, columnName);
+                }
+            }
+            return map;
         }
     }
+
 }

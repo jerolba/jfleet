@@ -88,4 +88,11 @@ public class FieldInfo {
         return fieldName + " (" + columnName + "): " + fieldType.getFieldType().name();
     }
 
+    public FieldInfo withColumnName(String newColumnName) {
+        FieldInfo newOne = new FieldInfo();
+        newOne.setFieldName(this.fieldName);
+        newOne.setColumnName(newColumnName);
+        newOne.setFieldType(this.fieldType);
+        return newOne;
+    }
 }

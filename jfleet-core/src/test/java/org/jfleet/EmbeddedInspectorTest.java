@@ -18,6 +18,7 @@ package org.jfleet;
 import static org.junit.Assert.assertEquals;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
 import org.junit.Test;
 
@@ -44,6 +45,38 @@ public class EmbeddedInspectorTest {
         assertEquals(FieldTypeEnum.STRING, city.getFieldType().getFieldType());
         assertEquals("city", city.getColumnName());
     }
+
+    @Test
+    public void inspectEmbeddedEntityWithAttributeOverrides() {
+        JpaEntityInspector inspector = new JpaEntityInspector(Company.class);
+        EntityInfo entityInfo = inspector.inspect();
+
+        FieldInfo id = getField(entityInfo, "id");
+        assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
+        assertEquals("id", id.getColumnName());
+
+        FieldInfo name = getField(entityInfo, "name");
+        assertEquals(FieldTypeEnum.STRING, name.getFieldType().getFieldType());
+        assertEquals("name", name.getColumnName());
+
+        FieldInfo postalStreet = getField(entityInfo, "postalAddress.street");
+        assertEquals(FieldTypeEnum.STRING, postalStreet.getFieldType().getFieldType());
+        assertEquals("postal_street", postalStreet.getColumnName());
+
+        FieldInfo postalCity = getField(entityInfo, "postalAddress.city");
+        assertEquals(FieldTypeEnum.STRING, postalCity.getFieldType().getFieldType());
+        assertEquals("postal_city", postalCity.getColumnName());
+
+        FieldInfo fiscalStreet = getField(entityInfo, "fiscalAddress.street");
+        assertEquals(FieldTypeEnum.STRING, fiscalStreet.getFieldType().getFieldType());
+        assertEquals("fiscal_street", fiscalStreet.getColumnName());
+
+        FieldInfo fiscalCity = getField(entityInfo, "fiscalAddress.city");
+        assertEquals(FieldTypeEnum.STRING, fiscalCity.getFieldType().getFieldType());
+        assertEquals("fiscal_city", fiscalCity.getColumnName());
+
+    }
+
 
     private FieldInfo getField(EntityInfo entityInfo, String fieldName) {
         return entityInfo.getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();

@@ -48,10 +48,10 @@ public class EntityFieldAccesorFactory {
         for (int i = 0; i < fieldSeq.length; i++) {
             String fieldName = fieldSeq[i];
             EntityFieldAccessor accessor = getAccessor(entityClass, fieldName);
-            if (i<fieldSeq.length-1) {
+            if (i < fieldSeq.length - 1) {
                 composed = composed.andThen(accessor);
                 entityClass = getAccessorTarget(entityClass, fieldName);
-            }else {
+            } else {
                 composed.andFinally(accessor);
             }
         }
