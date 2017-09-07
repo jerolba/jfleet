@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.entities;
 
-import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Id;
 
 @Entity
-@Table(name = "simple_entity")
-public class SimpleEntity {
+public class Person {
 
-    @Column(name = "name")
+    @Id
+    private Long id;
+
     private String name;
+
+    @Embedded
+    private Address address;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -32,6 +44,14 @@ public class SimpleEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
 }

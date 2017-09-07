@@ -13,16 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.entities;
 
-@FunctionalInterface
-public interface EntityFieldAccessor {
+import javax.persistence.Embeddable;
 
-    Object getValue(Object obj);
+@Embeddable
+public class Address {
 
-    static EntityFieldAccessor identity() {
-        return t -> t;
+    private String street;
+
+    private String city;
+
+    public String getStreet() {
+        return street;
     }
 
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
 }

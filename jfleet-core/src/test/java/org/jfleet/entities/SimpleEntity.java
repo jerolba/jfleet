@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.entities;
 
-@FunctionalInterface
-public interface EntityFieldAccessor {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-    Object getValue(Object obj);
+@Entity
+@Table(name = "simple_entity")
+public class SimpleEntity {
 
-    static EntityFieldAccessor identity() {
-        return t -> t;
+    @Column(name = "name")
+    private String name;
+
+    public String getName() {
+        return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

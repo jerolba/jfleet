@@ -41,7 +41,7 @@ public class StdInContentBuilder {
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
-            EntityFieldAccessor accesor = factory.getAccesor(entityInfo.getEntityClass(), f);
+            EntityFieldAccessor accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
             accessors.add(accesor);
         }
     }
