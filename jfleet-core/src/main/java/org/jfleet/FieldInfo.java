@@ -45,7 +45,7 @@ public class FieldInfo {
         this.fieldType = fieldType;
     }
 
-    public FieldInfo prepend(String name) {
+    public FieldInfo prependName(String name) {
         FieldInfo newOne = new FieldInfo();
         newOne.fieldType = fieldType;
         newOne.columnName = columnName;
