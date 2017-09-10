@@ -16,30 +16,26 @@
 package org.jfleet.citibikenyc;
 
 //TODO: improve parse time
-public class TripParser extends CSVParser<TripEntity> {
+public class FlatTripParser extends CSVParser<TripFlatEntity> {
 
-	public TripParser(String line) {
+	public FlatTripParser(String line) {
 	    super(line);
 	}
 
 	@Override
-    public TripEntity parse() {
-		TripEntity trip = new TripEntity();
+    public TripFlatEntity parse() {
+		TripFlatEntity trip = new TripFlatEntity();
 		trip.setTripduration(nextInteger());
 		trip.setStarttime(nextDate());
 		trip.setStoptime(nextDate());
-		StationEmbedded startStation = new StationEmbedded();
-		startStation.setStationId(nextInteger());
-		startStation.setStationName(nextString());
-		startStation.setStationLatitude(nextDouble());
-		startStation.setStationLongitude(nextDouble());
-		trip.setStartStation(startStation);
-		StationEmbedded endStation = new StationEmbedded();
-		endStation.setStationId(nextInteger());
-		endStation.setStationName(nextString());
-		endStation.setStationLatitude(nextDouble());
-		endStation.setStationLongitude(nextDouble());
-		trip.setEndStation(endStation);
+		trip.setStartStationId(nextInteger());
+		trip.setStartStationName(nextString());
+		trip.setStartStationLatitude(nextDouble());
+		trip.setStartStationLongitude(nextDouble());
+		trip.setEndStationId(nextInteger());
+		trip.setEndStationName(nextString());
+		trip.setEndStationLatitude(nextDouble());
+		trip.setEndStationLongitude(nextDouble());
 		trip.setBikeId(nextLong());
 		trip.setUserType(nextString());
 		trip.setBirthYear(nextInteger());

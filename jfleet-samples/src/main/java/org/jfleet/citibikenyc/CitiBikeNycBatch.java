@@ -46,12 +46,12 @@ public class CitiBikeNycBatch {
 			stmt.execute("DROP TABLE IF EXISTS bike_trip");
 			stmt.execute("CREATE TABLE bike_trip (id INT NOT NULL AUTO_INCREMENT, tripduration INT NOT NULL, starttime DATETIME, stoptime DATETIME, start_station_id INT NOT NULL, start_station_name VARCHAR(255), start_station_latitude DOUBLE NOT NULL, start_station_longitude DOUBLE NOT NULL, end_station_id INT NOT NULL, end_station_name VARCHAR(255), end_station_latitude DOUBLE NOT NULL, end_station_longitude DOUBLE NOT NULL, bike_id BIGINT NOT NULL, user_type VARCHAR(255), birth_year INT, gender CHAR, PRIMARY KEY (id))");
 		}
-		List<List<TripEntity>> tripsData = new ArrayList<>();
-		CitiBikeReader reader = new CitiBikeReader("/tmp");
+		List<List<TripFlatEntity>> tripsData = new ArrayList<>();
+		CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
         reader.forEachCsvInZip(trips -> tripsData.add(trips.collect(Collectors.toList())));
 
-        BulkInsert<TripEntity> bulkInsert = new LoadDataBulkInsert<>(TripEntity.class);
-        for(List<TripEntity> trip: tripsData) {
+        BulkInsert<TripFlatEntity> bulkInsert = new LoadDataBulkInsert<>(TripFlatEntity.class);
+        for(List<TripFlatEntity> trip: tripsData) {
             bulkInsert.insertAll(connection, trip);
         }
 	}

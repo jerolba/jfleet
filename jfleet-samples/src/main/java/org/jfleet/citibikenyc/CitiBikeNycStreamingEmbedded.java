@@ -32,10 +32,10 @@ import org.jfleet.util.MySqlTestConnectionProvider;
  * Parse all files located in /tmp directory and stream its content inserting into
  * the database.
  *
- * There is only one entity mapped with all fields.
+ * There is only one entity, but with stations information mapped as embedded objects (start and end).
  *
  */
-public class CitiBikeNycStreaming {
+public class CitiBikeNycStreamingEmbedded {
 
     public static void main(String[] args) throws IOException, SQLException {
         MySqlTestConnectionProvider connectionSuplier = new MySqlTestConnectionProvider();
@@ -45,8 +45,8 @@ public class CitiBikeNycStreaming {
             stmt.execute("DROP TABLE IF EXISTS bike_trip");
             stmt.execute("CREATE TABLE bike_trip (id INT NOT NULL AUTO_INCREMENT, tripduration INT NOT NULL, starttime DATETIME, stoptime DATETIME, start_station_id INT NOT NULL, start_station_name VARCHAR(255), start_station_latitude DOUBLE NOT NULL, start_station_longitude DOUBLE NOT NULL, end_station_id INT NOT NULL, end_station_name VARCHAR(255), end_station_latitude DOUBLE NOT NULL, end_station_longitude DOUBLE NOT NULL, bike_id BIGINT NOT NULL, user_type VARCHAR(255), birth_year INT, gender CHAR, PRIMARY KEY (id))");
         }
-        CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
-        BulkInsert<TripFlatEntity> bulkInsert = new LoadDataBulkInsert<>(TripFlatEntity.class);
+        CitiBikeReader<TripEntity> reader = new CitiBikeReader<>("/tmp", str -> new TripParser(str));
+        BulkInsert<TripEntity> bulkInsert = new LoadDataBulkInsert<>(TripEntity.class);
 
         reader.forEachCsvInZip(trips -> {
             try {

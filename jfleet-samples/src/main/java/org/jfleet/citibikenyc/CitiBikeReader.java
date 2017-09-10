@@ -23,30 +23,39 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class CitiBikeReader {
+public class CitiBikeReader<T> {
 
+    private final Function<String, CSVParser<T>> csvParser;
     private final File datasetDir;
     private final Predicate<File> isCitibikeFile = f -> f.getName().contains("citibike-tripdata");
 
-    public CitiBikeReader(String path) {
-        datasetDir = new File(path);
+    public CitiBikeReader(String path, Function<String, CSVParser<T>> csvParser) {
+        this.csvParser = csvParser;
+        this.datasetDir = new File(path);
     }
 
-    public void forEachCsvInZip(Consumer<Stream<TripEntity>> consumer) {
+    /**
+     * Read each ZIP file containing CSVs and apply to consumer an stream for each file CSV found.
+     * Each CSV file is parsed in different stream.
+     *
+     * @param consumer
+     */
+    public void forEachCsvInZip(Consumer<Stream<T>> consumer) {
         Stream.of(datasetDir.listFiles()).filter(f -> f.getName().endsWith(".zip")).filter(isCitibikeFile)
                 .forEach(f -> {
                     try (ZipInputStream zis = new ZipInputStream(new FileInputStream(f))) {
                         ZipEntry ze = zis.getNextEntry();
                         while (ze != null) {
-                            StreamCounter<TripEntity> counter = new StreamCounter<>();
+                            StreamCounter<T> counter = new StreamCounter<>();
                             BufferedReader reader = new BufferedReader(new InputStreamReader(zis));
-                            Stream<TripEntity> trips = reader.lines().skip(1).map(TripParser::new)
-                                    .map(TripParser::parse).map(counter::count);
+                            Stream<T> trips = reader.lines().skip(1).map(l -> csvParser.apply(l))
+                                    .map(CSVParser::parse).map(counter::count);
 
                             consumer.accept(trips);
 
@@ -60,12 +69,18 @@ public class CitiBikeReader {
                 });
     }
 
-    public void forEachCsv(Consumer<Stream<TripEntity>> consumer) {
+    /**
+     * Read each CSV file containing and apply to consumer an stream for each file CSV found
+     * Each CSV file is parsed in different stream.
+     *
+     * @param consumer
+     */
+    public void forEachCsv(Consumer<Stream<T>> consumer) {
         Stream.of(datasetDir.listFiles()).filter(f -> f.getName().endsWith(".csv")).filter(isCitibikeFile)
                 .forEach(f -> {
-                    try (StreamCounter<TripEntity> counter = new StreamCounter<>()) {
-                        Stream<TripEntity> trips = Files.lines(Paths.get(f.getAbsolutePath())).skip(1)
-                                .map(TripParser::new).map(TripParser::parse).map(counter::count);
+                    try (StreamCounter<T> counter = new StreamCounter<>()) {
+                        Stream<T> trips = Files.lines(Paths.get(f.getAbsolutePath())).skip(1)
+                                .map(l -> csvParser.apply(l)).map(CSVParser::parse).map(counter::count);
                         consumer.accept(trips);
                     } catch (IOException e) {
                         e.printStackTrace();
