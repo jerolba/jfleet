@@ -35,6 +35,11 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -42,8 +47,12 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JpaEntityInspector {
+
+    private static Logger logger = LoggerFactory.getLogger(JpaEntityInspector.class);
 
     private Class<?> entityClass;
 
@@ -122,11 +131,14 @@ public class JpaEntityInspector {
             Embedded embedded = field.getAnnotation(Embedded.class);
             if (embedded != null) {
                 EmbeddedInspector embeddedInspector = new EmbeddedInspector(field);
-                List<FieldInfo> embeddedFields = embeddedInspector.getFields();
-                return embeddedFields;
+                return embeddedInspector.getFields();
+            }
+            ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
+            if (manyToOne !=null) {
+                ManyToOneInspector manyToOneInspector = new ManyToOneInspector(field);
+                return manyToOneInspector.getFields();
             }
 
-            // TODO: manage Embedded classes
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setColumnName(getColumnName());
             fieldInfo.setFieldName(getFieldName());
@@ -287,7 +299,7 @@ public class JpaEntityInspector {
             String name = field.getName();
             Class<?> javaType = field.getType();
             FieldsCollection currentClassFields = getFieldsFromClass(javaType);
-            return currentClassFields.stream().map(field -> field.prepend(name)).collect(Collectors.toList());
+            return currentClassFields.stream().map(field -> field.prependName(name)).collect(Collectors.toList());
         }
 
         private FieldsCollection getFieldsFromClass(Class<?> entityClass) {
@@ -326,6 +338,78 @@ public class JpaEntityInspector {
             }
             return map;
         }
+    }
+
+    private class ManyToOneInspector {
+
+        private Field field;
+
+        ManyToOneInspector(Field field) {
+            this.field = field;
+        }
+
+        public List<FieldInfo> getFields() {
+            if (!reviewSupportedRelations(field)) {
+                return Collections.emptyList();
+            }
+            String name = field.getName();
+            Class<?> javaType = field.getType();
+            FieldsCollection currentClassFields = getIdFieldsFromClass(javaType);
+            if (currentClassFields.size() == 0) {
+                logger.warn(javaType.getName() + " has no simple @id annotation. Relation not persisted.");
+                return Collections.emptyList();
+            }
+            if (currentClassFields.size() == 1) {
+                FieldInfo fieldId = currentClassFields.get(0);
+                JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+                String columnName = null;
+                if (joinColumn != null) {
+                    columnName = joinColumn.name();
+                } else {
+                    columnName = name + "_" + fieldId.getColumnName();
+                }
+                return asList(fieldId.prependName(name).withColumnName(columnName));
+            }
+            return currentClassFields.stream().map(field -> {
+                    String columnName = name + "_" + field.getColumnName();
+                    return field.prependName(name).withColumnName(columnName);
+                }).collect(Collectors.toList());
+        }
+
+        private FieldsCollection getIdFieldsFromClass(Class<?> entityClass) {
+            if (entityClass == Object.class) {
+                return EMPTY_FIELD_COLLECTION;
+            }
+            FieldsCollection parentClassFields = getIdFieldsFromClass(entityClass.getSuperclass());
+            FieldsCollection currentClassFields = new FieldsCollection(Stream.of(entityClass.getDeclaredFields())
+                    .filter(this::isIdAnnotated)
+                    .map(FieldInspector::new)
+                    .map(FieldInspector::inspect)
+                    .flatMap(List::stream)
+            );
+
+            currentClassFields.addNotPresent(parentClassFields);
+            return currentClassFields;
+        }
+
+        private boolean isIdAnnotated(Field field) {
+            Id id = field.getAnnotation(Id.class);
+            return id!=null;
+        }
+
+        private boolean reviewSupportedRelations(Field field) {
+            JoinTable joinTable = field.getDeclaredAnnotation(JoinTable.class);
+            if (joinTable != null) {
+                logger.warn("JoinTable mapping unsupported, has no effect on join table persistence if needed");
+                return false;
+            }
+            JoinColumns joinColumns = field.getDeclaredAnnotation(JoinColumns.class);
+            if (joinColumns != null) {
+                throw new UnsupportedOperationException("@JoinColumns annotation not supported");
+            }
+            return true;
+        }
+
     }
 
 }
