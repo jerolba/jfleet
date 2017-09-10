@@ -89,7 +89,7 @@ public class FailedManyToOneEntityInspectorTest {
         private int serialId;
 
         @ManyToOne
-        @JoinColumns(value= {})
+        @JoinColumns(value = {})
         private Foo foo;
 
         public int getSerialId() {
