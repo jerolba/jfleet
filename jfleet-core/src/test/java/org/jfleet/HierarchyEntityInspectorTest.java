@@ -19,6 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
@@ -142,6 +145,64 @@ public class HierarchyEntityInspectorTest {
         List<FieldInfo> fields = entityInfo.getFields();
         assertEquals(1, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
+    }
+
+    @Entity
+    @AttributeOverrides(value = {
+        @AttributeOverride(name = "someField", column = @Column(name = "field_override")),
+    })
+    public class ChildClassWithAttributeOverrides extends BaseClassMapped {
+
+        private int otherField;
+
+        public int getOtherField() {
+            return otherField;
+        }
+
+        public void setOtherField(int otherField) {
+            this.otherField = otherField;
+        }
+
+    }
+
+    @Test
+    public void inspectTableWithAttributeOverrides() {
+        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverrides.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        assertEquals("otherField", fields.get(0).getFieldName());
+        assertEquals("someField", fields.get(1).getFieldName());
+        assertEquals("field_override", fields.get(1).getColumnName());
+
+    }
+
+    @Entity
+    @AttributeOverride(name = "someField", column = @Column(name = "field_override"))
+    public class ChildClassWithAttributeOverride extends BaseClassMapped {
+
+        private int otherField;
+
+        public int getOtherField() {
+            return otherField;
+        }
+
+        public void setOtherField(int otherField) {
+            this.otherField = otherField;
+        }
+
+    }
+
+    @Test
+    public void inspectTableWithAttributeOverride() {
+        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverride.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        assertEquals("otherField", fields.get(0).getFieldName());
+        assertEquals("someField", fields.get(1).getFieldName());
+        assertEquals("field_override", fields.get(1).getColumnName());
+
     }
 
 }

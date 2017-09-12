@@ -54,7 +54,7 @@ public class EmbeddedEntityPersistenceTest extends AllDatabasesBaseTest {
         address2.setCity("London");
         address2.setStreet("4 Whitehall Place");
         p2.setAddress(address2);
-        List<Person> persons = Arrays.asList(p1,p2);
+        List<Person> persons = Arrays.asList(p1, p2);
 
         BulkInsert<Person> insert = database.getBulkInsert(Person.class);
         try (Connection conn = database.getConnection()) {

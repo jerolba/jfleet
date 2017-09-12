@@ -16,6 +16,8 @@
 package org.jfleet;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -24,10 +26,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.persistence.AttributeOverride;
@@ -54,7 +55,7 @@ public class JpaEntityInspector {
 
     private static Logger logger = LoggerFactory.getLogger(JpaEntityInspector.class);
 
-    private Class<?> entityClass;
+    private final Class<?> entityClass;
 
     public JpaEntityInspector(Class<?> entityClass) {
         this.entityClass = entityClass;
@@ -96,11 +97,13 @@ public class JpaEntityInspector {
         if (!isEntityOrMapped(entityClass)) {
             return parentClassFields;
         }
+        MappingOverride mappingOverride = new MappingOverride(entityClass);
+        FieldsCollection overwrittenClassFields = mappingOverride.override(parentClassFields);
 
         FieldsCollection currentClassFields = new FieldsCollection(Stream.of(entityClass.getDeclaredFields())
                 .map(FieldInspector::new).map(FieldInspector::inspect).flatMap(List::stream));
 
-        currentClassFields.addNotPresent(parentClassFields);
+        currentClassFields.addNotPresent(overwrittenClassFields);
         return currentClassFields;
     }
 
@@ -116,9 +119,9 @@ public class JpaEntityInspector {
         return false;
     }
 
-    private class FieldInspector {
+    private static class FieldInspector {
 
-        private Field field;
+        private final Field field;
 
         FieldInspector(Field field) {
             this.field = field;
@@ -134,14 +137,14 @@ public class JpaEntityInspector {
                 return embeddedInspector.getFields();
             }
             ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
-            if (manyToOne !=null) {
+            if (manyToOne != null) {
                 ManyToOneInspector manyToOneInspector = new ManyToOneInspector(field);
                 return manyToOneInspector.getFields();
             }
 
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setColumnName(getColumnName());
-            fieldInfo.setFieldName(getFieldName());
+            fieldInfo.setFieldName(field.getName());
             fieldInfo.setFieldType(getFieldType());
             return asList(fieldInfo);
         }
@@ -154,10 +157,6 @@ public class JpaEntityInspector {
                     return name;
                 }
             }
-            return field.getName();
-        }
-
-        private String getFieldName() {
             return field.getName();
         }
 
@@ -226,8 +225,7 @@ public class JpaEntityInspector {
         }
 
         private boolean isTransient() {
-            Transient trans = field.getAnnotation(Transient.class);
-            return trans != null;
+            return field.getAnnotation(Transient.class) != null;
         }
 
         private boolean isStaticField() {
@@ -287,9 +285,9 @@ public class JpaEntityInspector {
 
     }
 
-    private class EmbeddedInspector {
+    private static class EmbeddedInspector {
 
-        private Field field;
+        private final Field field;
 
         EmbeddedInspector(Field field) {
             this.field = field;
@@ -299,7 +297,7 @@ public class JpaEntityInspector {
             String name = field.getName();
             Class<?> javaType = field.getType();
             FieldsCollection currentClassFields = getFieldsFromClass(javaType);
-            return currentClassFields.stream().map(field -> field.prependName(name)).collect(Collectors.toList());
+            return currentClassFields.stream().map(field -> field.prependName(name)).collect(toList());
         }
 
         private FieldsCollection getFieldsFromClass(Class<?> entityClass) {
@@ -314,35 +312,62 @@ public class JpaEntityInspector {
             );
 
             currentClassFields.addNotPresent(parentClassFields);
-            Map<String, String> overrideAttrs = getMappingOverride(field);
-            FieldsCollection override = currentClassFields.overrideAtttributes(overrideAttrs);
-            return override;
+
+            MappingOverride mappingOverride = new MappingOverride(field);
+            return mappingOverride.override(currentClassFields);
         }
 
-        private Map<String, String> getMappingOverride(Field field) {
-            AttributeOverrides annotation = field.getAnnotation(AttributeOverrides.class);
-            if (annotation == null) {
-                return Collections.emptyMap();
-            }
-            AttributeOverride[] overrides = annotation.value();
-            if (overrides.length == 0) {
-                return Collections.emptyMap();
-            }
-            Map<String, String> map = new HashMap<>();
-            for (AttributeOverride attr : overrides) {
-                String fieldName = attr.name();
-                String columnName = attr.column().name();
-                if (fieldName != null && columnName != null) {
-                    map.put(fieldName, columnName);
-                }
-            }
-            return map;
-        }
     }
 
-    private class ManyToOneInspector {
+    private static class MappingOverride {
 
-        private Field field;
+        private final Map<String, String> mapping;
+
+        MappingOverride(Field field) {
+            AttributeOverrides multiple = field.getAnnotation(AttributeOverrides.class);
+            AttributeOverride simple = field.getAnnotation(AttributeOverride.class);
+            this.mapping = getMappingOverrride(multiple, simple);
+        }
+
+        MappingOverride(Class<?> entityClass) {
+            AttributeOverrides multiple = entityClass.getAnnotation(AttributeOverrides.class);
+            AttributeOverride simple = entityClass.getAnnotation(AttributeOverride.class);
+            this.mapping = getMappingOverrride(multiple, simple);
+        }
+
+        private Map<String, String> getMappingOverrride(AttributeOverrides multiple, AttributeOverride simple) {
+            Stream<AttributeOverride> overrides = getMappingOverride(multiple)
+                    .orElseGet(() -> getMappingOverride(simple).orElse(Stream.empty()));
+            return overrides.collect(toMap(attr -> attr.name(), attr -> attr.column().name()));
+        }
+
+        private Optional<Stream<AttributeOverride>> getMappingOverride(AttributeOverrides multiple) {
+            if (multiple == null) {
+                return Optional.empty();
+            }
+            if (multiple.value().length == 0) {
+                logger.warn("An @AttributeOverrides has no @AttributeOverride elements.");
+                return Optional.empty();
+            }
+            return Optional.of(Stream.of(multiple.value()));
+        }
+
+        private Optional<Stream<AttributeOverride>> getMappingOverride(AttributeOverride simple) {
+            if (simple == null) {
+                return Optional.empty();
+            }
+            return Optional.of(Stream.of(simple));
+        }
+
+        public FieldsCollection override(FieldsCollection fieldsCollection) {
+            return fieldsCollection.overrideAtttributes(mapping);
+        }
+
+    }
+
+    private static class ManyToOneInspector {
+
+        private final Field field;
 
         ManyToOneInspector(Field field) {
             this.field = field;
@@ -373,7 +398,7 @@ public class JpaEntityInspector {
             return currentClassFields.stream().map(field -> {
                     String columnName = name + "_" + field.getColumnName();
                     return field.prependName(name).withColumnName(columnName);
-                }).collect(Collectors.toList());
+                }).collect(toList());
         }
 
         private FieldsCollection getIdFieldsFromClass(Class<?> entityClass) {
@@ -394,7 +419,7 @@ public class JpaEntityInspector {
 
         private boolean isIdAnnotated(Field field) {
             Id id = field.getAnnotation(Id.class);
-            return id!=null;
+            return id != null;
         }
 
         private boolean reviewSupportedRelations(Field field) {

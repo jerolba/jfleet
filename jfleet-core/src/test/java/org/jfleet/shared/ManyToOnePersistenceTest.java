@@ -1,3 +1,18 @@
+/**
+ * Copyright 2017 Jerónimo López Bezanilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jfleet.shared;
 
 import static org.junit.Assert.assertEquals;
@@ -155,7 +170,7 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
                     for (Bar f : bars) {
                         assertTrue(rs.next());
                         assertEquals(f.getId().longValue(), rs.getLong("id"));
-                        assertEquals(f.getPrice(), rs.getDouble("price"),0.0001);
+                        assertEquals(f.getPrice(), rs.getDouble("price"), 0.0001);
                         assertEquals(f.getProduct().getId().longValue(), rs.getLong("alternate_id"));
                     }
                 }
@@ -186,12 +201,12 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
                 try (ResultSet rs = stmt.executeQuery("SELECT id, price, alternate_id FROM textil ORDER BY id ASC")) {
                     assertTrue(rs.next());
                     assertEquals(f1.getId().longValue(), rs.getLong("id"));
-                    assertEquals(f1.getPrice(), rs.getDouble("price"),0.0001);
+                    assertEquals(f1.getPrice(), rs.getDouble("price"), 0.0001);
                     assertEquals(f1.getProduct().getId().longValue(), rs.getLong("alternate_id"));
 
                     assertTrue(rs.next());
                     assertEquals(f2.getId().longValue(), rs.getLong("id"));
-                    assertEquals(f2.getPrice(), rs.getDouble("price"),0.0001);
+                    assertEquals(f2.getPrice(), rs.getDouble("price"), 0.0001);
                     rs.getLong("alternate_id");
                     assertTrue(rs.wasNull());
                 }
@@ -216,12 +231,12 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
                 try (ResultSet rs = stmt.executeQuery("SELECT id, price, alternate_id FROM textil ORDER BY id ASC")) {
                     assertTrue(rs.next());
                     assertEquals(f1.getId().longValue(), rs.getLong("id"));
-                    assertEquals(f1.getPrice(), rs.getDouble("price"),0.0001);
+                    assertEquals(f1.getPrice(), rs.getDouble("price"), 0.0001);
                     assertEquals(f1.getProduct().getId().longValue(), rs.getLong("alternate_id"));
 
                     assertTrue(rs.next());
                     assertEquals(f2.getId().longValue(), rs.getLong("id"));
-                    assertEquals(f2.getPrice(), rs.getDouble("price"),0.0001);
+                    assertEquals(f2.getPrice(), rs.getDouble("price"), 0.0001);
                     rs.getLong("alternate_id");
                     assertTrue(rs.wasNull());
                 }
