@@ -35,6 +35,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -132,7 +133,8 @@ public class JpaEntityInspector {
                 return Collections.emptyList();
             }
             Embedded embedded = field.getAnnotation(Embedded.class);
-            if (embedded != null) {
+            EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
+            if (embedded != null || embeddedId != null) {
                 EmbeddedInspector embeddedInspector = new EmbeddedInspector(field);
                 return embeddedInspector.getFields();
             }
