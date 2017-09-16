@@ -52,4 +52,9 @@ public class EntityInfo {
         this.fields.addAll(fields);
     }
 
+    public FieldInfo findField(String fieldName) {
+        return getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();
+    }
+
+
 }

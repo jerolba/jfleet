@@ -43,6 +43,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -139,9 +140,10 @@ public class JpaEntityInspector {
                 return embeddedInspector.getFields();
             }
             ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
-            if (manyToOne != null) {
-                ManyToOneInspector manyToOneInspector = new ManyToOneInspector(field);
-                return manyToOneInspector.getFields();
+            OneToOne oneToOne = field.getAnnotation(OneToOne.class);
+            if (manyToOne != null || oneToOne != null) {
+                EntityToOneInspector entityToOneInspector = new EntityToOneInspector(field);
+                return entityToOneInspector.getFields();
             }
 
             FieldInfo fieldInfo = new FieldInfo();
@@ -367,11 +369,11 @@ public class JpaEntityInspector {
 
     }
 
-    private static class ManyToOneInspector {
+    private static class EntityToOneInspector {
 
         private final Field field;
 
-        ManyToOneInspector(Field field) {
+        EntityToOneInspector(Field field) {
             this.field = field;
         }
 
@@ -420,8 +422,7 @@ public class JpaEntityInspector {
         }
 
         private boolean isIdAnnotated(Field field) {
-            Id id = field.getAnnotation(Id.class);
-            return id != null;
+            return field.getAnnotation(Id.class) != null;
         }
 
         private boolean reviewSupportedRelations(Field field) {

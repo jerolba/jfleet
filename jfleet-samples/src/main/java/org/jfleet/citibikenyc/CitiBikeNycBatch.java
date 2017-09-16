@@ -33,7 +33,8 @@ import org.jfleet.util.MySqlTestConnectionProvider;
  * The dataset can be downloaded from: https://s3.amazonaws.com/tripdata/index.html
  *
  * Read and parse all files located in /tmp directory and each CSV file is inserted into the database.
- * The read and parse process are separated from insert one, which requires much more memory than streaming it.
+ * The read and parse process are separated from insert process. Firstly reads all content and creates entities and secondly writes it.
+ * This requires much more memory than streaming it, but allows to meter % time required for each part.
  *
  */
 public class CitiBikeNycBatch {

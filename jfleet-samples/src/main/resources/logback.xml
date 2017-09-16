@@ -29,4 +29,6 @@
 	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>
+	
+	<logger name="org.jfleet" level="DEBUG"/>
 </configuration>

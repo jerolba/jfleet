@@ -113,15 +113,15 @@ public class EmbeddedIdInspectorTest {
         JpaEntityInspector inspector = new JpaEntityInspector(SomeClass.class);
         EntityInfo entityInfo = inspector.inspect();
 
-        FieldInfo someId = getField(entityInfo, "key.someId");
+        FieldInfo someId = entityInfo.findField("key.someId");
         assertEquals(FieldTypeEnum.STRING, someId.getFieldType().getFieldType());
         assertEquals("someId", someId.getColumnName());
 
-        FieldInfo otherId = getField(entityInfo, "key.otherId");
+        FieldInfo otherId = entityInfo.findField("key.otherId");
         assertEquals(FieldTypeEnum.LONG, otherId.getFieldType().getFieldType());
         assertEquals("otherId", otherId.getColumnName());
 
-        FieldInfo someValue = getField(entityInfo, "someValue");
+        FieldInfo someValue = entityInfo.findField("someValue");
         assertEquals(FieldTypeEnum.STRING, someValue.getFieldType().getFieldType());
         assertEquals("someValue", someValue.getColumnName());
     }
@@ -132,22 +132,17 @@ public class EmbeddedIdInspectorTest {
         JpaEntityInspector inspector = new JpaEntityInspector(SomeClassWithOverride.class);
         EntityInfo entityInfo = inspector.inspect();
 
-        FieldInfo someId = getField(entityInfo, "key.someId");
+        FieldInfo someId = entityInfo.findField("key.someId");
         assertEquals(FieldTypeEnum.STRING, someId.getFieldType().getFieldType());
         assertEquals("id_string", someId.getColumnName());
 
-        FieldInfo otherId = getField(entityInfo, "key.otherId");
+        FieldInfo otherId = entityInfo.findField("key.otherId");
         assertEquals(FieldTypeEnum.LONG, otherId.getFieldType().getFieldType());
         assertEquals("id_long", otherId.getColumnName());
 
-        FieldInfo someValue = getField(entityInfo, "someValue");
+        FieldInfo someValue = entityInfo.findField("someValue");
         assertEquals(FieldTypeEnum.STRING, someValue.getFieldType().getFieldType());
         assertEquals("value", someValue.getColumnName());
-    }
-
-
-    private FieldInfo getField(EntityInfo entityInfo, String fieldName) {
-        return entityInfo.getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();
     }
 
 }

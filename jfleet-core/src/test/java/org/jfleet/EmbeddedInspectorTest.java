@@ -29,19 +29,19 @@ public class EmbeddedInspectorTest {
         JpaEntityInspector inspector = new JpaEntityInspector(Person.class);
         EntityInfo entityInfo = inspector.inspect();
 
-        FieldInfo id = getField(entityInfo, "id");
+        FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
         assertEquals("id", id.getColumnName());
 
-        FieldInfo name = getField(entityInfo, "name");
+        FieldInfo name = entityInfo.findField("name");
         assertEquals(FieldTypeEnum.STRING, name.getFieldType().getFieldType());
         assertEquals("name", name.getColumnName());
 
-        FieldInfo street = getField(entityInfo, "address.street");
+        FieldInfo street = entityInfo.findField("address.street");
         assertEquals(FieldTypeEnum.STRING, street.getFieldType().getFieldType());
         assertEquals("street", street.getColumnName());
 
-        FieldInfo city = getField(entityInfo, "address.city");
+        FieldInfo city = entityInfo.findField("address.city");
         assertEquals(FieldTypeEnum.STRING, city.getFieldType().getFieldType());
         assertEquals("city", city.getColumnName());
     }
@@ -51,35 +51,29 @@ public class EmbeddedInspectorTest {
         JpaEntityInspector inspector = new JpaEntityInspector(Company.class);
         EntityInfo entityInfo = inspector.inspect();
 
-        FieldInfo id = getField(entityInfo, "id");
+        FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
         assertEquals("id", id.getColumnName());
 
-        FieldInfo name = getField(entityInfo, "name");
+        FieldInfo name = entityInfo.findField("name");
         assertEquals(FieldTypeEnum.STRING, name.getFieldType().getFieldType());
         assertEquals("name", name.getColumnName());
 
-        FieldInfo postalStreet = getField(entityInfo, "postalAddress.street");
+        FieldInfo postalStreet = entityInfo.findField("postalAddress.street");
         assertEquals(FieldTypeEnum.STRING, postalStreet.getFieldType().getFieldType());
         assertEquals("postal_street", postalStreet.getColumnName());
 
-        FieldInfo postalCity = getField(entityInfo, "postalAddress.city");
+        FieldInfo postalCity = entityInfo.findField("postalAddress.city");
         assertEquals(FieldTypeEnum.STRING, postalCity.getFieldType().getFieldType());
         assertEquals("postal_city", postalCity.getColumnName());
 
-        FieldInfo fiscalStreet = getField(entityInfo, "fiscalAddress.street");
+        FieldInfo fiscalStreet = entityInfo.findField("fiscalAddress.street");
         assertEquals(FieldTypeEnum.STRING, fiscalStreet.getFieldType().getFieldType());
         assertEquals("fiscal_street", fiscalStreet.getColumnName());
 
-        FieldInfo fiscalCity = getField(entityInfo, "fiscalAddress.city");
+        FieldInfo fiscalCity = entityInfo.findField("fiscalAddress.city");
         assertEquals(FieldTypeEnum.STRING, fiscalCity.getFieldType().getFieldType());
         assertEquals("fiscal_city", fiscalCity.getColumnName());
-
-    }
-
-
-    private FieldInfo getField(EntityInfo entityInfo, String fieldName) {
-        return entityInfo.getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();
     }
 
 }
