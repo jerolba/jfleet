@@ -19,7 +19,7 @@ package org.jfleet.citibikenyc;
 public class TripParser extends CSVParser<TripEntity> {
 
 	public TripParser(String line) {
-	    super(line);
+	    super(line, 15);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ package org.jfleet.citibikenyc;
 public class FlatTripParser extends CSVParser<TripFlatEntity> {
 
 	public FlatTripParser(String line) {
-	    super(line);
+	    super(line, 15);
 	}
 
 	@Override

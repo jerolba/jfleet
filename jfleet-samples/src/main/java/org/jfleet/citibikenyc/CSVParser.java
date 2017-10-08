@@ -17,8 +17,9 @@ package org.jfleet.citibikenyc;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+
+import org.jfleet.util.CsvSplit;
 
 public abstract class CSVParser<T> {
 
@@ -29,31 +30,9 @@ public abstract class CSVParser<T> {
 
     public abstract T parse();
 
-    public CSVParser(String line) {
-        int idx = 0;
-        ArrayList<String> list = new ArrayList<>();
-        while (idx < line.length()) {
-            if (line.charAt(idx)=='"') {
-                idx++;
-                int ini = idx;
-                while (idx<line.length() && line.charAt(idx)!='"') {
-                    idx++;
-                }
-                list.add(line.substring(ini, idx));
-                idx++; //Skip "
-                idx++; //Skip ,
-            }else {
-                int ini = idx;
-                while (idx<line.length() && line.charAt(idx)!=',') {
-                    idx++;
-                }
-                list.add(line.substring(ini, idx));
-                idx++; //Skip ,
-            }
-        }
-        this.cols = list.toArray(new String[list.size()]);
+    public CSVParser(String line, int fieldsNumber) {
+        this.cols = CsvSplit.split(line, fieldsNumber);
     }
-
 
     private String next() {
         String str = cols[col++];
