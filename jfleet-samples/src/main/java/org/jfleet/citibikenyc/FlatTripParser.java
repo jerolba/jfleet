@@ -15,7 +15,8 @@
  */
 package org.jfleet.citibikenyc;
 
-//TODO: improve parse time
+import org.jfleet.citibikenyc.entities.TripFlatEntity;
+
 public class FlatTripParser extends CSVParser<TripFlatEntity> {
 
 	public FlatTripParser(String line) {
