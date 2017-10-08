@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.jfleet.util.StreamCounter;
+
 public class CitiBikeReader<T> {
 
     private final Function<String, CSVParser<T>> csvParser;

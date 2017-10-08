@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.citibikenyc;
+package org.jfleet.util;
 
 import java.io.Closeable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class to log the number of items processed in a Stream and meter the time elaspsed from creation.
+ */
 public class StreamCounter<T> implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamCounter.class);

@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.jfleet.util.CsvSplit;
 
+//TODO: improve parse time
 public abstract class CSVParser<T> {
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
