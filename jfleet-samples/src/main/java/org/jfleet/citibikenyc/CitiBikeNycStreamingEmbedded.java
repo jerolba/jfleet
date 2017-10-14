@@ -46,7 +46,7 @@ public class CitiBikeNycStreamingEmbedded {
             reader.forEachCsvInZip(trips -> {
                 try {
                     bulkInsert.insertAll(connection, trips);
-                } catch (JFleetException e) {
+                } catch (JFleetException | SQLException e) {
                     e.printStackTrace();
                 }
             });

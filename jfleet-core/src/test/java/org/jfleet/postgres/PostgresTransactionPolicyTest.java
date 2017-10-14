@@ -45,7 +45,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException {
+    public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException, JFleetException {
         Supplier<Connection> provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
             setupDatabase(connection);
@@ -57,7 +57,7 @@ public class PostgresTransactionPolicyTest {
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
                 connection.commit();
-            } catch (JFleetException e) {
+            } catch (SQLException e) {
                 logger.info("Expected error on missed FK");
                 connection.close();
             }
@@ -66,7 +66,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws IOException, SQLException {
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws IOException, SQLException, JFleetException {
         Supplier<Connection> provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
             setupDatabase(connection);
@@ -76,7 +76,7 @@ public class PostgresTransactionPolicyTest {
 
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
-            } catch(JFleetException e) {
+            } catch(SQLException e) {
                 logger.info("Expected error on missed FK");
             }
             assertTrue(numberOfRowsInEmployeeTable(connection)>0);

@@ -27,7 +27,6 @@ import org.jfleet.BulkInsert;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
-import org.jfleet.WrappedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,28 +62,22 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     }
 
     @Override
-    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
-        try {
-            MySqlTransactionPolicy txPolicy = MySqlTransactionPolicy.getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
-            try (Statement stmt = getStatementForLoadLocal(conn)) {
-                Iterator<T> it = stream.iterator();
-                while (it.hasNext()) {
-                    contentBuilder.add(it.next());
-                    if (contentBuilder.getContentSize() > batchSize) {
-                        logger.debug("Writing content");
-                        writeContent(txPolicy, stmt, contentBuilder);
-                    }
+        MySqlTransactionPolicy txPolicy = MySqlTransactionPolicy.getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
+        try (Statement stmt = getStatementForLoadLocal(conn)) {
+            Iterator<T> it = stream.iterator();
+            while (it.hasNext()) {
+                contentBuilder.add(it.next());
+                if (contentBuilder.getContentSize() > batchSize) {
+                    logger.debug("Writing content");
+                    writeContent(txPolicy, stmt, contentBuilder);
                 }
-                logger.debug("Flushing content");
-                writeContent(txPolicy, stmt, contentBuilder);
-            } finally {
-                txPolicy.close();
             }
-        } catch (SQLException e) {
-            throw new JFleetException(e);
-        } catch (WrappedException e) {
-            e.rethrow();
+            logger.debug("Flushing content");
+            writeContent(txPolicy, stmt, contentBuilder);
+        } finally {
+            txPolicy.close();
         }
     }
 

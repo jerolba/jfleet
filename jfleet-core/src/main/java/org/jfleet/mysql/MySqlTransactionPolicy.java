@@ -36,7 +36,6 @@ public interface MySqlTransactionPolicy {
     void close() throws SQLException;
 
 
-
     public static class LongTransaction implements MySqlTransactionPolicy {
 
         private boolean errorOnMissingRow;
@@ -49,7 +48,7 @@ public interface MySqlTransactionPolicy {
         public void commit(int processed, Optional<Long> updatedInDB) throws SQLException, JFleetException{
             if (errorOnMissingRow && updatedInDB.isPresent()) {
                 if (processed != updatedInDB.get()) {
-                    throw new JFleetException("Missed row, processed: "+processed+", expected: "+updatedInDB.get());
+                    throw new JFleetException("Missed row, processed: " + processed + ", expected: " + updatedInDB.get());
                 }
             }
         }
@@ -79,7 +78,7 @@ public interface MySqlTransactionPolicy {
             if (errorOnMissingRow && updatedInDB.isPresent()) {
                 if (processed != updatedInDB.get()) {
                     this.connection.rollback();
-                    throw new JFleetException("Missed row, processed: "+processed+", expected: "+updatedInDB.get());
+                    throw new JFleetException("Missed row, processed: " + processed + ", expected: " + updatedInDB.get());
                 }
             }
             this.connection.commit();

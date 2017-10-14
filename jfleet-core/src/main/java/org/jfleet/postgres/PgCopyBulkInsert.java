@@ -58,7 +58,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     }
 
     @Override
-    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
+    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
         CopyManager copyMng = getCopyManager(conn);
         try {
@@ -77,14 +77,12 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
             } finally {
                 txPolicy.close();
             }
-        } catch (SQLException e) {
-            throw new JFleetException(e);
         } catch (WrappedException e) {
             e.rethrow();
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder) {
+    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder) throws SQLException {
         if (contentBuilder.getContentSize() > 0) {
             try {
                 long init = System.nanoTime();
@@ -94,19 +92,15 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
                         contentBuilder.getContentSize(), contentBuilder.getRecords());
                 contentBuilder.reset();
                 txPolicy.commit();
-            } catch (SQLException | IOException e) {
+            } catch (IOException e) {
                 throw new WrappedException(e);
             }
         }
     }
 
-    private CopyManager getCopyManager(Connection conn) throws JFleetException {
-        try {
-            PgConnection unwrapped = conn.unwrap(PgConnection.class);
-            return unwrapped.getCopyAPI();
-        } catch (SQLException e) {
-            throw new JFleetException(e);
-        }
+    private CopyManager getCopyManager(Connection conn) throws SQLException {
+        PgConnection unwrapped = conn.unwrap(PgConnection.class);
+        return unwrapped.getCopyAPI();
     }
 
 }

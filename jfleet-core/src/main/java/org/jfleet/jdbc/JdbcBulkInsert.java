@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,7 +34,6 @@ import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
-import org.jfleet.WrappedException;
 import org.jfleet.common.TransactionPolicy;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
@@ -82,20 +82,17 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     @Override
-    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
-        try {
-            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
-            try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-                BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
-                stream.forEach(statementCount::add);
-                statementCount.finish();
-            } finally {
-                txPolicy.close();
+    public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
+        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+        try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+            BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
+            Iterator<T> iterator = stream.iterator();
+            while (iterator.hasNext()) {
+                statementCount.add(iterator.next());
             }
-        } catch (SQLException e) {
-            throw new JFleetException(e);
-        } catch (WrappedException e) {
-            e.rethrow();
+            statementCount.finish();
+        } finally {
+            txPolicy.close();
         }
     }
 
@@ -110,17 +107,13 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             this.pstmt = pstmt;
         }
 
-        public void add(T entity) {
-            try {
-                setObjectValues(pstmt, entity);
-                pstmt.addBatch();
-                count++;
-                if (count == BATCH_SIZE) {
-                    flush();
-                    count = 0;
-                }
-            } catch (SQLException e) {
-                throw new WrappedException(e);
+        public void add(T entity) throws SQLException {
+            setObjectValues(pstmt, entity);
+            pstmt.addBatch();
+            count++;
+            if (count == BATCH_SIZE) {
+                flush();
+                count = 0;
             }
         }
 

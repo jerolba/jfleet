@@ -15,6 +15,8 @@
  */
 package org.jfleet;
 
+import java.sql.SQLException;
+
 public class WrappedException extends RuntimeException {
 
     private static final long serialVersionUID = 5687915465143634780L;
@@ -23,7 +25,10 @@ public class WrappedException extends RuntimeException {
         super(e);
     }
 
-    public void rethrow() throws JFleetException {
+    public void rethrow() throws JFleetException, SQLException {
+        if (getCause() instanceof SQLException) {
+            throw (SQLException) this.getCause();
+        }
         throw new JFleetException(this.getCause());
     }
 
