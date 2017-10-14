@@ -23,4 +23,8 @@ public class JFleetException extends Exception {
         super(e.getMessage(), e);
     }
 
+    public JFleetException(String message) {
+        super(message);
+    }
+
 }

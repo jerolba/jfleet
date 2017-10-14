@@ -36,19 +36,25 @@ import org.slf4j.LoggerFactory;
 public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyBulkInsert.class);
+    private static final long DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
 
     private final EntityInfo entityInfo;
     private final String mainSql;
-    private final long BATCH_SIZE = 50 * 1_024 * 1_024;
+    private final long batchSize;
+    private boolean longTransaction;
 
     public PgCopyBulkInsert(Class<T> clazz) {
+        this(clazz, DEFAULT_BATCH_SIZE, false);
+    }
+
+    public PgCopyBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction) {
         JpaEntityInspector inspector = new JpaEntityInspector(clazz);
         this.entityInfo = inspector.inspect();
-
-        SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
-        mainSql = sqlBuiler.build();
+        this.batchSize = batchSize;
+        this.longTransaction = longTransaction;
+        this.mainSql = new SqlBuilder(entityInfo).build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
-        logger.debug("Batch size: {} bytes", BATCH_SIZE);
+        logger.debug("Batch size: {} bytes", batchSize);
     }
 
     @Override
@@ -56,12 +62,12 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
         CopyManager copyMng = getCopyManager(conn);
         try {
-            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
             try {
                 Iterator<T> it = stream.iterator();
                 while (it.hasNext()) {
                     contentBuilder.add(it.next());
-                    if (contentBuilder.getContentSize() > BATCH_SIZE) {
+                    if (contentBuilder.getContentSize() > batchSize) {
                         logger.debug("Writing content");
                         writeContent(txPolicy, copyMng, contentBuilder);
                     }

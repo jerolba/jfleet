@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -27,41 +28,50 @@ import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
-import org.jfleet.common.TransactionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.jdbc.ResultsetInspector;
 import com.mysql.jdbc.Statement;
 
 public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(LoadDataBulkInsert.class);
+    private final static long DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
 
     private final EntityInfo entityInfo;
     private final String mainSql;
+    private final long batchSize;
+    private final boolean longTransaction;
+    private final boolean errorOnMissingRow;
     private final Charset encoding = Charset.forName("UTF-8");
-    private final long BATCH_SIZE = 50 * 1_024 * 1_024;
 
     public LoadDataBulkInsert(Class<T> clazz) {
+        this(clazz, DEFAULT_BATCH_SIZE, false, false);
+    }
+
+    public LoadDataBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction, boolean errorOnMissingRow) {
         JpaEntityInspector inspector = new JpaEntityInspector(clazz);
         this.entityInfo = inspector.inspect();
-
+        this.batchSize = batchSize;
+        this.longTransaction = longTransaction;
+        this.errorOnMissingRow = errorOnMissingRow;
         SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
         mainSql = sqlBuiler.build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
-        logger.debug("Batch size: {} bytes", BATCH_SIZE);
+        logger.debug("Batch size: {} bytes", batchSize);
     }
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
         try {
-            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+            MySqlTransactionPolicy txPolicy = MySqlTransactionPolicy.getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
             try (Statement stmt = getStatementForLoadLocal(conn)) {
                 Iterator<T> it = stream.iterator();
                 while (it.hasNext()) {
                     contentBuilder.add(it.next());
-                    if (contentBuilder.getContentSize() > BATCH_SIZE) {
+                    if (contentBuilder.getContentSize() > batchSize) {
                         logger.debug("Writing content");
                         writeContent(txPolicy, stmt, contentBuilder);
                     }
@@ -78,8 +88,8 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder)
-            throws SQLException {
+    private void writeContent(MySqlTransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder)
+            throws SQLException, JFleetException {
         if (contentBuilder.getContentSize() > 0) {
             long init = System.nanoTime();
             String content = contentBuilder.getContent();
@@ -87,8 +97,10 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
             stmt.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
                     contentBuilder.getContentSize(), contentBuilder.getRecords());
+            Optional<Long> updatedInDB = ResultsetInspector.getUpdatedRows(stmt);
+            int processed = contentBuilder.getRecords();
             contentBuilder.reset();
-            txPolicy.commit();
+            txPolicy.commit(processed, updatedInDB);
         }
     }
 
