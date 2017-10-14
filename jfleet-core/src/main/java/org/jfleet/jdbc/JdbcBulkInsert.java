@@ -38,17 +38,26 @@ import org.jfleet.common.TransactionPolicy;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
-    private static final int BATCH_SIZE = 10_000;
+    private static final int DEFAULT_BATCH_SIZE = 10_000;
     private final EntityInfo entityInfo;
     private final String insertSql;
+
+    private final long batchSize;
+    private final boolean longTransaction;
 
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
 
     public JdbcBulkInsert(Class<T> clazz) {
+        this(clazz, DEFAULT_BATCH_SIZE, false);
+    }
+
+    public JdbcBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction) {
         JpaEntityInspector inspector = new JpaEntityInspector(clazz);
         this.entityInfo = inspector.inspect();
+        this.batchSize = batchSize;
+        this.longTransaction = longTransaction;
         this.insertSql = createInsertQuery(entityInfo);
 
         this.fields = entityInfo.getFields();
@@ -83,7 +92,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, false);
+        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
             BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
             Iterator<T> iterator = stream.iterator();
@@ -111,7 +120,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             setObjectValues(pstmt, entity);
             pstmt.addBatch();
             count++;
-            if (count == BATCH_SIZE) {
+            if (count == batchSize) {
                 flush();
                 count = 0;
             }
