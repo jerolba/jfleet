@@ -41,7 +41,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private final EntityInfo entityInfo;
     private final String mainSql;
     private final long batchSize;
-    private boolean longTransaction;
+    private final boolean longTransaction;
 
     public PgCopyBulkInsert(Class<T> clazz) {
         this(clazz, DEFAULT_BATCH_SIZE, false);
@@ -82,7 +82,8 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder) throws SQLException {
+    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder)
+            throws SQLException {
         if (contentBuilder.getContentSize() > 0) {
             try {
                 long init = System.nanoTime();

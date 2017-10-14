@@ -15,6 +15,8 @@
  */
 package org.jfleet.mysql;
 
+import static org.jfleet.mysql.MySqlTransactionPolicy.getTransactionPolicy;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
@@ -64,7 +66,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
-        MySqlTransactionPolicy txPolicy = MySqlTransactionPolicy.getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
+        MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             Iterator<T> it = stream.iterator();
             while (it.hasNext()) {

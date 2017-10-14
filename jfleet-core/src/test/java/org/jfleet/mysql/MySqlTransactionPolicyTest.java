@@ -1,3 +1,18 @@
+/**
+ * Copyright 2017 Jerónimo López Bezanilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jfleet.mysql;
 
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithForeignKeyError;
@@ -27,7 +42,8 @@ public class MySqlTransactionPolicyTest {
     private static final long VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
     @Test
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws IOException, SQLException, JFleetException {
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
+            throws IOException, SQLException, JFleetException {
         Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
             setupDatabase(connection);
@@ -38,8 +54,8 @@ public class MySqlTransactionPolicyTest {
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
 
-            //We don't know how many load data operations were executed, but with
-            //low batch size, multiple load data are executed with few records.
+            // We don't know how many load data operations were executed, but with
+            // low batch size, multiple load data are executed with few records.
             assertEquals(7, numberOfRowsInEmployeeTable(connection));
             connection.rollback();
             assertEquals(0, numberOfRowsInEmployeeTable(connection));
@@ -83,7 +99,6 @@ public class MySqlTransactionPolicyTest {
         }
     }
 
-
     @Test
     public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws IOException, SQLException {
         Supplier<Connection> provider = new MySqlTestConnectionProvider();
@@ -122,7 +137,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws IOException, SQLException {
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
+            throws IOException, SQLException {
         Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
             setupDatabase(connection);
@@ -132,10 +148,10 @@ public class MySqlTransactionPolicyTest {
 
             try {
                 bulkInsert.insertAll(connection, employeesWithForeignKeyError());
-            } catch(JFleetException e) {
+            } catch (JFleetException e) {
                 logger.info("Expected error on missed FK");
             }
-            assertTrue(numberOfRowsInEmployeeTable(connection)>0);
+            assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
         }
     }
 
@@ -150,7 +166,7 @@ public class MySqlTransactionPolicyTest {
 
             try {
                 bulkInsert.insertAll(connection, employeesWithMultipleConstraintsErrors());
-            } catch(JFleetException e) {
+            } catch (JFleetException e) {
                 logger.info("Expected error on constraint error");
             }
             assertEquals(6, numberOfRowsInEmployeeTable(connection));
