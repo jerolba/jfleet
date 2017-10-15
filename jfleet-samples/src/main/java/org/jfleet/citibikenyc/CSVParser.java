@@ -24,7 +24,8 @@ import org.jfleet.util.CsvSplit;
 //TODO: improve parse time
 public abstract class CSVParser<T> {
 
-    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
+    private final SimpleDateFormat sdf2 = new SimpleDateFormat("M/d/yyyy H:mm");
 
     private int col = 0;
     private final String[] cols;
@@ -57,7 +58,7 @@ public abstract class CSVParser<T> {
 
     public Integer nextInteger() {
         String value = next();
-        if (value != null && !value.equals("NULL")) {
+        if (value != null && !value.equals("NULL") && value.length()>0) {
             return Integer.parseInt(value);
         }
         return null;
@@ -81,7 +82,12 @@ public abstract class CSVParser<T> {
 
     public Date nextDate() {
         try {
-            return sdf.parse(next());
+            String date = next();
+            if (date.contains("-")) {
+                return sdf1.parse(date);
+            }else {
+                return sdf2.parse(date);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }

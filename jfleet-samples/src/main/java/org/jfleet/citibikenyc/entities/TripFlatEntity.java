@@ -19,8 +19,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -28,8 +26,11 @@ import javax.persistence.Table;
 @Table(name="bike_trip")
 public class TripFlatEntity {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Id
+    /* Removed in JPA because disable batch inserts. He must get created IDs to update the entity
+     * and main the identity of entity in memory. You can also use a logical composite key.
+     */
+	//@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 
 	@Column(name="tripduration")
