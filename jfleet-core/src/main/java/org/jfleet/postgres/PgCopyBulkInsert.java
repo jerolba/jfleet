@@ -64,9 +64,9 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
             try {
-                Iterator<T> it = stream.iterator();
-                while (it.hasNext()) {
-                    contentBuilder.add(it.next());
+                Iterator<T> iterator = stream.iterator();
+                while (iterator.hasNext()) {
+                    contentBuilder.add(iterator.next());
                     if (contentBuilder.getContentSize() > batchSize) {
                         logger.debug("Writing content");
                         writeContent(txPolicy, copyMng, contentBuilder);

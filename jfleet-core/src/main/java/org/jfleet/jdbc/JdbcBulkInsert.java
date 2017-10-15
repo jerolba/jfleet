@@ -94,12 +94,12 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-            BatchInsert statementCount = new BatchInsert(conn, txPolicy, pstmt);
+            BatchInsert batchInsert = new BatchInsert(conn, txPolicy, pstmt);
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
-                statementCount.add(iterator.next());
+                batchInsert.add(iterator.next());
             }
-            statementCount.finish();
+            batchInsert.finish();
         } finally {
             txPolicy.close();
         }

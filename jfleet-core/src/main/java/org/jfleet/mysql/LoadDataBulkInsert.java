@@ -68,9 +68,9 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
-            Iterator<T> it = stream.iterator();
-            while (it.hasNext()) {
-                contentBuilder.add(it.next());
+            Iterator<T> iterator = stream.iterator();
+            while (iterator.hasNext()) {
+                contentBuilder.add(iterator.next());
                 if (contentBuilder.getContentSize() > batchSize) {
                     logger.debug("Writing content");
                     writeContent(txPolicy, stmt, contentBuilder);
