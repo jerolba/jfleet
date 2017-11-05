@@ -18,6 +18,10 @@ package org.jfleet.citibikenyc;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
@@ -26,30 +30,26 @@ import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.util.MySqlTestConnectionProvider;
 
 /*
- * This example works with the dataset provided by Citi Bike NYC about each trip with their bikes.
- * The dataset can be downloaded from: https://s3.amazonaws.com/tripdata/index.html
- *
- * Parse all files located in /tmp directory and stream its content inserting into
- * the database.
- *
- * There is only one entity mapped with all fields.
+ * In this example read and parse process are separated from insert process. Firstly reads all content
+ * and creates entities in memory and secondly writes it.
+ * This requires much more memory than streaming it, but allows to meter % time required for each part.
  *
  */
-public class CitiBikeNycStreaming {
+public class SampleFetchDataInBatchBulkInsert {
 
-    public static void main(String[] args) throws IOException, SQLException {
-        MySqlTestConnectionProvider connectionSuplier = new MySqlTestConnectionProvider();
-        try (Connection connection = connectionSuplier.get()){
+    public static void main(String[] args) throws JFleetException, IOException, SQLException {
+        Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
+        try (Connection connection = connectionSuplier.get()) {
             TableHelper.createTable(connection);
+
+            List<List<TripFlatEntity>> tripsData = new ArrayList<>();
             CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
+            reader.forEachCsvInZip(trips -> tripsData.add(trips.collect(Collectors.toList())));
+
             BulkInsert<TripFlatEntity> bulkInsert = new LoadDataBulkInsert<>(TripFlatEntity.class);
-            reader.forEachCsvInZip(trips -> {
-                try {
-                    bulkInsert.insertAll(connection, trips);
-                } catch (JFleetException | SQLException e) {
-                    e.printStackTrace();
-                }
-            });
+            for (List<TripFlatEntity> trip : tripsData) {
+                bulkInsert.insertAll(connection, trip);
+            }
         }
     }
 }

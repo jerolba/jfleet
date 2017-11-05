@@ -18,31 +18,27 @@ package org.jfleet.citibikenyc;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.citibikenyc.entities.TripFlatEntity;
-import org.jfleet.jdbc.JdbcBulkInsert;
+import org.jfleet.citibikenyc.entities.TripEntity;
+import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.util.MySqlTestConnectionProvider;
 
 /*
- * This example works with the dataset provided by Citi Bike NYC about each trip with their bikes.
- * The dataset can be downloaded from: https://s3.amazonaws.com/tripdata/index.html
- *
- * Parse all files located in /tmp directory and stream its content inserting into
- * the database.
- *
- * This version persist all records using plain JDBC batch inserts.
+ * This sample persist information from an entity with two embedded objects,
+ * showing how it works with @Embedded and @AttributeOverrides anotations
  *
  */
-public class CitiBikeNycJdbc {
+public class SampleStreamDataWithEmbeddedEntities {
 
     public static void main(String[] args) throws IOException, SQLException {
-        MySqlTestConnectionProvider connectionSuplier = new MySqlTestConnectionProvider();
-        try (Connection connection = connectionSuplier.get()){
+        Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
+        try (Connection connection = connectionSuplier.get()) {
             TableHelper.createTable(connection);
-            CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
-            BulkInsert<TripFlatEntity> bulkInsert = new JdbcBulkInsert<>(TripFlatEntity.class, 100, false);
+            CitiBikeReader<TripEntity> reader = new CitiBikeReader<>("/tmp", str -> new TripParser(str));
+            BulkInsert<TripEntity> bulkInsert = new LoadDataBulkInsert<>(TripEntity.class);
             reader.forEachCsvInZip(trips -> {
                 try {
                     bulkInsert.insertAll(connection, trips);

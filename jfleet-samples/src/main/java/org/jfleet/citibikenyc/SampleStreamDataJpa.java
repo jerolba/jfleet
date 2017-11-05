@@ -33,23 +33,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- * This example works with the dataset provided by Citi Bike NYC about each trip with their bikes.
- * The dataset can be downloaded from: https://s3.amazonaws.com/tripdata/index.html
- *
- * Parse all files located in /tmp directory and stream its content inserting into
- * the database.
- *
- * Persist data using JPA (Hibernate implementation) with batch operations, flushing periodically
- * the entity manager. For optimal performance, the property `hibernate.jdbc.batch_size` should
+ * This example read data from stream but persist it using JPA (Hibernate implementation)
+ * with batch operations, flushing periodically the entity manager.
+ * For optimal performance, the property `hibernate.jdbc.batch_size` should
  * be the same value of the flush and clean size.
  *
- *
  */
-public class CitiBikeNycJpa {
+public class SampleStreamDataJpa {
 
     private static int BATCH_SIZE = 200;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CitiBikeNycJpa.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SampleStreamDataJpa.class);
 
     public static void main(String[] args) throws JFleetException, IOException, SQLException {
         DataSource dataSource = new MySqlTestDatasourceProvider().get();
@@ -72,6 +66,7 @@ public class CitiBikeNycJpa {
 
         CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
         entityManager.getTransaction().begin();
+        //Batch operations are not allowed with autoinsert id. We need to generate it manually.
         int [] idSeq = new int[] {1};
         reader.forEachCsvInZip(trips -> {
             int cont = 0;
