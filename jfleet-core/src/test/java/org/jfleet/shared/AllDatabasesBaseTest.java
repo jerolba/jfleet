@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jfleet.parameterized.Database;
+import org.jfleet.parameterized.JdbcMysqlDatabase;
 import org.jfleet.parameterized.JdbcPostgresDatabase;
 import org.jfleet.parameterized.MySqlDatabase;
 import org.jfleet.parameterized.PostgresDatabase;
@@ -35,7 +36,8 @@ public abstract class AllDatabasesBaseTest {
         return Arrays.asList(new Object[][] {
             {"MySql", new MySqlDatabase()},
             {"Postgres", new PostgresDatabase()},
-            {"Jdbc", new JdbcPostgresDatabase()}
+            {"JdbcPosgres", new JdbcPostgresDatabase()},
+            {"JdbcMySql", new JdbcMysqlDatabase()}
         });
     }
 
