@@ -18,6 +18,9 @@ package org.jfleet.common;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +38,9 @@ public class BaseTypeSerializer {
     private final SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+    private final DateTimeFormatter dtfLocalDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final DateTimeFormatter dtfLocalTime = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private final DateTimeFormatter dtfLocalDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Map<FieldTypeEnum, Mapper> mappers = new HashMap<>();
 
@@ -53,6 +59,9 @@ public class BaseTypeSerializer {
         add(FieldTypeEnum.TIMESTAMP, FROM_TIMESTAMP);
         add(FieldTypeEnum.DATE, FROM_DATE);
         add(FieldTypeEnum.TIME, FROM_TIME);
+        add(FieldTypeEnum.LOCALDATE, FROM_LOCALDATE);
+        add(FieldTypeEnum.LOCALTIME, FROM_LOCALTIME);
+        add(FieldTypeEnum.LOCALDATETIME, FROM_LOCALDATETIME);
     }
 
     public void add(FieldTypeEnum type, Mapper mapper) {
@@ -97,6 +106,13 @@ public class BaseTypeSerializer {
         return null;
     };
 
+    private final Mapper FROM_LOCALDATETIME = (obj) -> {
+        if (obj instanceof LocalDateTime) {
+            return ((LocalDateTime) obj).format(dtfLocalDateTime);
+        }
+        return null;
+    };
+
     private final Mapper FROM_DATE = (obj) -> {
         if (obj instanceof java.util.Date) {
             return sdfDate.format((java.util.Date) obj);
@@ -104,9 +120,23 @@ public class BaseTypeSerializer {
         return null;
     };
 
+    private final Mapper FROM_LOCALDATE = (obj) -> {
+        if (obj instanceof LocalDate) {
+            return ((LocalDate) obj).format(dtfLocalDate);
+        }
+        return null;
+    };
+
     private final Mapper FROM_TIME = (obj) -> {
         if (obj instanceof java.util.Date) {
             return sdfTime.format((java.util.Date) obj);
+        }
+        return null;
+    };
+
+    private final Mapper FROM_LOCALTIME = (obj) -> {
+        if (obj instanceof LocalTime) {
+            return dtfLocalTime.format((LocalTime) obj);
         }
         return null;
     };
