@@ -18,6 +18,7 @@ package org.jfleet.common;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,7 +31,12 @@ public class BaseTypeSerializer {
     public interface Mapper extends Function<Object, String> {
     }
 
-    private Map<FieldTypeEnum, Mapper> mappers = new HashMap<>();
+    /* As Type Serializer is used in a single stream, we don't need to take care of threadsafety of SimpleDateFormat*/
+    private final SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
+
+    private final Map<FieldTypeEnum, Mapper> mappers = new HashMap<>();
 
     public BaseTypeSerializer() {
         add(FieldTypeEnum.BOOLEAN, FROM_BOOLEAN);
@@ -62,48 +68,45 @@ public class BaseTypeSerializer {
         return function.apply(obj);
     }
 
-    private static final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "1" : "0";
+    private final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "1" : "0";
 
-    private static final Mapper FROM_BYTE = (obj) -> ((Byte) obj).toString();
+    private final Mapper FROM_BYTE = (obj) -> ((Byte) obj).toString();
 
-    private static final Mapper FROM_CHAR = (obj) -> ((Character) obj).toString();
+    private final Mapper FROM_CHAR = (obj) -> ((Character) obj).toString();
 
-    private static final Mapper FROM_DOUBLE = (obj) -> ((Double) obj).toString();
+    private final Mapper FROM_DOUBLE = (obj) -> ((Double) obj).toString();
 
-    private static final Mapper FROM_FLOAT = (obj) -> ((Float) obj).toString();
+    private final Mapper FROM_FLOAT = (obj) -> ((Float) obj).toString();
 
-    private static final Mapper FROM_INT = (obj) -> ((Integer) obj).toString();
+    private final Mapper FROM_INT = (obj) -> ((Integer) obj).toString();
 
-    private static final Mapper FROM_LONG = (obj) -> ((Long) obj).toString();
+    private final Mapper FROM_LONG = (obj) -> ((Long) obj).toString();
 
-    private static final Mapper FROM_SHORT = (obj) -> ((Short) obj).toString();
+    private final Mapper FROM_SHORT = (obj) -> ((Short) obj).toString();
 
-    private static final Mapper FROM_BIGDECIMAL = (obj) -> ((BigDecimal) obj).toString();
+    private final Mapper FROM_BIGDECIMAL = (obj) -> ((BigDecimal) obj).toString();
 
-    private static final Mapper FROM_BIGINTEGER = (obj) -> ((BigInteger) obj).toString();
+    private final Mapper FROM_BIGINTEGER = (obj) -> ((BigInteger) obj).toString();
 
-    private static final Mapper FROM_STRING = (obj) -> (String) obj;
+    private final Mapper FROM_STRING = (obj) -> (String) obj;
 
-    private static final Mapper FROM_TIMESTAMP = (obj) -> {
+    private final Mapper FROM_TIMESTAMP = (obj) -> {
         if (obj instanceof java.util.Date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return sdf.format((java.util.Date) obj);
+            return sdfDateTime.format((java.util.Date) obj);
         }
         return null;
     };
 
-    private static final Mapper FROM_DATE = (obj) -> {
+    private final Mapper FROM_DATE = (obj) -> {
         if (obj instanceof java.util.Date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            return sdf.format((java.util.Date) obj);
+            return sdfDate.format((java.util.Date) obj);
         }
         return null;
     };
 
-    private static final Mapper FROM_TIME = (obj) -> {
+    private final Mapper FROM_TIME = (obj) -> {
         if (obj instanceof java.util.Date) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            return sdf.format((java.util.Date) obj);
+            return sdfTime.format((java.util.Date) obj);
         }
         return null;
     };
