@@ -22,6 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -181,6 +183,10 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
                 pstmt.setTimestamp(parameterIndex, (Timestamp) parameterObj);
             } else if (parameterObj instanceof BigInteger) {
                 pstmt.setObject(parameterIndex, parameterObj);
+            } else if (parameterObj instanceof LocalDate) {
+                pstmt.setObject(parameterIndex, java.sql.Date.valueOf((LocalDate) parameterObj));
+            } else if (parameterObj instanceof LocalDateTime) {
+                pstmt.setObject(parameterIndex, java.sql.Timestamp.valueOf((LocalDateTime) parameterObj));
             } else {
                 throw new RuntimeException("No type mapper for " + parameterObj.getClass());
             }

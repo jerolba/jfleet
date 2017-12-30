@@ -18,7 +18,7 @@ package org.jfleet;
 public class EntityFieldType {
 
     public enum FieldTypeEnum {
-        BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE, STRING, DATE, TIME, TIMESTAMP, BIGDECIMAL, BIGINTEGER;
+        BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE, STRING, DATE, TIME, TIMESTAMP, BIGDECIMAL, BIGINTEGER, LOCALDATE, LOCALDATETIME;
     }
 
     // TODO: add metainfo about ids and generation

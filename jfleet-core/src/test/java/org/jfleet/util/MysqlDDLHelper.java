@@ -88,6 +88,10 @@ public class MysqlDDLHelper implements DDLHelper {
             return "TIME";
         case TIMESTAMP:
             return "DATETIME";
+        case LOCALDATE:
+            return "DATE";
+        case LOCALDATETIME:
+            return "DATETIME";
         }
         return null;
 

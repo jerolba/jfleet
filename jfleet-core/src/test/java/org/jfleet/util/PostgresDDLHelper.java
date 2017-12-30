@@ -88,6 +88,10 @@ public class PostgresDDLHelper implements DDLHelper {
             return "TIME";
         case TIMESTAMP:
             return "TIMESTAMPTZ";
+        case LOCALDATE:
+            return "DATE";
+        case LOCALDATETIME:
+            return "TIMESTAMP";
         }
         return null;
 

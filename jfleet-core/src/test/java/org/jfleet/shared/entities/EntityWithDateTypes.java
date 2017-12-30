@@ -15,6 +15,8 @@
  */
 package org.jfleet.shared.entities;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -36,6 +38,8 @@ public class EntityWithDateTypes {
     private java.sql.Date sqlDate;
     private java.sql.Time sqlTime;
     private java.sql.Timestamp sqlTimeStamp;
+    private LocalDate localDate;
+    private LocalDateTime localDateTime;
 
     public Date getNonAnnotatedDate() {
         return nonAnnotatedDate;
@@ -91,6 +95,22 @@ public class EntityWithDateTypes {
 
     public void setSqlTimeStamp(java.sql.Timestamp sqlTimeStamp) {
         this.sqlTimeStamp = sqlTimeStamp;
+    }
+
+    public LocalDate getLocalDate() {
+        return localDate;
+    }
+
+    public void setLocalDate(LocalDate localDate) {
+        this.localDate = localDate;
+    }
+
+    public LocalDateTime getLocalDateTime() {
+        return localDateTime;
+    }
+
+    public void setLocalDateTime(LocalDateTime localDateTime) {
+        this.localDateTime = localDateTime;
     }
 
 }

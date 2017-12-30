@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -193,6 +195,10 @@ public class JpaEntityInspector {
                 type.setFieldType(FieldTypeEnum.BIGDECIMAL);
             } else if (BigInteger.class.equals(javaType)) {
                 type.setFieldType(FieldTypeEnum.BIGINTEGER);
+            } else if (LocalDate.class.equals(javaType)) {
+                type.setFieldType(FieldTypeEnum.LOCALDATE);
+            } else if (LocalDateTime.class.equals(javaType)) {
+                type.setFieldType(FieldTypeEnum.LOCALDATETIME);
             } else {
                 throw new RuntimeException("Unexpected type on " + field.toString());
             }
