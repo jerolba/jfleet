@@ -90,6 +90,8 @@ public class MysqlDDLHelper implements DDLHelper {
             return "DATETIME";
         case LOCALDATE:
             return "DATE";
+        case LOCALTIME:
+            return "TIME";
         case LOCALDATETIME:
             return "DATETIME";
         }

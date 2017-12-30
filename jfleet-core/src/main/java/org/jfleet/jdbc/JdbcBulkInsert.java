@@ -24,6 +24,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -185,6 +186,8 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
                 pstmt.setObject(parameterIndex, parameterObj);
             } else if (parameterObj instanceof LocalDate) {
                 pstmt.setObject(parameterIndex, java.sql.Date.valueOf((LocalDate) parameterObj));
+            } else if (parameterObj instanceof LocalTime) {
+                pstmt.setObject(parameterIndex, java.sql.Time.valueOf((LocalTime) parameterObj));
             } else if (parameterObj instanceof LocalDateTime) {
                 pstmt.setObject(parameterIndex, java.sql.Timestamp.valueOf((LocalDateTime) parameterObj));
             } else {
