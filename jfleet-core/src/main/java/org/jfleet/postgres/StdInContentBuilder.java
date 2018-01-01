@@ -29,7 +29,7 @@ import org.jfleet.FieldInfo;
 public class StdInContentBuilder {
 
     private final PgCopyEscaper escaper = new PgCopyEscaper();
-    private final PostgrestTypeSerializer typeSerializer = new PostgrestTypeSerializer();
+    private final PostgresTypeSerializer typeSerializer = new PostgresTypeSerializer();
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;

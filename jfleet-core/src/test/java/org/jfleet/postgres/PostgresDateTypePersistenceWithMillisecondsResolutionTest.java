@@ -1,0 +1,97 @@
+/**
+ * Copyright 2017 Jerónimo López Bezanilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.jfleet.postgres;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.SqlUtil;
+import org.junit.Test;
+
+public class PostgresDateTypePersistenceWithMillisecondsResolutionTest extends PostgresBaseTest {
+
+    @Test
+    public void persistWithMillisecondResolution() throws JFleetException, SQLException, IOException {
+        EntityWithDateTypes entity = new EntityWithDateTypes();
+        entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48.132"));
+        entity.setTime(getDate("24/01/2012 23:12:48.132"));
+        entity.setTimeStamp(getDate("24/01/2012 23:12:48.132"));
+        entity.setSqlTime(new java.sql.Time(getDate("24/01/2012 23:12:48.132").getTime()));
+        entity.setSqlTimeStamp(new Timestamp(getDate("24/01/2012 23:12:48.132").getTime()));
+        entity.setLocalTime(LocalTime.of(23, 12, 48, 132_000_000));
+        entity.setLocalDateTime(LocalDateTime.of(2012, 01, 24, 23, 12, 48, 132_000_000));
+
+        BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
+
+        Supplier<Connection> provider = new PostgresTestConnectionProvider();
+        try (Connection conn = provider.get()) {
+            SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
+            insert.insertAll(conn, Stream.of(entity));
+
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT nonAnnotatedDate, date, time, "
+                        + "timeStamp, sqlDate, sqlTime, sqlTimeStamp, localDate, local_time, localDateTime "
+                        + "FROM table_with_date_types")) {
+                    assertTrue(rs.next());
+                    assertEquals(getDate("24/01/2012 23:12:48.132"), rs.getTimestamp("nonAnnotatedDate"));
+                    assertEquals(new java.sql.Time(getTime("23:12:48.132").getTime()), rs.getTime("time"));
+                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("timeStamp"));
+                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("sqlTimeStamp"));
+                    assertEquals(new java.sql.Time(getTime("23:12:48.132").getTime()), rs.getTime("local_time"));
+                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("localDateTime"));
+                }
+            }
+        }
+    }
+
+    private Date getDate(String str) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+        try {
+            return sdf.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Date getTime(String str) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+        try {
+            return sdf.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+}
