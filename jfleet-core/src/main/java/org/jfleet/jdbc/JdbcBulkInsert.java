@@ -150,6 +150,11 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
+    /*
+     * Each JDBC driver implements code like this in their setObject(idx, object) method.
+     * If following conersions are not supported by your driver (like LocalDate, LocalTime, and LocalDateTime),
+     * extend and overwrite it with the correct one.
+     */
     public void setParameter(PreparedStatement pstmt, int parameterIndex, Object parameterObj) throws SQLException {
         if (parameterObj == null) {
             pstmt.setNull(parameterIndex, java.sql.Types.OTHER);
@@ -185,11 +190,11 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             } else if (parameterObj instanceof BigInteger) {
                 pstmt.setObject(parameterIndex, parameterObj);
             } else if (parameterObj instanceof LocalDate) {
-                pstmt.setObject(parameterIndex, java.sql.Date.valueOf((LocalDate) parameterObj));
+                pstmt.setObject(parameterIndex, parameterObj);
             } else if (parameterObj instanceof LocalTime) {
-                pstmt.setObject(parameterIndex, java.sql.Time.valueOf((LocalTime) parameterObj));
+                pstmt.setObject(parameterIndex, parameterObj);
             } else if (parameterObj instanceof LocalDateTime) {
-                pstmt.setObject(parameterIndex, java.sql.Timestamp.valueOf((LocalDateTime) parameterObj));
+                pstmt.setObject(parameterIndex, parameterObj);
             } else {
                 throw new RuntimeException("No type mapper for " + parameterObj.getClass());
             }
