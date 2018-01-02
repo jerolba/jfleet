@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,12 +64,14 @@ public class PostgresDateTypePersistenceWithMillisecondsResolutionTest extends P
                         + "timeStamp, sqlDate, sqlTime, sqlTimeStamp, localDate, local_time, localDateTime "
                         + "FROM table_with_date_types")) {
                     assertTrue(rs.next());
+                    Time expectedTime = new java.sql.Time(getTime("23:12:48.132").getTime());
+                    Timestamp expectedTimeStamp = java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132");
                     assertEquals(getDate("24/01/2012 23:12:48.132"), rs.getTimestamp("nonAnnotatedDate"));
-                    assertEquals(new java.sql.Time(getTime("23:12:48.132").getTime()), rs.getTime("time"));
-                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("timeStamp"));
-                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("sqlTimeStamp"));
-                    assertEquals(new java.sql.Time(getTime("23:12:48.132").getTime()), rs.getTime("local_time"));
-                    assertEquals(java.sql.Timestamp.valueOf("2012-1-24 23:12:48.132"), rs.getTimestamp("localDateTime"));
+                    assertEquals(expectedTime, rs.getTime("time"));
+                    assertEquals(expectedTimeStamp, rs.getTimestamp("timeStamp"));
+                    assertEquals(expectedTimeStamp, rs.getTimestamp("sqlTimeStamp"));
+                    assertEquals(expectedTime, rs.getTime("local_time"));
+                    assertEquals(expectedTimeStamp, rs.getTimestamp("localDateTime"));
                 }
             }
         }

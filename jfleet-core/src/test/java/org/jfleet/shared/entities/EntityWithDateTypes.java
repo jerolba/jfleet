@@ -41,7 +41,7 @@ public class EntityWithDateTypes {
     private java.sql.Time sqlTime;
     private java.sql.Timestamp sqlTimeStamp;
     private LocalDate localDate;
-    @Column(name="local_time")  //localTime is a SQL function
+    @Column(name = "local_time") // localTime is a SQL function
     private LocalTime localTime;
     private LocalDateTime localDateTime;
 

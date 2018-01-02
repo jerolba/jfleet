@@ -49,7 +49,7 @@ public class DateTypePersistenceTest extends AllDatabasesBaseTest {
         entity.setSqlDate(java.sql.Date.valueOf("2017-08-02"));
         entity.setSqlTime(java.sql.Time.valueOf("09:13:23"));
         entity.setSqlTimeStamp(java.sql.Timestamp.valueOf("2017-08-02 09:13:23"));
-        entity.setLocalDate(LocalDate.of(2012, 01,24));
+        entity.setLocalDate(LocalDate.of(2012, 01, 24));
         entity.setLocalTime(LocalTime.of(23, 12, 48));
         entity.setLocalDateTime(LocalDateTime.of(2012, 01, 24, 23, 12, 48));
 
