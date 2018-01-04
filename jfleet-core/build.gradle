@@ -37,6 +37,34 @@ publishing {
             artifact javadocJar
             artifactId 'jfleet'
             version version
+            pom.withXml {
+                asNode().children().last() + {
+                    resolveStrategy = Closure.DELEGATE_FIRST
+                    name 'JFleet'
+                    description 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
+                    url 'https://github.com/jerolba/jfleet'
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'jerolba'
+                            name 'Jerónimo López'
+                            email 'jerolba+jfleet@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection 'scm:git:git://github.com/jerolba/jfleet.git'
+                        developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
+                        url 'https://github.com/jerolba/jfleet'
+                                             
+                    }
+                }
+            }
         }
     }
 }
@@ -56,8 +84,8 @@ if (project.hasProperty('bintrayUser')){
             vcsUrl = 'https://github.com/jerolba/jfleet.git'
             labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
             version {
-                name = version
-                desc = 'First release with MySql and Postgres'
+                name = '0.5.5'
+                desc = 'Add pom.xml metainfo for maven central release'
                 released  = new Date()
             }
         }
