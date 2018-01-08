@@ -15,8 +15,6 @@
  */
 package org.jfleet.postgres;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -63,39 +61,23 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         CopyManager copyMng = getCopyManager(conn);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
+            PgCopyContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
             try {
                 Iterator<T> iterator = stream.iterator();
                 while (iterator.hasNext()) {
                     contentBuilder.add(iterator.next());
                     if (contentBuilder.getContentSize() > batchSize) {
                         logger.debug("Writing content");
-                        writeContent(txPolicy, copyMng, contentBuilder);
+                        contentWriter.writeContent(contentBuilder);
                     }
                 }
                 logger.debug("Flushing content");
-                writeContent(txPolicy, copyMng, contentBuilder);
+                contentWriter.writeContent(contentBuilder);
             } finally {
                 txPolicy.close();
             }
         } catch (WrappedException e) {
             e.rethrow();
-        }
-    }
-
-    private void writeContent(TransactionPolicy txPolicy, CopyManager copyManager, StdInContentBuilder contentBuilder)
-            throws SQLException {
-        if (contentBuilder.getContentSize() > 0) {
-            try {
-                long init = System.nanoTime();
-                Reader reader = new StringBuilderReader(contentBuilder.getContent());
-                copyManager.copyIn(mainSql, reader);
-                logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                        contentBuilder.getContentSize(), contentBuilder.getRecords());
-                contentBuilder.reset();
-                txPolicy.commit();
-            } catch (IOException e) {
-                throw new WrappedException(e);
-            }
         }
     }
 

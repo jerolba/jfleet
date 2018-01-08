@@ -17,12 +17,10 @@ package org.jfleet.mysql;
 
 import static org.jfleet.mysql.MySqlTransactionPolicy.getTransactionPolicy;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -32,7 +30,6 @@ import org.jfleet.JpaEntityInspector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mysql.jdbc.ResultsetInspector;
 import com.mysql.jdbc.Statement;
 
 public class LoadDataBulkInsert<T> implements BulkInsert<T> {
@@ -68,34 +65,19 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
+            LoadDataContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
                 contentBuilder.add(iterator.next());
                 if (contentBuilder.getContentSize() > batchSize) {
                     logger.debug("Writing content");
-                    writeContent(txPolicy, stmt, contentBuilder);
+                    contentWriter.writeContent(contentBuilder);
                 }
             }
             logger.debug("Flushing content");
-            writeContent(txPolicy, stmt, contentBuilder);
+            contentWriter.writeContent(contentBuilder);
         } finally {
             txPolicy.close();
-        }
-    }
-
-    private void writeContent(MySqlTransactionPolicy txPolicy, Statement stmt, FileContentBuilder contentBuilder)
-            throws SQLException, JFleetException {
-        if (contentBuilder.getContentSize() > 0) {
-            long init = System.nanoTime();
-            String content = contentBuilder.getContent();
-            stmt.setLocalInfileInputStream(new ByteArrayInputStream(content.getBytes(encoding)));
-            stmt.execute(mainSql);
-            logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                    contentBuilder.getContentSize(), contentBuilder.getRecords());
-            Optional<Long> updatedInDB = ResultsetInspector.getUpdatedRows(stmt);
-            int processed = contentBuilder.getRecords();
-            contentBuilder.reset();
-            txPolicy.commit(processed, updatedInDB);
         }
     }
 
