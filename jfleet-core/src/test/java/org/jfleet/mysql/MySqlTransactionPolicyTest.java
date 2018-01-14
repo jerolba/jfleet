@@ -59,7 +59,7 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
                     .errorOnMissingRow(true);
@@ -80,7 +80,7 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
                     .errorOnMissingRow(true);
@@ -101,7 +101,7 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
                     .errorOnMissingRow(false);
@@ -119,7 +119,7 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
                     .errorOnMissingRow(true);
@@ -140,7 +140,7 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
                     .errorOnMissingRow(false);
@@ -157,7 +157,7 @@ public class MySqlTransactionPolicyTest {
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
             throws IOException, SQLException {
         try (Connection connection = provider.get()) {
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)
                     .errorOnMissingRow(true);
@@ -177,7 +177,7 @@ public class MySqlTransactionPolicyTest {
     @Test
     public void multipleBatchOperationsCanMissRows() throws IOException, SQLException, JFleetException {
         try (Connection connection = provider.get()) {
-            Configuration<Employee> config =new Configuration<>(Employee.class)
+            Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)
                     .errorOnMissingRow(false);
