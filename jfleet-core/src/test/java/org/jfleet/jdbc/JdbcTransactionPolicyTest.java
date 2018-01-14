@@ -25,18 +25,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.jfleet.postgres.PostgresTestConnectionProvider;
+import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO: Refactor, is "Same" code from PostgresTransactionPolicyTest. Only change BulkInsert constructor...
-public class JdbcTransactionPolicyTest {
+public class JdbcTransactionPolicyTest extends JdbcDatabasesBaseTest {
 
     private static Logger logger = LoggerFactory.getLogger(JdbcTransactionPolicyTest.class);
     private static final long TWO_ROW_BATCH_SIZE = 2;
@@ -44,12 +42,14 @@ public class JdbcTransactionPolicyTest {
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
             throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new JdbcBulkInsert<>(Employee.class, TWO_ROW_BATCH_SIZE, true);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(TWO_ROW_BATCH_SIZE)
+                    .autocommit(false);
+            BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
 
@@ -63,39 +63,47 @@ public class JdbcTransactionPolicyTest {
 
     @Test
     public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new JdbcBulkInsert<>(Employee.class, TWO_ROW_BATCH_SIZE, true);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(TWO_ROW_BATCH_SIZE)
+                    .autocommit(false);
+            BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
                 connection.commit();
             } catch (SQLException e) {
                 logger.info("Expected error on missed FK");
-                connection.close();
+                connection.rollback();
+                assertEquals(0, numberOfRowsInEmployeeTable(connection));
+                return;
             }
-            assertEquals(0, numberOfRowsInEmployeeTable(provider.get()));
+            assertTrue("Expected SQLException exception", false);
         }
     }
 
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
             throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
 
-            BulkInsert<Employee> bulkInsert = new JdbcBulkInsert<>(Employee.class, TWO_ROW_BATCH_SIZE, false);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(TWO_ROW_BATCH_SIZE)
+                    .autocommit(true);
+            BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
             } catch (SQLException e) {
                 logger.info("Expected error on missed FK");
+                assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+                return;
             }
-            assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+            assertTrue("Expected SQLException exception", false);
         }
     }
 

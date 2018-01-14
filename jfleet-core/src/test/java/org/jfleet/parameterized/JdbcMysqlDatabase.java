@@ -15,10 +15,7 @@
  */
 package org.jfleet.parameterized;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert;
-
-public class JdbcMysqlDatabase extends Database {
+public class JdbcMysqlDatabase extends JdbcDatabase {
 
     public JdbcMysqlDatabase(String properties) {
         super(properties);
@@ -26,11 +23,6 @@ public class JdbcMysqlDatabase extends Database {
 
     public JdbcMysqlDatabase() {
         super("mysql-test.properties");
-    }
-
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new JdbcBulkInsert<>(clazz);
     }
 
 }

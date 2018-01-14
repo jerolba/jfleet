@@ -39,17 +39,17 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private final EntityInfo entityInfo;
     private final String mainSql;
     private final long batchSize;
-    private final boolean longTransaction;
+    private final boolean autocommit;
 
     public PgCopyBulkInsert(Class<T> clazz) {
-        this(clazz, DEFAULT_BATCH_SIZE, false);
+        this(new Configuration<>(clazz));
     }
 
-    public PgCopyBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction) {
-        JpaEntityInspector inspector = new JpaEntityInspector(clazz);
+    public PgCopyBulkInsert(Configuration<T> config) {
+        JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
         this.entityInfo = inspector.inspect();
-        this.batchSize = batchSize;
-        this.longTransaction = longTransaction;
+        this.batchSize = config.batchSize;
+        this.autocommit = config.autocommit;
         this.mainSql = new SqlBuilder(entityInfo).build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
         logger.debug("Batch size: {} bytes", batchSize);
@@ -60,7 +60,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
         CopyManager copyMng = getCopyManager(conn);
         try {
-            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
             PgCopyContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
             try {
                 Iterator<T> iterator = stream.iterator();
@@ -84,6 +84,28 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private CopyManager getCopyManager(Connection conn) throws SQLException {
         PgConnection unwrapped = conn.unwrap(PgConnection.class);
         return unwrapped.getCopyAPI();
+    }
+
+    public static class Configuration<T> {
+
+        private Class<T> clazz;
+        private long batchSize = DEFAULT_BATCH_SIZE;
+        private boolean autocommit = true;
+
+        public Configuration(Class<T> clazz) {
+            this.clazz = clazz;
+        }
+
+        public Configuration<T> batchSize(long batchSize) {
+            this.batchSize = batchSize;
+            return this;
+        }
+
+        public Configuration<T> autocommit(boolean autocommit) {
+            this.autocommit = autocommit;
+            return this;
+        }
+
     }
 
 }

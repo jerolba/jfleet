@@ -24,6 +24,7 @@ import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.citibikenyc.entities.TripFlatEntity;
 import org.jfleet.jdbc.JdbcBulkInsert;
+import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
 import org.jfleet.util.MySqlTestConnectionProvider;
 
 /*
@@ -37,7 +38,9 @@ public class SampleStreamDataJdbcBulkInsert {
         try (Connection connection = connectionSuplier.get()){
             TableHelper.createTable(connection);
             CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
-            BulkInsert<TripFlatEntity> bulkInsert = new JdbcBulkInsert<>(TripFlatEntity.class, 100, false);
+            Configuration<TripFlatEntity> config = new Configuration<>(TripFlatEntity.class)
+                    .batchSize(100);
+            BulkInsert<TripFlatEntity> bulkInsert = new JdbcBulkInsert<>(config);
             reader.forEachCsvInZip(trips -> {
                 try {
                     bulkInsert.insertAll(connection, trips);

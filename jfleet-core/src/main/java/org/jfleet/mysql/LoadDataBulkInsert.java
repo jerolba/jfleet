@@ -40,20 +40,21 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     private final EntityInfo entityInfo;
     private final String mainSql;
     private final long batchSize;
-    private final boolean longTransaction;
+    private final boolean autocommit;
     private final boolean errorOnMissingRow;
-    private final Charset encoding = Charset.forName("UTF-8");
+    private final Charset encoding;
 
     public LoadDataBulkInsert(Class<T> clazz) {
-        this(clazz, DEFAULT_BATCH_SIZE, false, false);
+        this(new Configuration<>(clazz));
     }
 
-    public LoadDataBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction, boolean errorOnMissingRow) {
-        JpaEntityInspector inspector = new JpaEntityInspector(clazz);
+    public LoadDataBulkInsert(Configuration<T> config) {
+        JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
         this.entityInfo = inspector.inspect();
-        this.batchSize = batchSize;
-        this.longTransaction = longTransaction;
-        this.errorOnMissingRow = errorOnMissingRow;
+        this.encoding = config.encoding;
+        this.batchSize = config.batchSize;
+        this.autocommit = config.autocommit;
+        this.errorOnMissingRow = config.errorOnMissingRow;
         SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
         mainSql = sqlBuiler.build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
@@ -63,7 +64,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
-        MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, longTransaction, errorOnMissingRow);
+        MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, autocommit, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             LoadDataContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
             Iterator<T> iterator = stream.iterator();
@@ -90,6 +91,40 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
             throw new RuntimeException("Incorrect Connection type. Expected com.mysql.jdbc.Connection");
         }
         return (Statement) unwrapped.createStatement();
+    }
+
+    public static class Configuration<T> {
+
+        private Class<T> clazz;
+        private Charset encoding = Charset.forName("UTF-8");
+        private long batchSize = DEFAULT_BATCH_SIZE;
+        private boolean autocommit = true;
+        private boolean errorOnMissingRow = false;
+
+        public Configuration(Class<T> clazz) {
+            this.clazz = clazz;
+        }
+
+        public Configuration<T> encoding(Charset encoding) {
+            this.encoding = encoding;
+            return this;
+        }
+
+        public Configuration<T> batchSize(long batchSize) {
+            this.batchSize = batchSize;
+            return this;
+        }
+
+        public Configuration<T> autocommit(boolean autocommit) {
+            this.autocommit = autocommit;
+            return this;
+        }
+
+        public Configuration<T> errorOnMissingRow(boolean errorOnMissingRow) {
+            this.errorOnMissingRow = errorOnMissingRow;
+            return this;
+        }
+
     }
 
 }

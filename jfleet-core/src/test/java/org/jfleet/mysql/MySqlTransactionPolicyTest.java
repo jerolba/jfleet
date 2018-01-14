@@ -32,6 +32,8 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
+import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,16 +43,27 @@ public class MySqlTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);
     private static final long VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
+    private Supplier<Connection> provider;
+
+    @Before
+    public void setup() throws IOException, SQLException {
+        this.provider = new MySqlTestConnectionProvider();
+        try (Connection connection = provider.get()) {
+            setupDatabase(connection);
+        }
+    }
+
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
             throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true, true);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false)
+                    .errorOnMissingRow(true);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
 
@@ -64,13 +77,14 @@ public class MySqlTransactionPolicyTest {
 
     @Test
     public void inLongTransactionWithMissedForeignKeyCanBeRollbacked() throws IOException, SQLException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true, true);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false)
+                    .errorOnMissingRow(true);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithForeignKeyError());
@@ -84,13 +98,14 @@ public class MySqlTransactionPolicyTest {
 
     @Test
     public void inLongTransactionWithMissedForeignKeyCanBeSkipped() throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true, false);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false)
+                    .errorOnMissingRow(false);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithForeignKeyError());
             assertEquals(6, numberOfRowsInEmployeeTable(connection));
@@ -101,13 +116,14 @@ public class MySqlTransactionPolicyTest {
 
     @Test
     public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws IOException, SQLException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true, true);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false)
+                    .errorOnMissingRow(true);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithUniqueError());
@@ -121,13 +137,14 @@ public class MySqlTransactionPolicyTest {
 
     @Test
     public void inLongTransactionWithDuplicatedIdCanBeSkipped() throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true, false);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false)
+                    .errorOnMissingRow(false);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithUniqueError());
             assertEquals(4, numberOfRowsInEmployeeTable(connection));
@@ -139,36 +156,34 @@ public class MySqlTransactionPolicyTest {
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
             throws IOException, SQLException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
-
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, false, true);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(true)
+                    .errorOnMissingRow(true);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithForeignKeyError());
             } catch (JFleetException e) {
                 logger.info("Expected error on missed FK");
+                assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+                return;
             }
-            assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+            assertTrue("Expected JFleetException exception", false);
         }
     }
 
     @Test
-    public void multipleBatchOperationsCanMissRows() throws IOException, SQLException {
-        Supplier<Connection> provider = new MySqlTestConnectionProvider();
+    public void multipleBatchOperationsCanMissRows() throws IOException, SQLException, JFleetException {
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
+            Configuration<Employee> config =new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(true)
+                    .errorOnMissingRow(false);
+            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
-            BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, false, false);
-
-            try {
-                bulkInsert.insertAll(connection, employeesWithMultipleConstraintsErrors());
-            } catch (JFleetException e) {
-                logger.info("Expected error on constraint error");
-            }
+            bulkInsert.insertAll(connection, employeesWithMultipleConstraintsErrors());
             assertEquals(6, numberOfRowsInEmployeeTable(connection));
         }
     }

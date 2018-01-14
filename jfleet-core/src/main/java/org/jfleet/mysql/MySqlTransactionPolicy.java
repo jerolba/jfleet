@@ -23,12 +23,12 @@ import org.jfleet.JFleetException;
 
 public interface MySqlTransactionPolicy {
 
-    static MySqlTransactionPolicy getTransactionPolicy(Connection connection, boolean longTransaction,
+    static MySqlTransactionPolicy getTransactionPolicy(Connection connection, boolean autocommit,
             boolean errorOnMissingRow) throws SQLException {
-        if (longTransaction) {
-            return new LongTransaction(errorOnMissingRow);
+        if (autocommit) {
+            return new BatchTransaction(connection, errorOnMissingRow);
         }
-        return new BatchTransaction(connection, errorOnMissingRow);
+        return new LongTransaction(errorOnMissingRow);
     }
 
     void commit(int processed, Optional<Long> updatedInDB) throws SQLException, JFleetException;

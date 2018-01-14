@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
+import org.jfleet.postgres.PgCopyBulkInsert.Configuration;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +41,26 @@ public class PostgresTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(PostgresTransactionPolicyTest.class);
     private static final long VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
+    private Supplier<Connection> provider;
+
+    @Before
+    public void setup() throws IOException, SQLException {
+        this.provider = new PostgresTestConnectionProvider();
+        try (Connection connection = provider.get()) {
+            setupDatabase(connection);
+        }
+    }
+
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
             throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false);
+            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
 
@@ -62,41 +74,44 @@ public class PostgresTransactionPolicyTest {
 
     @Test
     public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, true);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(false);
+            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
                 connection.commit();
             } catch (SQLException e) {
+                connection.rollback();
                 logger.info("Expected error on missed FK");
-                connection.close();
+                assertEquals(0, numberOfRowsInEmployeeTable(connection));
+                return;
             }
-            assertEquals(0, numberOfRowsInEmployeeTable(provider.get()));
+            assertTrue("Expected JFleetException exception", false);
         }
     }
 
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
             throws IOException, SQLException, JFleetException {
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
-            setupDatabase(connection);
-
-            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(Employee.class,
-                    VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA, false);
+            Configuration<Employee> config = new Configuration<>(Employee.class)
+                    .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
+                    .autocommit(true);
+            BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             try {
                 bulkInsert.insertAll(connection, employeesWithConstraintError());
             } catch (SQLException e) {
                 logger.info("Expected error on missed FK");
+                assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+                return;
             }
-            assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
+            assertTrue("Expected JFleetException exception", false);
         }
     }
 

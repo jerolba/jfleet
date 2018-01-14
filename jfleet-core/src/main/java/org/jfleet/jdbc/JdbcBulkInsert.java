@@ -46,21 +46,21 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     private final String insertSql;
 
     private final long batchSize;
-    private final boolean longTransaction;
+    private final boolean autocommit;
 
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
 
     public JdbcBulkInsert(Class<T> clazz) {
-        this(clazz, DEFAULT_BATCH_SIZE, false);
+        this(new Configuration<>(clazz));
     }
 
-    public JdbcBulkInsert(Class<T> clazz, long batchSize, boolean longTransaction) {
-        JpaEntityInspector inspector = new JpaEntityInspector(clazz);
+    public JdbcBulkInsert(Configuration<T> config) {
+        JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
         this.entityInfo = inspector.inspect();
-        this.batchSize = batchSize;
-        this.longTransaction = longTransaction;
+        this.batchSize = config.batchSize;
+        this.autocommit = config.autocommit;
         this.insertSql = createInsertQuery(entityInfo);
 
         this.fields = entityInfo.getFields();
@@ -95,7 +95,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, longTransaction);
+        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
             BatchInsert batchInsert = new BatchInsert(conn, txPolicy, pstmt);
             Iterator<T> iterator = stream.iterator();
@@ -201,4 +201,25 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
+    public static class Configuration<T> {
+
+        private Class<T> clazz;
+        private long batchSize = DEFAULT_BATCH_SIZE;
+        private boolean autocommit = true;
+
+        public Configuration(Class<T> clazz) {
+            this.clazz = clazz;
+        }
+
+        public Configuration<T> batchSize(long batchSize) {
+            this.batchSize = batchSize;
+            return this;
+        }
+
+        public Configuration<T> autocommit(boolean autocommit) {
+            this.autocommit = autocommit;
+            return this;
+        }
+
+    }
 }

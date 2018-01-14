@@ -15,10 +15,7 @@
  */
 package org.jfleet.parameterized;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert;
-
-public class JdbcPostgresDatabase extends Database {
+public class JdbcPostgresDatabase extends JdbcDatabase {
 
     public JdbcPostgresDatabase(String properties) {
         super(properties);
@@ -26,11 +23,6 @@ public class JdbcPostgresDatabase extends Database {
 
     public JdbcPostgresDatabase() {
         super("postgres-test.properties");
-    }
-
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new JdbcBulkInsert<>(clazz);
     }
 
 }
