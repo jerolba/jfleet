@@ -19,6 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -71,6 +74,9 @@ public class FieldTypeInspectorTest {
         public java.sql.Time sqlTime;
         public java.sql.Timestamp sqlTimeStamp;
 
+        public LocalDate localDate;
+        public LocalTime localTime;
+        public LocalDateTime localDateTime;
     }
 
     private EntityInfo entityInfo = new JpaEntityInspector(EntityWithTypes.class).inspect();
@@ -241,6 +247,27 @@ public class FieldTypeInspectorTest {
         EntityFieldType type = getField("sqlTimeStamp");
         assertFalse(type.isPrimitive());
         assertEquals(FieldTypeEnum.TIMESTAMP, type.getFieldType());
+    }
+
+    @Test
+    public void localDateTest() {
+        EntityFieldType type = getField("localDate");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.LOCALDATE, type.getFieldType());
+    }
+
+    @Test
+    public void localTimeTest() {
+        EntityFieldType type = getField("localTime");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.LOCALTIME, type.getFieldType());
+    }
+
+    @Test
+    public void localDateTimeTest() {
+        EntityFieldType type = getField("localDateTime");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.LOCALDATETIME, type.getFieldType());
     }
 
     private EntityFieldType getField(String fieldName) {
