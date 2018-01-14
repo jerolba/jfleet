@@ -87,7 +87,6 @@ public class ManyToOneEntityInspectorTest {
 
     }
 
-
     @Entity
     public class Foo {
 
@@ -116,7 +115,7 @@ public class ManyToOneEntityInspectorTest {
     }
 
     @Test
-    public void inspectAnEntityWithManyToOneRelationShip() {
+    public void inspectAnEntityWithManyToOneRelationship() {
         JpaEntityInspector inspector = new JpaEntityInspector(Sku.class);
         EntityInfo entityInfo = inspector.inspect();
 
@@ -132,7 +131,6 @@ public class ManyToOneEntityInspectorTest {
         assertEquals(FieldTypeEnum.LONG, street.getFieldType().getFieldType());
         assertEquals("product_id", street.getColumnName());
     }
-
 
     @Test
     public void inspectAnEntityWithManyToOneJoinColumn() {

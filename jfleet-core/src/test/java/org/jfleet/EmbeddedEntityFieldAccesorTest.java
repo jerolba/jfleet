@@ -39,7 +39,7 @@ public class EmbeddedEntityFieldAccesorTest {
 
     private EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
 
-    //@Test
+    @Test
     public void mainFieldAccessTest() {
         EntityFieldAccessor accessorId = factory.getAccessor(Person.class, fieldFor("id"));
         assertEquals(1L, accessorId.getValue(person));

@@ -60,7 +60,7 @@ public class HierarchyEntityInspectorTest {
     }
 
     @Test
-    public void inspectTableWithHierarchy() {
+    public void inspectEntityWithHierarchy() {
         JpaEntityInspector inspector = new JpaEntityInspector(ChildClass.class);
         EntityInfo entityInfo = inspector.inspect();
         List<FieldInfo> fields = entityInfo.getFields();
@@ -100,7 +100,7 @@ public class HierarchyEntityInspectorTest {
     }
 
     @Test
-    public void inspectTableWithHierarchyMapped() {
+    public void inspectEntityWithHierarchyMapped() {
         JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithMapped.class);
         EntityInfo entityInfo = inspector.inspect();
         List<FieldInfo> fields = entityInfo.getFields();
@@ -139,7 +139,7 @@ public class HierarchyEntityInspectorTest {
     }
 
     @Test
-    public void inspectTableWithNonEntityParent() {
+    public void inspectEntityWithNonEntityParent() {
         JpaEntityInspector inspector = new JpaEntityInspector(ChildClassNonEntity.class);
         EntityInfo entityInfo = inspector.inspect();
         List<FieldInfo> fields = entityInfo.getFields();
@@ -166,7 +166,7 @@ public class HierarchyEntityInspectorTest {
     }
 
     @Test
-    public void inspectTableWithAttributeOverrides() {
+    public void inspectEntityWithAttributeOverrides() {
         JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverrides.class);
         EntityInfo entityInfo = inspector.inspect();
         List<FieldInfo> fields = entityInfo.getFields();
@@ -194,7 +194,7 @@ public class HierarchyEntityInspectorTest {
     }
 
     @Test
-    public void inspectTableWithAttributeOverride() {
+    public void inspectEntityWithAttributeOverride() {
         JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverride.class);
         EntityInfo entityInfo = inspector.inspect();
         List<FieldInfo> fields = entityInfo.getFields();
