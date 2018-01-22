@@ -12,7 +12,7 @@ Despite using JPA annotations to map Java objects to tables and columns, JFleet 
 
 ## Supported databases
 
-Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accesible from Java. 
+Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accessible from Java. 
  - **MySql** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
@@ -29,28 +29,35 @@ import javax.persistence.*;
 @Entity
 @Table(name = "CustomerContact")
 public class Customer {
+
     private Long id;
+
     private String contactName;
     @Column(name="CustomerName")
     private String name;
+    
     @ManyToOne
     @JoinColumn(name = "CityId")
     private City city;
+    
     //Getters and setters
 }
 
 @Entity
 @Table(name = "city")
 public class City {
+    
     @Id
     private Integer id;
+    
     private String name;
+    
     //Getters and setters
 }
 
 ```
 
-As JPA, JFleet follows the convention of using the field name if no @Column name is provided or the class name if no @Table name is provided. 
+As JPA, JFleet follows the convention of using the field name if no @Column name is provided, or the class name if no @Table name is provided. 
 
 Given a collection of objects Customer to persist in MySql with the Load Data technique you only need to provide a JDBC Connection:
 
@@ -69,6 +76,23 @@ JFleet prefers Streams instead of Collections as it don't force you to instantia
     BulkInsert<Customer> bulkInsert = new PgCopyBulkInsert<>(Customer.class);
     bulkInsert.insertAll(connection, customers);
 ```
+### IDs
+
+JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it and you have some strategies:
+
+- Use the mechanism provided by each database to autogenerate primary keys: 
+   - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
+   - **PostgreSQL**: [serial](https://www.postgresql.org/docs/9.6/static/datatype-numeric.html) numeric type  
+
+- Assign manually an Id to each object:
+   - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+   - If your domain allows it, use a [natural key](https://en.wikipedia.org/wiki/Natural_key)
+   - Use a composite key as primary key if the domain allows it also
+   - If you control the concurrency access to the table, at the beginning get the max Id value and from java increment and set ID value to each object
+
+If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column as it will be always null, but you can keep it if you want or are reusing a class from a existing JPA model. 
+
+In an autogenerate strategy ORMs like JPA populate the @ID field of your objects as they insert values in the database but, due to the insertion technique used by JFleet, the primary keys created by the database can not be retrieved for each row inserted, and is no possible to set it back to each object.
 
 
 ## Dependency
@@ -85,7 +109,7 @@ JFleet is uploaded to Maven Central Repository and to use it, you need to add th
 
 or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.5.6/jfleet-0.5.6.jar) from Maven repository.
 
-You can allways find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
+You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
 As JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must need to add the Javax Persistence API dependency:
 
