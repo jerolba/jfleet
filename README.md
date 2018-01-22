@@ -6,13 +6,13 @@
 
 JFleet is a Java library that try to persist your information to a database as fast as possible using the best available technique in each database provider.
 
-It is oriented to persist a large amount of information in batches in single table each time.  
+It is oriented to persist a large amount of information in batches in single table.  
 
 Despite using JPA annotations to map Java objects to tables and columns, JFleet is not an ORM.
 
 ## Supported databases
 
-Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accessible from Java. 
+Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accessible from Java:
  - **MySql** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
@@ -33,6 +33,7 @@ public class Customer {
     private Long id;
 
     private String contactName;
+    
     @Column(name="CustomerName")
     private String name;
     
@@ -59,7 +60,7 @@ public class City {
 
 As JPA, JFleet follows the convention of using the field name if no @Column name is provided, or the class name if no @Table name is provided. 
 
-Given a collection of objects Customer to persist in MySql with the Load Data technique you only need to provide a JDBC Connection:
+Given a collection of objects Customer to persist in MySql with the Load Data technique, you only need to provide a JDBC Connection:
 
 
 ```java
@@ -69,7 +70,7 @@ Given a collection of objects Customer to persist in MySql with the Load Data te
 ```
 
 If you are using PostgreSQL with the Copy technique, the `BulkInsert` implementation is `PgCopyBulkInsert`. 
-JFleet prefers Streams instead of Collections as it don't force you to instantiate all objects in memory, and allows you to create them lazily in a stream process: 
+JFleet prefers Streams instead of Collections because it don't force you to instantiate all objects in memory, and allows you to create them lazily in some stream process: 
 
 ```java
     Stream<Customer> customers = createLongStreamOfCustomers();
@@ -78,7 +79,7 @@ JFleet prefers Streams instead of Collections as it don't force you to instantia
 ```
 ### IDs
 
-JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it and you have some strategies:
+JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it, and you have some strategies to deal with it:
 
 - Use the mechanism provided by each database to autogenerate primary keys: 
    - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
@@ -87,12 +88,12 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
 - Assign manually an Id to each object:
    - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
    - If your domain allows it, use a [natural key](https://en.wikipedia.org/wiki/Natural_key)
-   - Use a composite key as primary key if the domain allows it also
-   - If you control the concurrency access to the table, at the beginning get the max Id value and from java increment and set ID value to each object
+   - Use a composite key as primary key if the domain also allows it
+   - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value and, from Java, increment and set a new Id value to each object
 
-If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column as it will be always null, but you can keep it if you want or are reusing a class from a existing JPA model. 
+If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
 
-In an autogenerate strategy ORMs like JPA populate the @ID field of your objects as they insert values in the database but, due to the insertion technique used by JFleet, the primary keys created by the database can not be retrieved for each row inserted, and is no possible to set it back to each object.
+In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert values in the database, but due to the insertion technique used by JFleet, the primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
 
 
 ## Dependency
