@@ -18,7 +18,7 @@ Each database provides some technique to insert a bulk of information bypassing 
  - **MySql** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
-In both cases, and in unsupported engines, you can use the default implementation based on [JDBC executeBatch](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--) statement.
+In both cases, and in unsupported databases, you can use the default implementation based on the standard [JDBC executeBatch](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--) statement.
 
 ## Usage
 
@@ -71,8 +71,8 @@ Given a collection of objects Customer to persist in MySql with the Load Data te
     bulkInsert.insertAll(connection, customers);
 ```
 
-If you are using PostgreSQL with the Copy technique, the `BulkInsert` implementation is `PgCopyBulkInsert`. 
-JFleet prefers Streams instead of Collections because it don't force you to instantiate all objects in memory, and allows you to create them lazily in some stream process: 
+If you are using PostgreSQL the `BulkInsert` implementation is `PgCopyBulkInsert`. 
+JFleet prefers Streams to Collections because it does not force you to instantiate all objects in memory, and allows you to create them lazily in some stream process: 
 
 ```java
     Stream<Customer> customers = createLongStreamOfCustomers();
@@ -95,7 +95,7 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
 
 If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
 
-In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert values in the database, but due to the insertion technique used by JFleet, the primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
+In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database, but due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
 
 
 ## Dependency
