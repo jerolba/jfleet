@@ -16,9 +16,12 @@
 package org.jfleet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.junit.Test;
@@ -142,10 +145,50 @@ public class EntityFieldAccesorTest {
 
     }
 
+    @Entity
+    public class ManyToOneClass {
+
+        @ManyToOne
+        @JoinColumn(name = "ref")
+        private PublicClass reference;
+
+        private int someField;
+
+        public ManyToOneClass(int someField, PublicClass reference) {
+            this.someField = someField;
+            this.reference = reference;
+        }
+
+        public PublicClass getReference() {
+            return reference;
+        }
+
+        public void setReference(PublicClass reference) {
+            this.reference = reference;
+        }
+
+        public int getSomeField() {
+            return someField;
+        }
+
+        public void setSomeField(int someField) {
+            this.someField = someField;
+        }
+
+    }
+
+    public class ManyToOneChildClass extends ManyToOneClass {
+
+        public ManyToOneChildClass(int someField, PublicClass reference) {
+            super(someField, reference);
+        }
+    }
+
     private PublicClass instancePublic = new PublicClass("private", "public", "bean");
     private PackageClass instancePackage = new PackageClass("private", "public", "bean");
     private PrivateClass instancePrivate = new PrivateClass("private", "public", "bean");
     private ChildClass instanceChild = new ChildClass(1, "bean value", "public one");
+    private ManyToOneClass intanceManyToOne = new ManyToOneClass(10, instancePublic);
 
     private EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
 
@@ -220,6 +263,31 @@ public class EntityFieldAccesorTest {
         EntityFieldAccessor accessor = factory.getAccessor(ChildClass.class, fieldFor("otherField"));
         assertEquals(1, accessor.getValue(instanceChild));
     }
+
+    @Test
+    public void composedField() {
+        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneClass.class, fieldFor("reference.privateField"));
+        assertEquals("private", accessor.getValue(intanceManyToOne));
+    }
+
+    @Test
+    public void nonExistentField() {
+        EntityFieldAccessor accessor = factory.getAccessor(PublicClass.class, fieldFor("nonExistent"));
+        assertNull(accessor);
+    }
+
+    @Test
+    public void nonExistentComposedField() {
+        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneClass.class, fieldFor("nonExistent.privateField"));
+        assertNull(accessor);
+    }
+
+    @Test
+    public void nonExistentComposedFieldOnChildClass() {
+        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneChildClass.class, fieldFor("nonExistent.privateField"));
+        assertNull(accessor);
+    }
+
 
     private FieldInfo fieldFor(String name) {
         FieldInfo fi = new FieldInfo();

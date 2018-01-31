@@ -51,6 +51,9 @@ public class EntityFieldAccesorFactory {
             if (i < fieldSeq.length - 1) {
                 composed = composed.andThen(accessor);
                 entityClass = getAccessorTarget(entityClass, fieldName);
+                if (entityClass == null) {
+                    return null;
+                }
             } else {
                 composed.andFinally(accessor);
             }
@@ -102,7 +105,7 @@ public class EntityFieldAccesorFactory {
                 return newAccessorByField(field);
             }
         } catch (NoSuchFieldException | SecurityException e) {
-            traceError(fieldName, entityClass, e);
+            traceAccess(fieldName, entityClass, e);
         }
         return Optional.empty();
     }
@@ -116,7 +119,7 @@ public class EntityFieldAccesorFactory {
             if (entityClass.getSuperclass() != Object.class) {
                 return getAccessorByPrivateField(entityClass.getSuperclass(), fieldName);
             }
-            traceError(fieldName, entityClass, e);
+            traceAccess(fieldName, entityClass, e);
         }
         return Optional.empty();
     }
@@ -126,14 +129,19 @@ public class EntityFieldAccesorFactory {
             try {
                 return field.get(obj);
             } catch (IllegalArgumentException | IllegalAccessException e) {
-                traceError(field.getName(), field.getDeclaringClass(), e);
+                traceAccess(field.getName(), field.getDeclaringClass(), e);
                 return null;
             }
         });
     }
 
+    private void traceAccess(String fieldName, Class<?> entityClass, Exception e) {
+        logger.trace("Unable to access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
+                + e.getMessage());
+    }
+
     private void traceError(String fieldName, Class<?> entityClass, Exception e) {
-        logger.trace("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
+        logger.error("Can not access to field \"" + fieldName + "\" on class " + entityClass.getName() + ": "
                 + e.getMessage());
     }
 
