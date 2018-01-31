@@ -4,6 +4,7 @@ plugins {
 
 apply plugin: 'maven-publish'
 apply plugin: 'java'
+apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 
 compileJava   {
@@ -23,6 +24,15 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
