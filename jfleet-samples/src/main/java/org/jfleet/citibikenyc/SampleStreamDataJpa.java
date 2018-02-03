@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.jfleet.JFleetException;
@@ -41,32 +40,20 @@ import org.slf4j.LoggerFactory;
  */
 public class SampleStreamDataJpa {
 
-    private static int BATCH_SIZE = 200;
+    private static int BATCH_SIZE = 2000;
 
     private static Logger LOGGER = LoggerFactory.getLogger(SampleStreamDataJpa.class);
 
     public static void main(String[] args) throws JFleetException, IOException, SQLException {
         DataSource dataSource = new MySqlTestDatasourceProvider().get();
-        EntityManagerFactoryFactory factory = new EntityManagerFactoryFactory(dataSource, TripFlatEntity.class) {
-            @Override
-            public Properties properties() {
-                Properties properties = super.properties();
-                properties.put("hibernate.hbm2ddl.auto", "none");
-                properties.put("hibernate.jdbc.batch_size", BATCH_SIZE);
-                return properties;
-            }
-        };
-
-        EntityManagerFactory entityManagerFactory = factory.newEntityManagerFactory();
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-
         try (Connection conn = dataSource.getConnection()) {
             TableHelper.createTable(conn);
         }
+        EntityManager entityManager = createEntityManager(dataSource);
 
         CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
         entityManager.getTransaction().begin();
-        //Batch operations are not allowed with autoinsert id. We need to generate it manually.
+        //Batch operations are not allowed with autoinsert id. We must generate it manually.
         int [] idSeq = new int[] {1};
         reader.forEachCsvInZip(trips -> {
             int cont = 0;
@@ -87,5 +74,18 @@ public class SampleStreamDataJpa {
         });
         entityManager.getTransaction().commit();
         entityManager.close();
+    }
+
+    private static EntityManager createEntityManager(DataSource dataSource) {
+        EntityManagerFactoryFactory factory = new EntityManagerFactoryFactory(dataSource, TripFlatEntity.class) {
+            @Override
+            public Properties properties() {
+                Properties properties = super.properties();
+                properties.put("hibernate.hbm2ddl.auto", "none");
+                properties.put("hibernate.jdbc.batch_size", BATCH_SIZE);
+                return properties;
+            }
+        };
+        return factory.newEntityManagerFactory().createEntityManager();
     }
 }

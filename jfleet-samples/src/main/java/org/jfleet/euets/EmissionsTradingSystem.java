@@ -30,34 +30,46 @@ import java.util.stream.Stream;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
 import org.jfleet.util.CsvSplit;
 import org.jfleet.util.MySqlTestConnectionProvider;
 
 /*
- * https://datahub.io/core/eu-emissions-trading-system/r/eu-ets.csv
+ * This example shows how to configure the used batch size to a lower number (1MB) and disable the autocommit,
+ * forcing to an atomic batch operation.
+ * Because the dataset is too small, read it 10 times.
+ *
+ * Dataset source: https://datahub.io/core/eu-emissions-trading-system/r/eu-ets.csv
  */
 public class EmissionsTradingSystem {
 
     public static void main(String[] args) throws JFleetException, IOException, SQLException {
         MySqlTestConnectionProvider connectionSuplier = new MySqlTestConnectionProvider();
         try (Connection connection = connectionSuplier.get()) {
-            try (Statement stmt = connection.createStatement()) {
-                stmt.execute("DROP TABLE IF EXISTS emmision_trade");
-                stmt.execute(
-                        "CREATE TABLE emmision_trade (id INT NOT NULL AUTO_INCREMENT, country_code VARCHAR(3) NOT NULL, "
-                                + "country VARCHAR(40) NOT NULL, activity_sector VARCHAR(40) NOT NULL, ets_information VARCHAR(128) NOT NULL, "
-                                + "year INT NOT NULL, value DECIMAL(10,2), period VARCHAR(40) NOT NULL, unit VARCHAR(64) NOT NULL, "
-                                + "PRIMARY KEY (id))");
-            }
-
+            createTable(connection);
             List<Stream<EmissionTrade>> emissions = new ArrayList<>();
             Path path = Paths.get("/tmp/eu-ets.csv");
             for (int i = 0; i < 10; i++) {
                 emissions.add(Files.lines(path).skip(1).map(EmissionsTradingSystem::parse));
             }
 
-            BulkInsert<EmissionTrade> bulkInsert = new LoadDataBulkInsert<>(EmissionTrade.class);
+            LoadDataBulkInsert.Configuration<EmissionTrade> config = new Configuration<>(EmissionTrade.class)
+                    .batchSize(1024*1024)
+                    .autocommit(false);
+
+            BulkInsert<EmissionTrade> bulkInsert = new LoadDataBulkInsert<>(config);
             bulkInsert.insertAll(connection, emissions.stream().flatMap(i -> i));
+        }
+    }
+
+    private static void createTable(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS emmision_trade");
+            stmt.execute(
+                    "CREATE TABLE emmision_trade (id INT NOT NULL AUTO_INCREMENT, country_code VARCHAR(3) NOT NULL, "
+                            + "country VARCHAR(40) NOT NULL, activity_sector VARCHAR(40) NOT NULL, ets_information VARCHAR(128) NOT NULL, "
+                            + "year INT NOT NULL, value DECIMAL(10,2), period VARCHAR(40) NOT NULL, unit VARCHAR(64) NOT NULL, "
+                            + "PRIMARY KEY (id))");
         }
     }
 

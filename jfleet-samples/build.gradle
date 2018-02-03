@@ -4,7 +4,6 @@ dependencies {
 	compile project(':jfleet-core')
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
 	compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-	//compile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.10.Final'
 	
 }
