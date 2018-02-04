@@ -15,7 +15,7 @@ Despite using JPA annotations to map Java objects to tables and columns, JFleet 
 ## Supported databases
 
 Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accessible from Java:
- - **MySql** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
+ - **MySQL** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
 In both cases, and in unsupported databases, you can use the default implementation based on the standard [JDBC executeBatch](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--) statement.
@@ -62,7 +62,7 @@ public class City {
 
 As JPA, JFleet follows the convention of using the field name if no @Column name is provided, or the class name if no @Table name is provided. 
 
-Given a collection of objects Customer to persist in MySql with the Load Data technique, you only need to provide a JDBC Connection:
+Given a collection of objects Customer to persist in MySQL with the Load Data technique, you only need to provide a JDBC Connection:
 
 
 ```java
@@ -79,6 +79,7 @@ JFleet prefers Streams to Collections because it does not force you to instantia
     BulkInsert<Customer> bulkInsert = new PgCopyBulkInsert<>(Customer.class);
     bulkInsert.insertAll(connection, customers);
 ```
+
 ### IDs
 
 JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it, and you have some strategies to deal with it:
@@ -106,11 +107,11 @@ JFleet is uploaded to Maven Central Repository and to use it, you need to add th
 <dependency>
     <groupId>org.jfleet</groupId>
     <artifactId>jfleet</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.7</version>
 </dependency>
 ```
 
-or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.5.6/jfleet-0.5.6.jar) from Maven repository.
+or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.5.7/jfleet-0.5.7.jar) from Maven repository.
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
@@ -123,4 +124,89 @@ As JFleed uses basic `javax.persistence` annotations, if you don't have any JPA 
     <version>1.0.2</version>
 </dependency>
 ```
-  
+Apart from `persistence-api` and [SLF4J](https://www.slf4j.org/) for logging, JFleet does not have any dependency.
+JFleet has not been tested against all JDBC driver versions, but it is expected that any modern version will work properly.
+
+## Advanced topics
+
+### BulkInsert configuration
+
+Load Data and Copy methods are based on serializing to a _CSVlike_ StringBuilder a batch of rows, and when serialized information reach a limit of chars, flush it to the database. Depending on the available memory and the size of each row you can tune this limit.
+In the JDBC batch insert method you can configure the numbers of rows of each batch operation.
+
+You can also configure how transactions are managed persisting your Stream or Collection:
+ - Let JFleet commit to database each time a batch of rows is flushed 
+ - Join to the existing transaction in the provided connection, and deciding on your code when to commit or rollback it.
+
+If you override the default values (50MB and autocommit), you must use a different BulkInsert constructor.
+
+For `LoadDataBulkInsert` version, with 5MB batch size and no autocommit:
+
+```java
+import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
+
+Configuration<Employee> config = new Configuration<>(Employee.class)
+        .batchSize(5 * 1024 * 1024)
+        .autocommit(false);
+BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
+bulkIsert.insertAll(connection, stream);
+```
+
+For `PgCopyBulkInsert` version, with 30MB batch size and autocommit after each batch:
+
+```java
+import org.jfleet.postgres.PgCopyBulkInsert.Configuration;
+
+Configuration<Employee> config = new Configuration<>(Employee.class)
+        .batchSize(30 * 1024 * 1024)
+        .autocommit(true);
+BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
+bulkInsert.insertAll(connection, stream);
+```
+
+For `JdbcBulkInsert` version, with 1000 rows batch size and autocommit after each batch:
+
+```java
+import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
+
+Configuration<Employee> config = new Configuration<>(Employee.class)
+        .batchSize(1000)
+        .autocommit(true);
+BulkInsert<Employee> bulkInsert = new JdbcBulkInsert<>(config);
+bulkInsert.insertAll(connection, stream);
+```
+
+#### MySQL LOAD DATA error handling
+
+In MySQL [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) command, data-interpretation, duplicate-key errors or foreign key errors become warnings and the operation continues until finish the whole data. Rows with errors are discarded and no SQLException is thrown by database or JDBC driver.
+
+If your business logic is sensitive to these errors you can configure JFleet to detect when some row 
+is missing and throw an exception:
+
+```java
+import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
+
+Configuration<Employee> config = new Configuration<>(Employee.class)
+    .errorOnMissingRow(true);
+BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
+try {
+    bulkInsert.insertAll(connection, employeesWithForeignKeyError);
+} catch (JFleetException e) {
+    logger.info("Expected error on missed FK");
+}
+```
+
+## Running the tests
+
+Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exists and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
+
+You can modify this settings changing locally [mysql-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/mysql-test.properties) and [postgres-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/postgres-test.properties) files.
+
+To execute all test you must execute the command:
+
+```bash
+gradle test
+```
+
+
+
