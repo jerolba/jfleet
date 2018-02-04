@@ -81,6 +81,7 @@ public class EntityFieldAccesorTest {
     }
 
     @Entity
+    @SuppressWarnings("unused")
     private class PrivateClass {
 
         @Id
@@ -284,10 +285,10 @@ public class EntityFieldAccesorTest {
 
     @Test
     public void nonExistentComposedFieldOnChildClass() {
-        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneChildClass.class, fieldFor("nonExistent.privateField"));
+        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneChildClass.class,
+                fieldFor("nonExistent.privateField"));
         assertNull(accessor);
     }
-
 
     private FieldInfo fieldFor(String name) {
         FieldInfo fi = new FieldInfo();

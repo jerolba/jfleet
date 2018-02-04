@@ -88,8 +88,8 @@ public class EntityFieldAccesorFactory {
                 try {
                     return readMethod.invoke(obj);
                 } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Can not access to field getter: " + fieldName + " on class " + entityClass.getName()
-                            + ": " + e.getMessage());
+                    logger.error("Can not access to field getter: " + fieldName + " on class "
+                            + entityClass.getName() + ": " + e.getMessage());
                     return null;
                 }
             });

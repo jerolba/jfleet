@@ -53,7 +53,7 @@ public class PostgresTransactionPolicyTest {
 
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
-            throws IOException, SQLException, JFleetException {
+            throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -73,7 +73,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException, JFleetException {
+    public void longTransactionWithConstraintExceptionIsRollbacked() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -97,7 +97,7 @@ public class PostgresTransactionPolicyTest {
 
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
-            throws IOException, SQLException, JFleetException {
+            throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)

@@ -103,7 +103,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-            BatchInsert batchInsert = new BatchInsert(conn, txPolicy, pstmt);
+            BatchInsert batchInsert = new BatchInsert(txPolicy, pstmt);
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
                 batchInsert.add(iterator.next());
@@ -120,7 +120,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         private final PreparedStatement pstmt;
         private int count = 0;
 
-        BatchInsert(Connection connection, TransactionPolicy txPolicy, PreparedStatement pstmt) throws SQLException {
+        BatchInsert(TransactionPolicy txPolicy, PreparedStatement pstmt) {
             this.txPolicy = txPolicy;
             this.pstmt = pstmt;
         }
@@ -142,7 +142,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
 
         private void flush() throws SQLException {
-            int[] result = pstmt.executeBatch();
+            pstmt.executeBatch();
             txPolicy.commit();
         }
 

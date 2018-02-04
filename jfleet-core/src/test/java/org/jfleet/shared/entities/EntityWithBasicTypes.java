@@ -130,8 +130,16 @@ public class EntityWithBasicTypes {
         this.string = string;
     }
 
+    public EnumForTest getEnumOrdinal() {
+        return enumOrdinal;
+    }
+
     public void setEnumOrdinal(EnumForTest enumOrdinal) {
         this.enumOrdinal = enumOrdinal;
+    }
+
+    public EnumForTest getEnumString() {
+        return enumString;
     }
 
     public void setEnumString(EnumForTest enumString) {

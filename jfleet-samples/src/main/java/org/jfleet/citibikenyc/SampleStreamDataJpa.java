@@ -24,7 +24,6 @@ import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
-import org.jfleet.JFleetException;
 import org.jfleet.citibikenyc.entities.TripFlatEntity;
 import org.jfleet.util.MySqlTestDatasourceProvider;
 import org.jfleet.util.jpa.EntityManagerFactoryFactory;
@@ -44,7 +43,7 @@ public class SampleStreamDataJpa {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SampleStreamDataJpa.class);
 
-    public static void main(String[] args) throws JFleetException, IOException, SQLException {
+    public static void main(String[] args) throws IOException, SQLException {
         DataSource dataSource = new MySqlTestDatasourceProvider().get();
         try (Connection conn = dataSource.getConnection()) {
             TableHelper.createTable(conn);

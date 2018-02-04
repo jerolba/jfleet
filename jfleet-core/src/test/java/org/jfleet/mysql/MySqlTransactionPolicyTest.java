@@ -54,8 +54,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
-            throws IOException, SQLException, JFleetException {
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -76,7 +75,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithMissedForeignKeyCanBeRollbacked() throws IOException, SQLException {
+    public void inLongTransactionWithMissedForeignKeyCanBeRollbacked() throws SQLException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -97,7 +96,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithMissedForeignKeyCanBeSkipped() throws IOException, SQLException, JFleetException {
+    public void inLongTransactionWithMissedForeignKeyCanBeSkipped() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -115,7 +114,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws IOException, SQLException {
+    public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws SQLException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -136,7 +135,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithDuplicatedIdCanBeSkipped() throws IOException, SQLException, JFleetException {
+    public void inLongTransactionWithDuplicatedIdCanBeSkipped() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -154,8 +153,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
-            throws IOException, SQLException {
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws SQLException {
         try (Connection connection = provider.get()) {
             Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
@@ -175,7 +173,7 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsCanMissRows() throws IOException, SQLException, JFleetException {
+    public void multipleBatchOperationsCanMissRows() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
             Configuration<Employee> config = new Configuration<>(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
