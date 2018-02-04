@@ -6,11 +6,11 @@
 
 # JFleet
 
-JFleet is a Java library that try to persist your information to a database as fast as possible using the best available technique in each database provider.
+JFleet is a Java library which persist in database large collections of Java POJOs, as fast as possible using the best available technique in each database provider, achieving it with alternate persistence methods from each JDBC driver implementation.
 
-It is oriented to persist a large amount of information in batches in single table.  
+It is oriented to persist a large amount of information in batches in **single table**.
 
-Despite using JPA annotations to map Java objects to tables and columns, JFleet is not an ORM.
+Despite using basic JPA annotations to map Java objects to tables and columns, JFleet is not an ORM.
 
 ## Supported databases
 
@@ -80,25 +80,6 @@ JFleet prefers Streams to Collections because it does not force you to instantia
     bulkInsert.insertAll(connection, customers);
 ```
 
-### IDs
-
-JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it, and you have some strategies to deal with it:
-
-- Use the mechanism provided by each database to autogenerate primary keys: 
-   - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
-   - **PostgreSQL**: [serial](https://www.postgresql.org/docs/9.6/static/datatype-numeric.html) numeric type  
-
-- Assign manually an Id to each object:
-   - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
-   - If your domain allows it, use a [natural key](https://en.wikipedia.org/wiki/Natural_key)
-   - Use a composite key as primary key if the domain also allows it
-   - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value and, from Java, increment and set a new Id value to each object
-
-If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
-
-In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database, but due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
-
-
 ## Dependency
 
 JFleet is uploaded to Maven Central Repository and to use it, you need to add the following Maven dependency:
@@ -128,6 +109,57 @@ Apart from `persistence-api` and [SLF4J](https://www.slf4j.org/) for logging, JF
 JFleet has not been tested against all JDBC driver versions, but it is expected that any modern version will work properly.
 
 ## Advanced topics
+
+### IDs
+
+JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it, and you have some strategies to deal with it:
+
+- Use the mechanism provided by each database to autogenerate primary keys: 
+   - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
+   - **PostgreSQL**: [serial](https://www.postgresql.org/docs/9.6/static/datatype-numeric.html) numeric type  
+
+- Assign manually an Id to each object:
+   - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
+   - If your domain allows it, use a [natural key](https://en.wikipedia.org/wiki/Natural_key)
+   - Use a composite key as primary key if the domain also allows it
+   - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value and, from Java, increment and set a new Id value to each object
+
+If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
+
+In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database, but due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
+
+### Annotations
+
+JFleet reuse existing JPA annotations to map Java object to tables. 
+
+JPA allows to define how to map your entities in [two ways](https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#access):
+- entity attributes (instance fields) 
+- or the accessors (instance properties)
+
+In JPA by default, the placement of the @Id annotation gives the default access strategy. 
+
+**JFleet only support access by entity attributes.**
+
+The supported annotations are:
+- **[@Entity](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Entity.java)**: Specifies that the class is an entity
+- **[@Table](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Table.java)**: Specifies the table name. If no value is specified, the class name in lower case is used.
+- **[@Column](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Column.java)**: Is used to specify a mapped column for a persistent field. If no value is specified, the field name is used.
+- **[@Id](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Id.java)**: Specifies the primary key field of an entity. It is only used to fetch foreign key values in ManyToOne relationships.
+- **[@MappedSuperclass](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/MappedSuperclass.java)**: Designates a class whose mapping information is applied to the entities that inherit from it. A mapped superclass has no separate table defined for it.
+- **[@Transient](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Transient.java)**: This annotation specifies that field is not persistent.
+- **[@Embedded](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Embedded.java)**: Defines a persistent field of an entity whose value is an instance of an embeddable class.
+- **[@EmbeddedId](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/EmbeddedId.java)**: Is applied to a persistent field of an entity class or mapped superclass to denote a composite primary key that is an embeddable class.
+- **[@AttributeOverrides](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/AttributeOverrides.java)**: Is used to override mappings of multiple fields.
+- **[@AttributeOverride](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/AttributeOverride.java)**: Is used to override the mapping of a basic field or Id field. May be applied to an entity that extends a mapped superclass or to an embedded field to override a basic mapping defined by the mapped superclass or embeddable class.
+- **[@ManyToOne](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/ManyToOne.java)**: Defines a single-valued association to another entity class that has many-to-one multiplicity. The `targetEntity` value is ignored if provided. Uses the field class annotated.
+- **[@OneToOne](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/OneToOne.java)**: Defines a single-valued association to another entity that has one-to-one multiplicity. The `targetEntity` value is ignored if provided. Uses the field class annotated.
+- **[@JoinColumn](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/JoinColumn.java)**: The name of the foreign key column. If no name is provided, the column name is the concatenation of the name of the referencing relationship field of the referencing entity, the char "\_", and the name of the referenced primary key column.
+- **[@Enumerated](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Enumerated.java)**: Specifies that a persistent field should be persisted as a enumerated type. The used value is specified by the EnumType value. If no annotation is used or no EnumType is used, the default enum type is ORDINAL.
+- **[@Temporal](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Temporal.java)**: This annotation must be specified for persistent fields of type `java.util.Date`. DATE, TIME and TIMESTAMP values are accepted.
+
+Some common annotations which are not unsupported are: [@GeneratedValue](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/GeneratedValue.java), [@OneToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/OneToMany.java), [@ManyToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/ManyToMany.java), [@JoinColumns]() and [@JoinTable](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/JoinTable.java).
+
+These annotations, and many configuration properties in _supported_ annotations, are ignored mainly because has no effect o meaning in the purpose and limitations of JFleet. If you find a relevant annotation or property to be included create an issue.
 
 ### BulkInsert configuration
 
