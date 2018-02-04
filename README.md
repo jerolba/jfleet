@@ -1,8 +1,8 @@
 
-[![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
+[![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
-
+[ ![Download](https://api.bintray.com/packages/jerolba/JFleet/jfleet/images/download.svg) ](https://bintray.com/jerolba/JFleet/jfleet/_latestVersion)
 
 # JFleet
 
