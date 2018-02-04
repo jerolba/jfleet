@@ -25,6 +25,8 @@ import java.time.LocalTime;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -32,6 +34,10 @@ import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 
 public class FieldTypeInspectorTest {
+
+    public enum EnumField {
+        one, two, three, four
+    }
 
     @Entity
     public class EntityWithTypes {
@@ -77,6 +83,14 @@ public class FieldTypeInspectorTest {
         public LocalDate localDate;
         public LocalTime localTime;
         public LocalDateTime localDateTime;
+
+        public EnumField enumUnAnnotated;
+        @Enumerated
+        public EnumField enumDefault;
+        @Enumerated(EnumType.STRING)
+        public EnumField enumString;
+        @Enumerated(EnumType.ORDINAL)
+        public EnumField enumOrdinal;
     }
 
     private EntityInfo entityInfo = new JpaEntityInspector(EntityWithTypes.class).inspect();
@@ -268,6 +282,34 @@ public class FieldTypeInspectorTest {
         EntityFieldType type = getField("localDateTime");
         assertFalse(type.isPrimitive());
         assertEquals(FieldTypeEnum.LOCALDATETIME, type.getFieldType());
+    }
+
+    @Test
+    public void enumUnAnnotatedTest() {
+        EntityFieldType type = getField("enumUnAnnotated");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.ENUMORDINAL, type.getFieldType());
+    }
+
+    @Test
+    public void enumDefaultTest() {
+        EntityFieldType type = getField("enumDefault");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.ENUMORDINAL, type.getFieldType());
+    }
+
+    @Test
+    public void enumOrdinalTest() {
+        EntityFieldType type = getField("enumOrdinal");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.ENUMORDINAL, type.getFieldType());
+    }
+
+    @Test
+    public void enumStringTest() {
+        EntityFieldType type = getField("enumString");
+        assertFalse(type.isPrimitive());
+        assertEquals(FieldTypeEnum.ENUMSTRING, type.getFieldType());
     }
 
     private EntityFieldType getField(String fieldName) {

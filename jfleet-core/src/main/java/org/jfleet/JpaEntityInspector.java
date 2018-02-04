@@ -40,6 +40,8 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -202,6 +204,8 @@ public class JpaEntityInspector {
                 type.setFieldType(FieldTypeEnum.LOCALTIME);
             } else if (LocalDateTime.class.equals(javaType)) {
                 type.setFieldType(FieldTypeEnum.LOCALDATETIME);
+            } else if (javaType.isEnum()) {
+                type.setFieldType(getEnumType(field.getAnnotation(Enumerated.class)));
             } else {
                 throw new RuntimeException("Unexpected type on " + field.toString());
             }
@@ -231,6 +235,17 @@ public class JpaEntityInspector {
                 }
             }
             return FieldTypeEnum.TIMESTAMP;
+        }
+
+        private FieldTypeEnum getEnumType(Enumerated enumerated) {
+            if (enumerated == null) {
+                return FieldTypeEnum.ENUMORDINAL;
+            }
+            EnumType type = enumerated.value();
+            if (type == null || type == EnumType.ORDINAL) {
+                return FieldTypeEnum.ENUMORDINAL;
+            }
+            return FieldTypeEnum.ENUMSTRING;
         }
 
         private boolean isSkippable() {

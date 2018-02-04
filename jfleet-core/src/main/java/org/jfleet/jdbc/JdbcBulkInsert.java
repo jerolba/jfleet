@@ -28,6 +28,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -49,6 +50,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     private final boolean autocommit;
 
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
+    private final List<Function<Object, Object>> preConvert = new ArrayList<>();
 
     private final List<FieldInfo> fields;
 
@@ -65,9 +67,13 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        for (FieldInfo f : fields) {
-            EntityFieldAccessor accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
-            accessors.add(accesor);
+        Class<?> entityClass = entityInfo.getEntityClass();
+        for (FieldInfo field : fields) {
+            accessors.add(factory.getAccessor(entityClass, field));
+        }
+        FieldPreConvert fieldPreConvert = new FieldPreConvert();
+        for (FieldInfo field : fields) {
+            preConvert.add(fieldPreConvert.preConvert(field.getFieldType()));
         }
     }
 
@@ -146,13 +152,14 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         for (int i = 0; i < fields.size(); i++) {
             EntityFieldAccessor accessor = accessors.get(i);
             Object value = accessor.getValue(entity);
-            setParameter(pstmt, i + 1, value);
+            Function<Object, Object> f = preConvert.get(i);
+            setParameter(pstmt, i + 1, f.apply(value));
         }
     }
 
     /*
      * Each JDBC driver implements code like this in their setObject(idx, object) method.
-     * If following conersions are not supported by your driver (like LocalDate, LocalTime, and LocalDateTime),
+     * If following conversions are not supported by your driver (like LocalDate, LocalTime, and LocalDateTime),
      * extend and overwrite it with the correct one.
      */
     public void setParameter(PreparedStatement pstmt, int parameterIndex, Object parameterObj) throws SQLException {

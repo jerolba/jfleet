@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
@@ -36,6 +38,9 @@ public class EntityWithBasicTypes {
     private BigDecimal bigDecimal;
     private BigInteger bigInteger;
     private String string;
+    private EnumForTest enumOrdinal;
+    @Enumerated(EnumType.STRING)
+    private EnumForTest enumString;
 
     public Boolean getBooleanObject() {
         return booleanObject;
@@ -123,6 +128,14 @@ public class EntityWithBasicTypes {
 
     public void setString(String string) {
         this.string = string;
+    }
+
+    public void setEnumOrdinal(EnumForTest enumOrdinal) {
+        this.enumOrdinal = enumOrdinal;
+    }
+
+    public void setEnumString(EnumForTest enumString) {
+        this.enumString = enumString;
     }
 
 }

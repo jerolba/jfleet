@@ -15,6 +15,26 @@
  */
 package org.jfleet.common;
 
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BIGDECIMAL;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BIGINTEGER;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BOOLEAN;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BYTE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.CHAR;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.DATE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.DOUBLE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.ENUMORDINAL;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.ENUMSTRING;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.FLOAT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.INT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LOCALDATE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LOCALDATETIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LOCALTIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LONG;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.SHORT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.STRING;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.TIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.TIMESTAMP;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -22,7 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -34,7 +54,10 @@ public class BaseTypeSerializer {
     public interface Mapper extends Function<Object, String> {
     }
 
-    /* As Type Serializer is used in a single stream, we don't need to take care of threadsafety of SimpleDateFormat*/
+    /*
+     * As Type Serializer is used in a single stream, we don't need to take care of
+     * threadsafety of SimpleDateFormat
+     */
     private final SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss");
@@ -42,26 +65,28 @@ public class BaseTypeSerializer {
     private final DateTimeFormatter dtfLocalTime = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final DateTimeFormatter dtfLocalDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final Map<FieldTypeEnum, Mapper> mappers = new HashMap<>();
+    private final Map<FieldTypeEnum, Mapper> mappers = new EnumMap<>(FieldTypeEnum.class);
 
     public BaseTypeSerializer() {
-        add(FieldTypeEnum.BOOLEAN, FROM_BOOLEAN);
-        add(FieldTypeEnum.BYTE, FROM_BYTE);
-        add(FieldTypeEnum.CHAR, FROM_CHAR);
-        add(FieldTypeEnum.DOUBLE, FROM_DOUBLE);
-        add(FieldTypeEnum.FLOAT, FROM_FLOAT);
-        add(FieldTypeEnum.INT, FROM_INT);
-        add(FieldTypeEnum.LONG, FROM_LONG);
-        add(FieldTypeEnum.SHORT, FROM_SHORT);
-        add(FieldTypeEnum.BIGDECIMAL, FROM_BIGDECIMAL);
-        add(FieldTypeEnum.BIGINTEGER, FROM_BIGINTEGER);
-        add(FieldTypeEnum.STRING, FROM_STRING);
-        add(FieldTypeEnum.TIMESTAMP, FROM_TIMESTAMP);
-        add(FieldTypeEnum.DATE, FROM_DATE);
-        add(FieldTypeEnum.TIME, FROM_TIME);
-        add(FieldTypeEnum.LOCALDATE, FROM_LOCALDATE);
-        add(FieldTypeEnum.LOCALTIME, FROM_LOCALTIME);
-        add(FieldTypeEnum.LOCALDATETIME, FROM_LOCALDATETIME);
+        add(BOOLEAN, FROM_BOOLEAN);
+        add(BYTE, FROM_BYTE);
+        add(CHAR, FROM_CHAR);
+        add(DOUBLE, FROM_DOUBLE);
+        add(FLOAT, FROM_FLOAT);
+        add(INT, FROM_INT);
+        add(LONG, FROM_LONG);
+        add(SHORT, FROM_SHORT);
+        add(BIGDECIMAL, FROM_BIGDECIMAL);
+        add(BIGINTEGER, FROM_BIGINTEGER);
+        add(STRING, FROM_STRING);
+        add(TIMESTAMP, FROM_TIMESTAMP);
+        add(DATE, FROM_DATE);
+        add(TIME, FROM_TIME);
+        add(LOCALDATE, FROM_LOCALDATE);
+        add(LOCALTIME, FROM_LOCALTIME);
+        add(LOCALDATETIME, FROM_LOCALDATETIME);
+        add(ENUMORDINAL, FROM_ENUMORDINAL);
+        add(ENUMSTRING, FROM_ENUMSTRING);
     }
 
     public void add(FieldTypeEnum type, Mapper mapper) {
@@ -137,6 +162,20 @@ public class BaseTypeSerializer {
     private final Mapper FROM_LOCALTIME = (obj) -> {
         if (obj instanceof LocalTime) {
             return dtfLocalTime.format((LocalTime) obj);
+        }
+        return null;
+    };
+
+    private final Mapper FROM_ENUMORDINAL = (obj) -> {
+        if (obj instanceof Enum) {
+            return Integer.toString(((Enum<?>) obj).ordinal());
+        }
+        return null;
+    };
+
+    private final Mapper FROM_ENUMSTRING = (obj) -> {
+        if (obj instanceof Enum) {
+            return ((Enum<?>) obj).name();
         }
         return null;
     };

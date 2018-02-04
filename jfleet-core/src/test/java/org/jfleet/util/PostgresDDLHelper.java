@@ -94,6 +94,10 @@ public class PostgresDDLHelper implements DDLHelper {
             return "TIME";
         case LOCALDATETIME:
             return "TIMESTAMP";
+        case ENUMORDINAL:
+            return "SMALLINT";
+        case ENUMSTRING:
+            return "VARCHAR(255)";
         }
         return null;
     }

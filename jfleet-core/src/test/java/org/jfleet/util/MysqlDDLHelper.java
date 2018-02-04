@@ -94,6 +94,10 @@ public class MysqlDDLHelper implements DDLHelper {
             return "TIME";
         case LOCALDATETIME:
             return "DATETIME";
+        case ENUMORDINAL:
+            return "TINYINT";
+        case ENUMSTRING:
+            return "VARCHAR(255)";
         }
         return null;
 

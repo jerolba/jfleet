@@ -19,12 +19,8 @@ public class EntityFieldType {
 
     public enum FieldTypeEnum {
         BOOLEAN, BYTE, SHORT, INT, LONG, CHAR, FLOAT, DOUBLE, STRING, DATE, TIME, TIMESTAMP,
-        BIGDECIMAL, BIGINTEGER, LOCALDATE, LOCALTIME, LOCALDATETIME;
+        BIGDECIMAL, BIGINTEGER, LOCALDATE, LOCALTIME, LOCALDATETIME, ENUMSTRING, ENUMORDINAL;
     }
-
-    // TODO: add metainfo about ids and generation
-    // TODO: add metainfo about FK in ManyToOne relations
-    // TODO: manage @lob or byte[] types
 
     private boolean primitive;
     private FieldTypeEnum fieldType;

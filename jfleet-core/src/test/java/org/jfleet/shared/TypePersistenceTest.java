@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
+import org.jfleet.shared.entities.EnumForTest;
 import org.jfleet.util.SqlUtil;
 import org.junit.Test;
 
@@ -49,6 +50,8 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
         entity.setBigDecimal(new BigDecimal("1234567.89"));
         entity.setBigInteger(new BigInteger("1234567890"));
         entity.setString("some string");
+        entity.setEnumOrdinal(EnumForTest.one);
+        entity.setEnumString(EnumForTest.four);
 
         BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
 
@@ -59,7 +62,7 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
                         + " doubleObject, floatObject, intObject, longObject, shortObject, string,"
-                        + " bigDecimal, bigInteger" + " FROM table_with_basic_types")) {
+                        + " bigDecimal, bigInteger, enumOrdinal, enumString FROM table_with_basic_types")) {
                     assertTrue(rs.next());
                     assertEquals(true, rs.getBoolean("booleanObject"));
                     assertEquals(42, rs.getByte("byteObject"));
@@ -71,7 +74,8 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
                     assertEquals(12345, rs.getShort("shortObject"));
                     assertEquals(new BigDecimal("1234567.89"), rs.getBigDecimal("bigDecimal"));
                     assertEquals(new BigInteger("1234567890").longValueExact(), rs.getInt("bigInteger"));
-                    assertEquals("some string", rs.getString("string"));
+                    assertEquals(0, rs.getInt("enumOrdinal"));
+                    assertEquals("four", rs.getString("enumString"));
                 }
             }
         }
@@ -89,6 +93,10 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
         entity.setLongObject(null);
         entity.setShortObject(null);
         entity.setString(null);
+        entity.setBigDecimal(null);
+        entity.setBigInteger(null);
+        entity.setEnumOrdinal(null);
+        entity.setEnumString(null);
 
         BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
 
@@ -98,7 +106,8 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
 
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
-                        + " doubleObject, floatObject, intObject, longObject, shortObject, string"
+                        + " doubleObject, floatObject, intObject, longObject, shortObject, string,"
+                        + " bigDecimal, bigInteger, enumOrdinal, enumString "
                         + " FROM table_with_basic_types")) {
                     assertTrue(rs.next());
                     assertEquals(false, rs.getBoolean("booleanObject"));
@@ -118,6 +127,12 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
                     assertEquals(0, rs.getShort("shortObject"));
                     assertTrue(rs.wasNull());
                     assertEquals(null, rs.getString("string"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getBigDecimal("bigDecimal"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(0, rs.getInt("enumOrdinal"));
+                    assertTrue(rs.wasNull());
+                    assertEquals(null, rs.getString("enumString"));
                     assertTrue(rs.wasNull());
                 }
             }

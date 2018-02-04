@@ -15,12 +15,17 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BOOLEAN;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LOCALDATETIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LOCALTIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.TIME;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.TIMESTAMP;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.common.BaseTypeSerializer;
 
 public class PostgresTypeSerializer extends BaseTypeSerializer {
@@ -32,11 +37,11 @@ public class PostgresTypeSerializer extends BaseTypeSerializer {
 
     public PostgresTypeSerializer() {
         super();
-        add(FieldTypeEnum.BOOLEAN, FROM_BOOLEAN);
-        add(FieldTypeEnum.TIMESTAMP, FROM_TIMESTAMP);
-        add(FieldTypeEnum.TIME, FROM_TIME);
-        add(FieldTypeEnum.LOCALTIME, FROM_LOCALTIME);
-        add(FieldTypeEnum.LOCALDATETIME, FROM_LOCALDATETIME);
+        add(BOOLEAN, FROM_BOOLEAN);
+        add(TIMESTAMP, FROM_TIMESTAMP);
+        add(TIME, FROM_TIME);
+        add(LOCALTIME, FROM_LOCALTIME);
+        add(LOCALDATETIME, FROM_LOCALDATETIME);
     }
 
     private final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "true" : "false";
