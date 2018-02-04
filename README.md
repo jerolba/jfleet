@@ -29,18 +29,18 @@ JFleet needs to know how to map your Java objects or entities to a table. The me
 import javax.persistence.*;
 
 @Entity
-@Table(name = "CustomerContact")
+@Table(name = "customer_contact")
 public class Customer {
 
     private Long id;
 
     private String contactName;
     
-    @Column(name="CustomerName")
+    @Column(name="customer_name")
     private String name;
     
     @ManyToOne
-    @JoinColumn(name = "CityId")
+    @JoinColumn(name = "city_id")
     private City city;
     
     //Getters and setters
@@ -124,9 +124,9 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
    - Use a composite key as primary key if the domain also allows it
    - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value and, from Java, increment and set a new Id value to each object
 
-If you opt for an autogenerate strategy, you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
+If you opt for an autogenerate strategy, breaking the [JPA specification](http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1517785731_05caec473636207cb2f5000798645aba), you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
 
-In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database, but due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
+In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database. But due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
 
 ### Annotations
 
@@ -138,7 +138,7 @@ JPA allows to define how to map your entities in [two ways](https://docs.jboss.o
 
 In JPA by default, the placement of the @Id annotation gives the default access strategy. 
 
-**JFleet only support access by entity attributes.**
+**JFleet only support access by entity attributes**, and expect annotations on fields.
 
 The supported annotations are:
 - **[@Entity](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Entity.java)**: Specifies that the class is an entity
@@ -164,11 +164,12 @@ These annotations, and many configuration properties in _supported_ annotations,
 ### BulkInsert configuration
 
 Load Data and Copy methods are based on serializing to a _CSVlike_ StringBuilder a batch of rows, and when serialized information reach a limit of chars, flush it to the database. Depending on the available memory and the size of each row you can tune this limit.
+
 In the JDBC batch insert method you can configure the numbers of rows of each batch operation.
 
 You can also configure how transactions are managed persisting your Stream or Collection:
- - Let JFleet commit to database each time a batch of rows is flushed 
- - Join to the existing transaction in the provided connection, and deciding on your code when to commit or rollback it.
+ - Let JFleet commit to database each time a batch of rows is flushed. 
+ - Join to the existing transaction in the provided connection, and deciding on your own code when to commit or rollback it.
 
 If you override the default values (50MB and autocommit), you must use a different BulkInsert constructor.
 
