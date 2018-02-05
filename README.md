@@ -229,6 +229,16 @@ try {
 }
 ```
 
+### Supported database versions
+
+JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and the latest stable release of **PostgreSQL 9.6**.
+
+PostgreSQL 10.1 release has been manually tested without any problem.
+
+MySQL 8 is not yet supported by JFleet because requires the lastest JDBC driver version, and all internal classes used by JFleet change from 5.x versions.
+
+All database engines with a standard JDBC driver can be used with the `JdbcBulkInsert` implementation.
+
 ## Running the tests
 
 Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exists and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
@@ -241,5 +251,6 @@ To execute all test you must execute the command:
 gradle test
 ```
 
+You can also fork the project and test it in your [CircleCI](https://circleci.com/signup/) free account.
 
 
