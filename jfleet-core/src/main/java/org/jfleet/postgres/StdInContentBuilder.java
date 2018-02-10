@@ -39,7 +39,7 @@ public class StdInContentBuilder {
     private int records = 0;
 
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize) {
-        this.sb = new StringBuilder(batchSize);
+        this.sb = new StringBuilder(batchSize + Math.min(1024, batchSize/1000));
         this.batchSize = batchSize;
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
