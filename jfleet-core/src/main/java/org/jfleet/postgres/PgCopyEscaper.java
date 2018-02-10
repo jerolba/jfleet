@@ -52,7 +52,7 @@ public class PgCopyEscaper {
         return -1;
     }
 
-    public boolean isEscapable(char character) {
+    private boolean isEscapable(char character) {
         switch (character) {
         case PgCopyConstants.DELIMITER_CHAR:
         case PgCopyConstants.NEWLINE_CHAR:
