@@ -1,12 +1,12 @@
 /**
  * Copyright 2002-2017 The Apache Software Foundation
- * 
+ *
  * This file is part of Apache Commons IO
  * This product includes software developed at
  * The Apache Software Foundation (http://www.apache.org/).
- * 
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. 
+ * contributor license agreements.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
@@ -18,10 +18,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * This file is extracted from:
+ *
+ * This file is copied from:
  * https://github.com/apache/commons-io/blob/master/src/main/java/org/apache/commons/io/input/ReaderInputStream.java
- * 
+ * to avoid including entire Commons IO dependency.
  */
 package org.jfleet.mysql;
 
@@ -48,15 +48,14 @@ public class ReaderInputStream extends InputStream {
     private final CharsetEncoder encoder;
 
     /**
-     * CharBuffer used as input for the decoder. It should be reasonably
-     * large as we read data from the underlying Reader into this buffer.
+     * CharBuffer used as input for the decoder. It should be reasonably large as we read data from the underlying
+     * Reader into this buffer.
      */
     private final CharBuffer encoderIn;
 
     /**
-     * ByteBuffer used as output for the decoder. This buffer can be small
-     * as it is only used to transfer data from the decoder to the
-     * buffer provided by the caller.
+     * ByteBuffer used as output for the decoder. This buffer can be small as it is only used to transfer data from the
+     * decoder to the buffer provided by the caller.
      */
     private final ByteBuffer encoderOut;
 
@@ -66,8 +65,10 @@ public class ReaderInputStream extends InputStream {
     /**
      * Construct a new {@link ReaderInputStream}.
      *
-     * @param reader the target {@link Reader}
-     * @param encoder the charset encoder
+     * @param reader
+     *            the target {@link Reader}
+     * @param encoder
+     *            the charset encoder
      * @since 2.1
      */
     public ReaderInputStream(final Reader reader, final CharsetEncoder encoder) {
@@ -77,9 +78,12 @@ public class ReaderInputStream extends InputStream {
     /**
      * Construct a new {@link ReaderInputStream}.
      *
-     * @param reader the target {@link Reader}
-     * @param encoder the charset encoder
-     * @param bufferSize the size of the input buffer in number of characters
+     * @param reader
+     *            the target {@link Reader}
+     * @param encoder
+     *            the charset encoder
+     * @param bufferSize
+     *            the size of the input buffer in number of characters
      * @since 2.1
      */
     public ReaderInputStream(final Reader reader, final CharsetEncoder encoder, final int bufferSize) {
@@ -94,24 +98,28 @@ public class ReaderInputStream extends InputStream {
     /**
      * Construct a new {@link ReaderInputStream}.
      *
-     * @param reader the target {@link Reader}
-     * @param charset the charset encoding
-     * @param bufferSize the size of the input buffer in number of characters
+     * @param reader
+     *            the target {@link Reader}
+     * @param charset
+     *            the charset encoding
+     * @param bufferSize
+     *            the size of the input buffer in number of characters
      */
     public ReaderInputStream(final Reader reader, final Charset charset, final int bufferSize) {
         this(reader,
-             charset.newEncoder()
-                    .onMalformedInput(CodingErrorAction.REPLACE)
-                    .onUnmappableCharacter(CodingErrorAction.REPLACE),
-             bufferSize);
+                charset.newEncoder()
+                        .onMalformedInput(CodingErrorAction.REPLACE)
+                        .onUnmappableCharacter(CodingErrorAction.REPLACE),
+                bufferSize);
     }
 
     /**
-     * Construct a new {@link ReaderInputStream} with a default input buffer size of
-     * 1024 characters.
+     * Construct a new {@link ReaderInputStream} with a default input buffer size of 1024 characters.
      *
-     * @param reader the target {@link Reader}
-     * @param charset the charset encoding
+     * @param reader
+     *            the target {@link Reader}
+     * @param charset
+     *            the charset encoding
      */
     public ReaderInputStream(final Reader reader, final Charset charset) {
         this(reader, charset, DEFAULT_BUFFER_SIZE);
@@ -134,7 +142,7 @@ public class ReaderInputStream extends InputStream {
             if (c == EOF) {
                 endOfInput = true;
             } else {
-                encoderIn.position(position+c);
+                encoderIn.position(position + c);
             }
             encoderIn.flip();
         }
@@ -146,12 +154,15 @@ public class ReaderInputStream extends InputStream {
     /**
      * Read the specified number of bytes into an array.
      *
-     * @param b the byte array to read into
-     * @param off the offset to start reading bytes into
-     * @param len the number of bytes to read
-     * @return the number of bytes read or <code>-1</code>
-     *         if the end of the stream has been reached
-     * @throws IOException if an I/O error occurs
+     * @param b
+     *            the byte array to read into
+     * @param off
+     *            the offset to start reading bytes into
+     * @param len
+     *            the number of bytes to read
+     * @return the number of bytes read or <code>-1</code> if the end of the stream has been reached
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Override
     public int read(final byte[] b, int off, int len) throws IOException {
@@ -159,8 +170,7 @@ public class ReaderInputStream extends InputStream {
             throw new NullPointerException("Byte array must not be null");
         }
         if (len < 0 || off < 0 || (off + len) > b.length) {
-            throw new IndexOutOfBoundsException("Array Size=" + b.length +
-                    ", offset=" + off + ", length=" + len);
+            throw new IndexOutOfBoundsException("Array Size=" + b.length + ", offset=" + off + ", length=" + len);
         }
         int read = 0;
         if (len == 0) {
@@ -186,10 +196,11 @@ public class ReaderInputStream extends InputStream {
     /**
      * Read the specified number of bytes into an array.
      *
-     * @param b the byte array to read into
-     * @return the number of bytes read or <code>-1</code>
-     *         if the end of the stream has been reached
-     * @throws IOException if an I/O error occurs
+     * @param b
+     *            the byte array to read into
+     * @return the number of bytes read or <code>-1</code> if the end of the stream has been reached
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Override
     public int read(final byte[] b) throws IOException {
@@ -199,9 +210,9 @@ public class ReaderInputStream extends InputStream {
     /**
      * Read a single byte.
      *
-     * @return either the byte read or <code>-1</code> if the end of the stream
-     *         has been reached
-     * @throws IOException if an I/O error occurs
+     * @return either the byte read or <code>-1</code> if the end of the stream has been reached
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Override
     public int read() throws IOException {
@@ -217,9 +228,10 @@ public class ReaderInputStream extends InputStream {
     }
 
     /**
-     * Close the stream. This method will cause the underlying {@link Reader}
-     * to be closed.
-     * @throws IOException if an I/O error occurs
+     * Close the stream. This method will cause the underlying {@link Reader} to be closed.
+     *
+     * @throws IOException
+     *             if an I/O error occurs
      */
     @Override
     public void close() throws IOException {

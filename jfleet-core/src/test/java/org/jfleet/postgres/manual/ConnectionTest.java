@@ -26,8 +26,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.jfleet.common.StringBuilderReader;
 import org.jfleet.postgres.PostgresTestConnectionProvider;
-import org.jfleet.postgres.StringBuilderReader;
 import org.junit.Test;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;

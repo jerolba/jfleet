@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import org.jfleet.JFleetException;
-import org.jfleet.postgres.StringBuilderReader;
+import org.jfleet.common.StringBuilderReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,20 +34,21 @@ public class LoadDataContentWriter {
     private final Statement statement;
     private final MySqlTransactionPolicy txPolicy;
     private final String mainSql;
-    private final Charset encoding;
+    private final Charset charset;
 
     public LoadDataContentWriter(Statement statement, MySqlTransactionPolicy txPolicy, String mainSql,
-            Charset encoding) {
+            Charset charset) {
         this.statement = statement;
         this.txPolicy = txPolicy;
         this.mainSql = mainSql;
-        this.encoding = encoding;
+        this.charset = charset;
     }
 
     public void writeContent(FileContentBuilder contentBuilder) throws SQLException, JFleetException {
         if (contentBuilder.getContentSize() > 0) {
             long init = System.nanoTime();
-            ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(contentBuilder.getContent()), encoding);
+            ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(contentBuilder.getContent()),
+                    charset);
             statement.setLocalInfileInputStream(ris);
             statement.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
