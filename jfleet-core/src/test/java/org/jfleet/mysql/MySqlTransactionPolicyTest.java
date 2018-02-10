@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class MySqlTransactionPolicyTest {
 
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);
-    private static final long VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
+    private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
     private Supplier<Connection> provider;
 

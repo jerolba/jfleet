@@ -35,11 +35,11 @@ import com.mysql.jdbc.Statement;
 public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(LoadDataBulkInsert.class);
-    private final static long DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
+    private final static int DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
 
     private final EntityInfo entityInfo;
     private final String mainSql;
-    private final long batchSize;
+    private final int batchSize;
     private final boolean autocommit;
     private final boolean errorOnMissingRow;
     private final Charset encoding;
@@ -63,14 +63,14 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo);
+        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize);
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, autocommit, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             LoadDataContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
                 contentBuilder.add(iterator.next());
-                if (contentBuilder.getContentSize() > batchSize) {
+                if (contentBuilder.isFilled()) {
                     logger.debug("Writing content");
                     contentWriter.writeContent(contentBuilder);
                 }
@@ -97,7 +97,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
         private Class<T> clazz;
         private Charset encoding = Charset.forName("UTF-8");
-        private long batchSize = DEFAULT_BATCH_SIZE;
+        private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
         private boolean errorOnMissingRow = false;
 
@@ -110,7 +110,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
             return this;
         }
 
-        public Configuration<T> batchSize(long batchSize) {
+        public Configuration<T> batchSize(int batchSize) {
             this.batchSize = batchSize;
             return this;
         }
