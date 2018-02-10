@@ -9,6 +9,7 @@ allprojects {
     exclude "**/*.properties"
     exclude "**/*.txt"
     exclude "**/PersistenceUnitInfoImpl.java"
+    exclude "**/ReaderInputStream.java"
   }
   
   repositories {

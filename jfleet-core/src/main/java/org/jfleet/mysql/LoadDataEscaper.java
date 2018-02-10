@@ -56,7 +56,7 @@ public class LoadDataEscaper {
         return -1;
     }
 
-    public boolean isEscapable(char character) {
+    private boolean isEscapable(char character) {
         switch (character) {
         case ESCAPED_BY_CHAR:
         case LINE_TERMINATED_CHAR:

@@ -33,11 +33,14 @@ public class FileContentBuilder {
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
+    private final int batchSize;
 
-    private final StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb;
     private int records = 0;
 
-    public FileContentBuilder(EntityInfo entityInfo) {
+    public FileContentBuilder(EntityInfo entityInfo, int batchSize) {
+        this.sb = new StringBuilder(batchSize + Math.min(1024, batchSize / 1000));
+        this.batchSize = batchSize;
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
@@ -69,6 +72,10 @@ public class FileContentBuilder {
         records++;
     }
 
+    public boolean isFilled() {
+        return sb.length() > batchSize;
+    }
+
     public int getContentSize() {
         return sb.length();
     }
@@ -77,8 +84,8 @@ public class FileContentBuilder {
         return records;
     }
 
-    public String getContent() {
-        return sb.toString();
+    public StringBuilder getContent() {
+        return sb;
     }
 
 }

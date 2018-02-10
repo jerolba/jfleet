@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.sql.SQLException;
 
 import org.jfleet.WrappedException;
+import org.jfleet.common.StringBuilderReader;
 import org.jfleet.common.TransactionPolicy;
 import org.postgresql.copy.CopyManager;
 import org.slf4j.Logger;

@@ -34,11 +34,11 @@ import org.slf4j.LoggerFactory;
 public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyBulkInsert.class);
-    private static final long DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
+    private static final int DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
 
     private final EntityInfo entityInfo;
     private final String mainSql;
-    private final long batchSize;
+    private final int batchSize;
     private final boolean autocommit;
 
     public PgCopyBulkInsert(Class<T> clazz) {
@@ -57,7 +57,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo);
+        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo, batchSize);
         CopyManager copyMng = getCopyManager(conn);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
@@ -66,7 +66,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
                 Iterator<T> iterator = stream.iterator();
                 while (iterator.hasNext()) {
                     contentBuilder.add(iterator.next());
-                    if (contentBuilder.getContentSize() > batchSize) {
+                    if (contentBuilder.isFilled()) {
                         logger.debug("Writing content");
                         contentWriter.writeContent(contentBuilder);
                     }
@@ -89,14 +89,14 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     public static class Configuration<T> {
 
         private Class<T> clazz;
-        private long batchSize = DEFAULT_BATCH_SIZE;
+        private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
         }
 
-        public Configuration<T> batchSize(long batchSize) {
+        public Configuration<T> batchSize(int batchSize) {
             this.batchSize = batchSize;
             return this;
         }

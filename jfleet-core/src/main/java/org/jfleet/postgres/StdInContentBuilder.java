@@ -33,11 +33,14 @@ public class StdInContentBuilder {
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
+    private final int batchSize;
 
-    private final StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb;
     private int records = 0;
 
-    public StdInContentBuilder(EntityInfo entityInfo) {
+    public StdInContentBuilder(EntityInfo entityInfo, int batchSize) {
+        this.sb = new StringBuilder(batchSize + Math.min(1024, batchSize / 1000));
+        this.batchSize = batchSize;
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
@@ -69,6 +72,10 @@ public class StdInContentBuilder {
         }
         sb.append(NEWLINE_CHAR);
         records++;
+    }
+
+    public boolean isFilled() {
+        return sb.length() > batchSize;
     }
 
     public int getContentSize() {
