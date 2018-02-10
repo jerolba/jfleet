@@ -84,8 +84,8 @@ public class FileContentBuilder {
         return records;
     }
 
-    public String getContent() {
-        return sb.toString();
+    public StringBuilder getContent() {
+        return sb;
     }
 
 }

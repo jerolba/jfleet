@@ -15,12 +15,12 @@
  */
 package org.jfleet.mysql;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.Optional;
 
 import org.jfleet.JFleetException;
+import org.jfleet.postgres.StringBuilderReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +47,8 @@ public class LoadDataContentWriter {
     public void writeContent(FileContentBuilder contentBuilder) throws SQLException, JFleetException {
         if (contentBuilder.getContentSize() > 0) {
             long init = System.nanoTime();
-            String content = contentBuilder.getContent();
-            statement.setLocalInfileInputStream(new ByteArrayInputStream(content.getBytes(encoding)));
+            ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(contentBuilder.getContent()), encoding);
+            statement.setLocalInfileInputStream(ris);
             statement.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
                     contentBuilder.getContentSize(), contentBuilder.getRecords());
