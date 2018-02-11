@@ -37,7 +37,7 @@ public class FileContentBuilder {
 
     private StringContent sc;
 
-    public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
+    public FileContentBuilder(EntityInfo entityInfo, int batchSize) {
         this.sc = new StringContent(batchSize);
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
@@ -84,5 +84,5 @@ public class FileContentBuilder {
     public StringContent getContent() {
         return sc;
     }
-    
+
 }

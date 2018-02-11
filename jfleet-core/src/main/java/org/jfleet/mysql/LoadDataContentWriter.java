@@ -59,8 +59,5 @@ public class LoadDataContentWriter {
             txPolicy.commit(processed, updatedInDB);
         }
     }
-    
-    public void waitForWrite() {
-    }
 
 }
