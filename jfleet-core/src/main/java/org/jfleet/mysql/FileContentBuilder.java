@@ -35,11 +35,19 @@ public class FileContentBuilder {
 
     private final List<FieldInfo> fields;
 
+    private final int batchSize;
+    private final int number;
+    private int current = 0;
+    private StringContent[] scArr;
     private StringContent sc;
 
-    public FileContentBuilder(EntityInfo entityInfo, int batchSize) {
-        this.sc = new StringContent(batchSize);
+    public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
         this.fields = entityInfo.getFields();
+        this.batchSize = batchSize;
+        this.number = concurrent ? 2 : 1;
+        this.scArr = new StringContent[number];
+        this.scArr[0] = new StringContent(batchSize);
+        this.sc = this.scArr[0];
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
             EntityFieldAccessor accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
@@ -48,6 +56,12 @@ public class FileContentBuilder {
     }
 
     public void reset() {
+        int next = (current + 1) % number;
+        if (scArr[next] == null) {
+            scArr[next] = new StringContent(batchSize);
+        }
+        current = next;
+        sc = scArr[next];
         sc.reset();
     }
 
