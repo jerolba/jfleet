@@ -16,14 +16,19 @@
 package org.jfleet.util;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.util.Dialect.DDLHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PostgresDDLHelper implements DDLHelper {
+
+    private static Logger logger = LoggerFactory.getLogger(PostgresDDLHelper.class);
 
     @Override
     public String dropTableSentence(EntityInfo entityInfo) {
@@ -53,11 +58,15 @@ public class PostgresDDLHelper implements DDLHelper {
                 sb.append(", ");
             }
         }
+        sb.append(getPrimaryKey(fields));
         sb.append(")");
         return sb.toString();
     }
 
     private String getDbType(EntityFieldType fieldType) {
+        if (fieldType.isIdentityId()) {
+            return getSerial(fieldType);
+        }
         FieldTypeEnum type = fieldType.getFieldType();
         switch (type) {
         case BOOLEAN:
@@ -101,4 +110,22 @@ public class PostgresDDLHelper implements DDLHelper {
         }
         return null;
     }
+
+    private String getSerial(EntityFieldType fieldType) {
+        switch (fieldType.getFieldType()) {
+        case INT:
+            return "SERIAL";
+        case LONG:
+            return "BIGSERIAL";
+        default:
+            logger.warn("Declared IDENTITY @Id strategy over non int or long type");
+            return "";
+        }
+    }
+
+    private String getPrimaryKey(List<FieldInfo> fields) {
+        Optional<FieldInfo> id = fields.stream().filter(f -> f.getFieldType().isIdentityId()).findFirst();
+        return id.map(f -> ", PRIMARY KEY (" + f.getColumnName() + ")").orElse("");
+    }
+
 }

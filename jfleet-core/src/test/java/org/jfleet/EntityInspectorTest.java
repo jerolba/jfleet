@@ -17,11 +17,15 @@ package org.jfleet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
@@ -124,6 +128,90 @@ public class EntityInspectorTest {
         EntityFieldType fieldType = field.getFieldType();
         assertFalse(fieldType.isPrimitive());
         assertEquals(FieldTypeEnum.STRING, fieldType.getFieldType());
+    }
+
+    @Entity
+    @Table(name = "entity_with_sequence_id")
+    public class EntityWithGeneratedSequenceId {
+
+        @Id
+        @GeneratedValue(strategy=GenerationType.SEQUENCE)
+        private Long id;
+
+        @Column(name = "some_column")
+        private String someField;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getSomeField() {
+            return someField;
+        }
+
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
+
+    }
+
+    @Test
+    public void inspectEntitySequenceId() {
+        JpaEntityInspector inspector = new JpaEntityInspector(EntityWithGeneratedSequenceId.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        FieldInfo field = fields.get(0);
+        EntityFieldType fieldType = field.getFieldType();
+        assertFalse(fieldType.isPrimitive());
+        assertEquals(FieldTypeEnum.LONG, fieldType.getFieldType());
+        assertFalse(fieldType.isIdentityId());
+    }
+
+    @Entity
+    @Table(name = "entity_with_identity_id")
+    public class EntityWithGeneratedIdentityId {
+
+        @Id
+        @GeneratedValue(strategy=GenerationType.IDENTITY)
+        private Long id;
+
+        @Column(name = "some_column")
+        private String someField;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getSomeField() {
+            return someField;
+        }
+
+        public void setSomeField(String someField) {
+            this.someField = someField;
+        }
+
+    }
+
+    @Test
+    public void inspectEntityIdetityId() {
+        JpaEntityInspector inspector = new JpaEntityInspector(EntityWithGeneratedIdentityId.class);
+        EntityInfo entityInfo = inspector.inspect();
+        List<FieldInfo> fields = entityInfo.getFields();
+        assertEquals(2, fields.size());
+        FieldInfo field = fields.get(0);
+        EntityFieldType fieldType = field.getFieldType();
+        assertFalse(fieldType.isPrimitive());
+        assertEquals(FieldTypeEnum.LONG, fieldType.getFieldType());
+        assertTrue(fieldType.isIdentityId());
     }
 
 }

@@ -1,0 +1,121 @@
+package org.jfleet.shared;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.util.SqlUtil;
+import org.junit.Test;
+
+public class IdPersistenceTest extends AllDatabasesBaseTest {
+
+    @Entity
+    @Table(name = "simple_table")
+    public class EntityWithAssignedId {
+
+        @Id
+        private Long id;
+        private String name;
+
+        public EntityWithAssignedId(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+    }
+
+    @Test
+    public void canPersistWithAssignedId() throws JFleetException, SQLException, IOException {
+        int times = 1000;
+        BulkInsert<EntityWithAssignedId> insert = database.getBulkInsert(EntityWithAssignedId.class);
+        Stream<EntityWithAssignedId> stream = LongStream.range(0, times)
+                .mapToObj(i -> new EntityWithAssignedId(i, "name_" + i));
+
+        try (Connection conn = database.getConnection()) {
+            SqlUtil.createTableForEntity(conn, EntityWithAssignedId.class);
+            insert.insertAll(conn, stream);
+
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT id, name FROM simple_table ORDER BY id ASC")) {
+                    for (int i = 0; i < times; i++) {
+                        assertTrue(rs.next());
+                        assertEquals(i, rs.getLong("id"));
+                        assertEquals("name_" + i, rs.getString("name"));
+                    }
+                }
+            }
+        }
+    }
+
+
+    @Entity
+    @Table(name = "simple_table")
+    public class EntityWithIdentityId {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+        private String name;
+
+        public EntityWithIdentityId(Long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+    }
+
+    @Test
+    public void canPersistWithIdentityId() throws JFleetException, SQLException, IOException {
+        int times = 1000;
+        BulkInsert<EntityWithIdentityId> insert = database.getBulkInsert(EntityWithIdentityId.class);
+        Stream<EntityWithIdentityId> stream = LongStream.range(0, times)
+                .mapToObj(i -> new EntityWithIdentityId(null, "name_" + i));
+
+        try (Connection conn = database.getConnection()) {
+            SqlUtil.createTableForEntity(conn, EntityWithIdentityId.class);
+            insert.insertAll(conn, stream);
+
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT id, name FROM simple_table ORDER BY id ASC")) {
+                    for (int i = 0; i < times; i++) {
+                        assertTrue(rs.next());
+                        assertNotNull(rs.getLong("id"));
+                        assertEquals("name_" + i, rs.getString("name"));
+                    }
+                }
+            }
+        }
+    }
+}

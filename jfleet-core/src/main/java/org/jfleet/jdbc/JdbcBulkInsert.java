@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -63,9 +64,9 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         this.entityInfo = inspector.inspect();
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
-        this.insertSql = createInsertQuery(entityInfo);
-
-        this.fields = entityInfo.getFields();
+        this.fields = entityInfo.getFields().stream().filter(f -> !f.getFieldType().isIdentityId())
+                .collect(Collectors.toList());
+        this.insertSql = createInsertQuery(entityInfo.getTableName(), fields);
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         Class<?> entityClass = entityInfo.getEntityClass();
         for (FieldInfo field : fields) {
@@ -77,10 +78,9 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    private String createInsertQuery(EntityInfo entityInfo) {
+    private String createInsertQuery(String tableName, List<FieldInfo> fields) {
         StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ").append(entityInfo.getTableName()).append(" (");
-        List<FieldInfo> fields = entityInfo.getFields();
+        sb.append("INSERT INTO ").append(tableName).append(" (");
         for (int i = 0; i < fields.size(); i++) {
             FieldInfo fieldInfo = fields.get(i);
             sb.append(fieldInfo.getColumnName());
@@ -158,9 +158,10 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     /*
-     * Each JDBC driver implements code like this in their setObject(idx, object) method.
-     * If following conversions are not supported by your driver (like LocalDate, LocalTime, and LocalDateTime),
-     * extend and overwrite it with the correct one.
+     * Each JDBC driver implements code like this in their setObject(idx, object)
+     * method. If following conversions are not supported by your driver (like
+     * LocalDate, LocalTime, and LocalDateTime), extend and overwrite it with the
+     * correct one.
      */
     public void setParameter(PreparedStatement pstmt, int parameterIndex, Object parameterObj) throws SQLException {
         if (parameterObj == null) {
