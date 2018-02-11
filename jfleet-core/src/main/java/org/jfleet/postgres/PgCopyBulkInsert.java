@@ -61,7 +61,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo, batchSize);
+        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo, batchSize, concurrent);
         CopyManager copyMng = getCopyManager(conn);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
