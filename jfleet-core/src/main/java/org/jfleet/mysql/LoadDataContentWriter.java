@@ -48,14 +48,15 @@ public class LoadDataContentWriter implements ContentWriter {
 
     @Override
     public void writeContent(StringContent stringContent) throws SQLException, JFleetException {
-        if (stringContent.getContentSize() > 0) {
+        int bytes = stringContent.getContentSize();
+        if (bytes > 0) {
             long init = System.nanoTime();
             ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(stringContent.getContent()),
                     charset);
             statement.setLocalInfileInputStream(ris);
             statement.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                    stringContent.getContentSize(), stringContent.getRecords());
+                    bytes, stringContent.getRecords());
             Optional<Long> updatedInDB = ResultsetInspector.getUpdatedRows(statement);
             int processed = stringContent.getRecords();
             txPolicy.commit(processed, updatedInDB);
