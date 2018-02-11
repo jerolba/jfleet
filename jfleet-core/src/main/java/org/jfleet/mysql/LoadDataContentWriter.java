@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.jfleet.JFleetException;
 import org.jfleet.common.StringBuilderReader;
+import org.jfleet.common.StringContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,20 +45,22 @@ public class LoadDataContentWriter {
         this.charset = charset;
     }
 
-    public void writeContent(FileContentBuilder contentBuilder) throws SQLException, JFleetException {
-        if (contentBuilder.getContentSize() > 0) {
+    public void writeContent(StringContent stringContent) throws SQLException, JFleetException {
+        if (stringContent.getContentSize() > 0) {
             long init = System.nanoTime();
-            ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(contentBuilder.getContent()),
+            ReaderInputStream ris = new ReaderInputStream(new StringBuilderReader(stringContent.getContent()),
                     charset);
             statement.setLocalInfileInputStream(ris);
             statement.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                    contentBuilder.getContentSize(), contentBuilder.getRecords());
+                    stringContent.getContentSize(), stringContent.getRecords());
             Optional<Long> updatedInDB = ResultsetInspector.getUpdatedRows(statement);
-            int processed = contentBuilder.getRecords();
-            contentBuilder.reset();
+            int processed = stringContent.getRecords();
             txPolicy.commit(processed, updatedInDB);
         }
+    }
+    
+    public void waitForWrite() {
     }
 
 }

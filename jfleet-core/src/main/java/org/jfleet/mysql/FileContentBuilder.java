@@ -25,6 +25,7 @@ import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
+import org.jfleet.common.StringContent;
 
 public class FileContentBuilder {
 
@@ -33,14 +34,11 @@ public class FileContentBuilder {
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
-    private final int batchSize;
 
-    private final StringBuilder sb;
-    private int records = 0;
+    private StringContent sc;
 
-    public FileContentBuilder(EntityInfo entityInfo, int batchSize) {
-        this.sb = new StringBuilder(batchSize + Math.min(1024, batchSize / 1000));
-        this.batchSize = batchSize;
+    public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
+        this.sc = new StringContent(batchSize);
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
@@ -50,8 +48,7 @@ public class FileContentBuilder {
     }
 
     public void reset() {
-        records = 0;
-        sb.setLength(0);
+        sc.reset();
     }
 
     public <T> void add(T entity) {
@@ -62,30 +59,30 @@ public class FileContentBuilder {
             if (value != null) {
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForLoadFile(valueStr);
-                sb.append(escapedValue);
+                sc.append(escapedValue);
             } else {
-                sb.append("\\N");
+                sc.append("\\N");
             }
-            sb.append(FIELD_TERMINATED_CHAR);
+            sc.append(FIELD_TERMINATED_CHAR);
         }
-        sb.append(LINE_TERMINATED_CHAR);
-        records++;
+        sc.append(LINE_TERMINATED_CHAR);
+        sc.inc();
     }
 
     public boolean isFilled() {
-        return sb.length() > batchSize;
+        return sc.isFilled();
     }
 
     public int getContentSize() {
-        return sb.length();
+        return sc.getContentSize();
     }
 
     public int getRecords() {
-        return records;
+        return sc.getRecords();
     }
 
-    public StringBuilder getContent() {
-        return sb;
+    public StringContent getContent() {
+        return sc;
     }
-
+    
 }

@@ -63,7 +63,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize);
+        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize, false);
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, autocommit, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             LoadDataContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
@@ -72,11 +72,13 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
                 contentBuilder.add(iterator.next());
                 if (contentBuilder.isFilled()) {
                     logger.debug("Writing content");
-                    contentWriter.writeContent(contentBuilder);
+                    contentWriter.writeContent(contentBuilder.getContent());
+                    contentBuilder.reset();
                 }
             }
             logger.debug("Flushing content");
-            contentWriter.writeContent(contentBuilder);
+            contentWriter.writeContent(contentBuilder.getContent());
+            contentBuilder.reset();
         } finally {
             txPolicy.close();
         }
