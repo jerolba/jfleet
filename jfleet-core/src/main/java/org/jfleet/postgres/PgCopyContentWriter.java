@@ -21,6 +21,7 @@ import java.sql.SQLException;
 
 import org.jfleet.WrappedException;
 import org.jfleet.common.StringBuilderReader;
+import org.jfleet.common.StringContent;
 import org.jfleet.common.TransactionPolicy;
 import org.postgresql.copy.CopyManager;
 import org.slf4j.Logger;
@@ -40,15 +41,15 @@ public class PgCopyContentWriter {
         this.mainSql = mainSql;
     }
 
-    public void writeContent(StdInContentBuilder contentBuilder) throws SQLException {
-        if (contentBuilder.getContentSize() > 0) {
+    public void writeContent(StringContent stringContent) throws SQLException {
+        if (stringContent.getContentSize() > 0) {
             try {
                 long init = System.nanoTime();
-                Reader reader = new StringBuilderReader(contentBuilder.getContent());
+                Reader reader = new StringBuilderReader(stringContent.getContent());
                 copyManager.copyIn(mainSql, reader);
                 logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                        contentBuilder.getContentSize(), contentBuilder.getRecords());
-                contentBuilder.reset();
+                        stringContent.getContentSize(), stringContent.getRecords());
+                stringContent.reset();
                 txPolicy.commit();
             } catch (IOException e) {
                 throw new WrappedException(e);

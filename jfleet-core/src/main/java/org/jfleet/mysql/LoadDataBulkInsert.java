@@ -72,11 +72,13 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
                 contentBuilder.add(iterator.next());
                 if (contentBuilder.isFilled()) {
                     logger.debug("Writing content");
-                    contentWriter.writeContent(contentBuilder);
+                    contentWriter.writeContent(contentBuilder.getContent());
+                    contentBuilder.reset();
                 }
             }
             logger.debug("Flushing content");
-            contentWriter.writeContent(contentBuilder);
+            contentWriter.writeContent(contentBuilder.getContent());
+            contentBuilder.reset();
         } finally {
             txPolicy.close();
         }

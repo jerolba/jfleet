@@ -25,6 +25,7 @@ import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
+import org.jfleet.common.StringContent;
 
 public class StdInContentBuilder {
 
@@ -33,14 +34,11 @@ public class StdInContentBuilder {
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields;
-    private final int batchSize;
 
-    private final StringBuilder sb;
-    private int records = 0;
+    private StringContent sc;
 
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize) {
-        this.sb = new StringBuilder(batchSize + Math.min(1024, batchSize / 1000));
-        this.batchSize = batchSize;
+        this.sc = new StringContent(batchSize);
         this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
@@ -50,8 +48,7 @@ public class StdInContentBuilder {
     }
 
     public void reset() {
-        records = 0;
-        sb.setLength(0);
+        sc.reset();
     }
 
     public <T> void add(T entity) {
@@ -62,32 +59,32 @@ public class StdInContentBuilder {
             if (value != null) {
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForStdIn(valueStr);
-                sb.append(escapedValue);
+                sc.append(escapedValue);
             } else {
-                sb.append("\\N");
+                sc.append("\\N");
             }
             if (i < fields.size() - 1) {
-                sb.append(DELIMITER_CHAR);
+                sc.append(DELIMITER_CHAR);
             }
         }
-        sb.append(NEWLINE_CHAR);
-        records++;
+        sc.append(NEWLINE_CHAR);
+        sc.inc();
     }
 
     public boolean isFilled() {
-        return sb.length() > batchSize;
+        return sc.isFilled();
     }
 
     public int getContentSize() {
-        return sb.length();
+        return sc.getContentSize();
     }
 
     public int getRecords() {
-        return records;
+        return sc.getRecords();
     }
 
-    public StringBuilder getContent() {
-        return sb;
+    public StringContent getContent() {
+        return sc;
     }
 
 }
