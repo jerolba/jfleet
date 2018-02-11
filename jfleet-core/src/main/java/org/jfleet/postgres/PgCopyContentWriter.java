@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.sql.SQLException;
 
 import org.jfleet.WrappedException;
+import org.jfleet.common.ContentWriter;
 import org.jfleet.common.StringBuilderReader;
 import org.jfleet.common.StringContent;
 import org.jfleet.common.TransactionPolicy;
@@ -27,7 +28,7 @@ import org.postgresql.copy.CopyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PgCopyContentWriter {
+public class PgCopyContentWriter implements ContentWriter {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyContentWriter.class);
 
@@ -41,6 +42,7 @@ public class PgCopyContentWriter {
         this.mainSql = mainSql;
     }
 
+    @Override
     public void writeContent(StringContent stringContent) throws SQLException {
         if (stringContent.getContentSize() > 0) {
             try {

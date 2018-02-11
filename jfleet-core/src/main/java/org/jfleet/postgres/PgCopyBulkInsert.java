@@ -25,6 +25,8 @@ import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
+import org.jfleet.common.ContentWriter;
+import org.jfleet.common.ParallelContentWriter;
 import org.jfleet.common.TransactionPolicy;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
@@ -40,6 +42,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private final String mainSql;
     private final int batchSize;
     private final boolean autocommit;
+    private final boolean concurrent;
 
     public PgCopyBulkInsert(Class<T> clazz) {
         this(new Configuration<>(clazz));
@@ -50,6 +53,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         this.entityInfo = inspector.inspect();
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
+        this.concurrent = config.concurrent;
         this.mainSql = new SqlBuilder(entityInfo).build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
         logger.debug("Batch size: {} bytes", batchSize);
@@ -61,8 +65,11 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         CopyManager copyMng = getCopyManager(conn);
         try {
             TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
-            PgCopyContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
             try {
+                ContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
+                if (concurrent) {
+                    contentWriter = new ParallelContentWriter(contentWriter);
+                }
                 Iterator<T> iterator = stream.iterator();
                 while (iterator.hasNext()) {
                     contentBuilder.add(iterator.next());
@@ -74,6 +81,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
                 }
                 logger.debug("Flushing content");
                 contentWriter.writeContent(contentBuilder.getContent());
+                contentWriter.waitForWrite();
                 contentBuilder.reset();
             } finally {
                 txPolicy.close();
@@ -93,6 +101,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         private Class<T> clazz;
         private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
+        private boolean concurrent = true;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
@@ -105,6 +114,11 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
         public Configuration<T> autocommit(boolean autocommit) {
             this.autocommit = autocommit;
+            return this;
+        }
+
+        public Configuration<T> concurrent(boolean concurrent) {
+            this.concurrent = concurrent;
             return this;
         }
 
