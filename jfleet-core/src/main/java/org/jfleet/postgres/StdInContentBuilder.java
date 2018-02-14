@@ -40,11 +40,9 @@ public class StdInContentBuilder {
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize) {
         this.sc = new StringContent(batchSize);
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        for (FieldInfo f : entityInfo.getFields()) {
-            if (!f.getFieldType().isIdentityId()) {
-                fields.add(f);
-                accessors.add(factory.getAccessor(entityInfo.getEntityClass(), f));
-            }
+        for (FieldInfo f : entityInfo.getNotIdentityField()) {
+            fields.add(f);
+            accessors.add(factory.getAccessor(entityInfo.getEntityClass(), f));
         }
     }
 
@@ -54,10 +52,10 @@ public class StdInContentBuilder {
 
     public <T> void add(T entity) {
         for (int i = 0; i < fields.size(); i++) {
-            FieldInfo info = fields.get(i);
             EntityFieldAccessor accessor = accessors.get(i);
             Object value = accessor.getValue(entity);
             if (value != null) {
+                FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForStdIn(valueStr);
                 sc.append(escapedValue);

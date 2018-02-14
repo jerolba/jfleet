@@ -16,7 +16,6 @@
 package org.jfleet.postgres;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
@@ -43,8 +42,7 @@ public class SqlBuilder {
 
     public void addColumnNames() {
         sb.append("(");
-        List<FieldInfo> fields = entityInfo.getFields()
-                .stream().filter(f -> !f.getFieldType().isIdentityId()).collect(Collectors.toList());
+        List<FieldInfo> fields = entityInfo.getNotIdentityField();
         for (int i = 0; i < fields.size(); i++) {
             FieldInfo fieldInfo = fields.get(i);
             sb.append(fieldInfo.getColumnName());

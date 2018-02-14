@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -64,8 +63,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         this.entityInfo = inspector.inspect();
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
-        this.fields = entityInfo.getFields().stream().filter(f -> !f.getFieldType().isIdentityId())
-                .collect(Collectors.toList());
+        this.fields = entityInfo.getNotIdentityField();
         this.insertSql = createInsertQuery(entityInfo.getTableName(), fields);
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         Class<?> entityClass = entityInfo.getEntityClass();

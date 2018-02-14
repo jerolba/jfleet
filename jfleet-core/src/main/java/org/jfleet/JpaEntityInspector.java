@@ -219,7 +219,7 @@ public class JpaEntityInspector {
             Id id = field.getAnnotation(Id.class);
             if (id != null) {
                 GeneratedValue generated = field.getAnnotation(GeneratedValue.class);
-                return(generated != null && generated.strategy() == GenerationType.IDENTITY);
+                return (generated != null && generated.strategy() == GenerationType.IDENTITY);
             }
             return false;
         }

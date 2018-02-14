@@ -135,7 +135,7 @@ public class EntityInspectorTest {
     public class EntityWithGeneratedSequenceId {
 
         @Id
-        @GeneratedValue(strategy=GenerationType.SEQUENCE)
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
         private Long id;
 
         @Column(name = "some_column")
@@ -177,7 +177,7 @@ public class EntityInspectorTest {
     public class EntityWithGeneratedIdentityId {
 
         @Id
-        @GeneratedValue(strategy=GenerationType.IDENTITY)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
         @Column(name = "some_column")

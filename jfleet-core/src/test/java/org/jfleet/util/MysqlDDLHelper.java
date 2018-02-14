@@ -130,6 +130,7 @@ public class MysqlDDLHelper implements DDLHelper {
 
     private String getPrimaryKey(List<FieldInfo> fields) {
         Optional<FieldInfo> id = fields.stream().filter(f -> f.getFieldType().isIdentityId()).findFirst();
-        return id.map(f -> ", PRIMARY KEY (`"+f.getColumnName()+"`)").orElse("");
+        return id.map(f -> ", PRIMARY KEY (`" + f.getColumnName() + "`)").orElse("");
     }
+
 }
