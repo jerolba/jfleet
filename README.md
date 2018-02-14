@@ -3,6 +3,7 @@
 [![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
 [ ![Download](https://api.bintray.com/packages/jerolba/JFleet/jfleet/images/download.svg) ](https://bintray.com/jerolba/JFleet/jfleet/_latestVersion)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # JFleet
 
@@ -116,7 +117,7 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
 
 - Use the mechanism provided by each database to autogenerate primary keys: 
    - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
-   - **PostgreSQL**: [serial](https://www.postgresql.org/docs/9.6/static/datatype-numeric.html) numeric type  
+   - **PostgreSQL**: [SERIAL](https://www.postgresql.org/docs/9.6/static/datatype-numeric.html) numeric type  
 
 - Assign manually an Id to each object:
    - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
@@ -127,6 +128,10 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
 If you opt for an autogenerate strategy, breaking the [JPA specification](http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1517785731_05caec473636207cb2f5000798645aba), you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
 
 In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database. But due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
+
+In PostgreSQL, if you have a field in an entity which the corresponding database column is declared as SERIAL, you must annotate the field with `@Id` and `@GeneratedValue(strategy = GenerationType.IDENTITY)`. Otherwise JFleet will try to insert a null value and the database will raise an error. SERIAL is an alias to NOT NULL with a DEFAULT value implemented as a sequence, and does not accept to insert a null value, even when afterwards it will assign one.
+
+JFleet needs to know if a field is SERIAL, and the convention used is annotating it with IDENTITY strategy.    
 
 ### Annotations
 

@@ -33,17 +33,16 @@ public class StdInContentBuilder {
     private final PostgresTypeSerializer typeSerializer = new PostgresTypeSerializer();
     private final List<EntityFieldAccessor> accessors = new ArrayList<>();
 
-    private final List<FieldInfo> fields;
+    private final List<FieldInfo> fields = new ArrayList<>();
 
     private StringContent sc;
 
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize) {
         this.sc = new StringContent(batchSize);
-        this.fields = entityInfo.getFields();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        for (FieldInfo f : fields) {
-            EntityFieldAccessor accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
-            accessors.add(accesor);
+        for (FieldInfo f : entityInfo.getNotIdentityField()) {
+            fields.add(f);
+            accessors.add(factory.getAccessor(entityInfo.getEntityClass(), f));
         }
     }
 
@@ -53,10 +52,10 @@ public class StdInContentBuilder {
 
     public <T> void add(T entity) {
         for (int i = 0; i < fields.size(); i++) {
-            FieldInfo info = fields.get(i);
             EntityFieldAccessor accessor = accessors.get(i);
             Object value = accessor.getValue(entity);
             if (value != null) {
+                FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForStdIn(valueStr);
                 sc.append(escapedValue);

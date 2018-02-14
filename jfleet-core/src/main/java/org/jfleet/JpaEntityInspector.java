@@ -42,6 +42,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -209,7 +211,17 @@ public class JpaEntityInspector {
             } else {
                 throw new RuntimeException("Unexpected type on " + field.toString());
             }
+            type.setIdentityId(isIdentityId());
             return type;
+        }
+
+        private boolean isIdentityId() {
+            Id id = field.getAnnotation(Id.class);
+            if (id != null) {
+                GeneratedValue generated = field.getAnnotation(GeneratedValue.class);
+                return (generated != null && generated.strategy() == GenerationType.IDENTITY);
+            }
+            return false;
         }
 
         private FieldTypeEnum getDateFieldType(Class<?> javaType) {

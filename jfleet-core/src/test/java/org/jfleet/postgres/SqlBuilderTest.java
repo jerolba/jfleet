@@ -17,6 +17,8 @@ package org.jfleet.postgres;
 
 import static org.junit.Assert.assertEquals;
 
+import org.jfleet.EntityFieldType;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.junit.Test;
@@ -29,10 +31,20 @@ public class SqlBuilderTest {
 
         FieldInfo f1 = new FieldInfo();
         f1.setColumnName("column1");
+        EntityFieldType type1 = new EntityFieldType();
+        type1.setFieldType(FieldTypeEnum.INT);
+        type1.setPrimitive(false);
+        type1.setIdentityId(false);
+        f1.setFieldType(type1);
         entityInfo.addField(f1);
 
         FieldInfo f2 = new FieldInfo();
         f2.setColumnName("column2");
+        EntityFieldType type2 = new EntityFieldType();
+        type2.setFieldType(FieldTypeEnum.STRING);
+        type2.setPrimitive(false);
+        type2.setIdentityId(false);
+        f2.setFieldType(type2);
         entityInfo.addField(f2);
 
         return entityInfo;
