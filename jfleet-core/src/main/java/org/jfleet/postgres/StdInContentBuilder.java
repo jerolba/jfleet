@@ -40,7 +40,6 @@ public class StdInContentBuilder {
     private StringContent sc;
 
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
-        this.fields = entityInfo.getFields();
         this.df = new DoubleBufferStringContent(batchSize, concurrent);
         this.sc = df.next();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
