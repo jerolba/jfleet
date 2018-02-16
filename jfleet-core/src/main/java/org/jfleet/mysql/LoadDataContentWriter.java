@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 import org.jfleet.JFleetException;
+import org.jfleet.common.ContentWriter;
 import org.jfleet.common.StringBuilderReader;
 import org.jfleet.common.StringContent;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.ResultsetInspector;
 import com.mysql.jdbc.Statement;
 
-public class LoadDataContentWriter {
+public class LoadDataContentWriter implements ContentWriter {
 
     private static Logger logger = LoggerFactory.getLogger(LoadDataContentWriter.class);
 
@@ -45,6 +46,7 @@ public class LoadDataContentWriter {
         this.charset = charset;
     }
 
+    @Override
     public void writeContent(StringContent stringContent) throws SQLException, JFleetException {
         int contentSize = stringContent.getContentSize();
         if (contentSize > 0) {

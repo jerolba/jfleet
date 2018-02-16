@@ -25,6 +25,7 @@ import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
+import org.jfleet.common.DoubleBufferStringContent;
 import org.jfleet.common.StringContent;
 
 public class FileContentBuilder {
@@ -35,11 +36,13 @@ public class FileContentBuilder {
 
     private final List<FieldInfo> fields;
 
+    private DoubleBufferStringContent df;
     private StringContent sc;
 
-    public FileContentBuilder(EntityInfo entityInfo, int batchSize) {
-        this.sc = new StringContent(batchSize);
+    public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
         this.fields = entityInfo.getFields();
+        this.df = new DoubleBufferStringContent(batchSize, concurrent);
+        this.sc = df.next();
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         for (FieldInfo f : fields) {
             EntityFieldAccessor accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
@@ -48,7 +51,7 @@ public class FileContentBuilder {
     }
 
     public void reset() {
-        sc.reset();
+        this.sc = df.next();
     }
 
     public <T> void add(T entity) {

@@ -27,6 +27,8 @@ import org.jfleet.BulkInsert;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.JpaEntityInspector;
+import org.jfleet.common.ContentWriter;
+import org.jfleet.common.ParallelContentWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     private final String mainSql;
     private final int batchSize;
     private final boolean autocommit;
+    private final boolean concurrent;
     private final boolean errorOnMissingRow;
     private final Charset encoding;
 
@@ -54,6 +57,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         this.encoding = config.encoding;
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
+        this.concurrent = config.concurrent;
         this.errorOnMissingRow = config.errorOnMissingRow;
         SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
         mainSql = sqlBuiler.build();
@@ -63,10 +67,13 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize);
+        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize, true);
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, autocommit, errorOnMissingRow);
         try (Statement stmt = getStatementForLoadLocal(conn)) {
-            LoadDataContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
+            ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
+            if (concurrent) {
+                contentWriter = new ParallelContentWriter(contentWriter);
+            }
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
                 contentBuilder.add(iterator.next());
@@ -78,6 +85,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
             }
             logger.debug("Flushing content");
             contentWriter.writeContent(contentBuilder.getContent());
+            contentWriter.waitForWrite();
             contentBuilder.reset();
         } finally {
             txPolicy.close();
@@ -101,6 +109,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         private Charset encoding = Charset.forName("UTF-8");
         private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
+        private boolean concurrent = true;
         private boolean errorOnMissingRow = false;
 
         public Configuration(Class<T> clazz) {
@@ -119,6 +128,11 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
         public Configuration<T> autocommit(boolean autocommit) {
             this.autocommit = autocommit;
+            return this;
+        }
+
+        public Configuration<T> concurrent(boolean concurrent) {
+            this.concurrent = concurrent;
             return this;
         }
 
