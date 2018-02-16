@@ -17,6 +17,7 @@ package org.jfleet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EntityInfo {
 
@@ -56,5 +57,8 @@ public class EntityInfo {
         return getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();
     }
 
+    public List<FieldInfo> getNotIdentityField() {
+        return getFields().stream().filter(f -> !f.getFieldType().isIdentityId()).collect(Collectors.toList());
+    }
 
 }

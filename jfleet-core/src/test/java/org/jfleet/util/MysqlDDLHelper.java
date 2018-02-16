@@ -16,14 +16,19 @@
 package org.jfleet.util;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.util.Dialect.DDLHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MysqlDDLHelper implements DDLHelper {
+
+    private static Logger logger = LoggerFactory.getLogger(MysqlDDLHelper.class);
 
     @Override
     public String dropTableSentence(EntityInfo entityInfo) {
@@ -49,10 +54,12 @@ public class MysqlDDLHelper implements DDLHelper {
             if (fieldInfo.getFieldType().isPrimitive()) {
                 sb.append(" NOT NULL");
             }
+            sb.append(getAutoIncrement(fieldInfo));
             if (i < fields.size() - 1) {
                 sb.append(", ");
             }
         }
+        sb.append(getPrimaryKey(fields));
         sb.append(") DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         return sb.toString();
     }
@@ -100,6 +107,30 @@ public class MysqlDDLHelper implements DDLHelper {
             return "VARCHAR(255)";
         }
         return null;
-
     }
+
+    private String getAutoIncrement(FieldInfo fieldInfo) {
+        EntityFieldType fieldType = fieldInfo.getFieldType();
+        if (!fieldType.isIdentityId()) {
+            return "";
+        }
+        FieldTypeEnum type = fieldType.getFieldType();
+        switch (type) {
+        case BYTE:
+        case INT:
+        case LONG:
+        case SHORT:
+        case BIGINTEGER:
+            return " AUTO_INCREMENT";
+        default:
+            logger.warn("Declared IDENTITY @Id strategy over non int type");
+            return "";
+        }
+    }
+
+    private String getPrimaryKey(List<FieldInfo> fields) {
+        Optional<FieldInfo> id = fields.stream().filter(f -> f.getFieldType().isIdentityId()).findFirst();
+        return id.map(f -> ", PRIMARY KEY (`" + f.getColumnName() + "`)").orElse("");
+    }
+
 }

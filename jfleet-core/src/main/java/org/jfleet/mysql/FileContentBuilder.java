@@ -56,10 +56,10 @@ public class FileContentBuilder {
 
     public <T> void add(T entity) {
         for (int i = 0; i < fields.size(); i++) {
-            FieldInfo info = fields.get(i);
             EntityFieldAccessor accessor = accessors.get(i);
             Object value = accessor.getValue(entity);
             if (value != null) {
+                FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForLoadFile(valueStr);
                 sc.append(escapedValue);

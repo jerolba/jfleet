@@ -31,6 +31,7 @@ import org.jfleet.postgres.PostgresTestConnectionProvider;
 import org.junit.Test;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
+import org.postgresql.util.PSQLException;
 
 public class ConnectionTest {
 
@@ -109,4 +110,58 @@ public class ConnectionTest {
             }
         }
     }
+
+    @Test(expected = PSQLException.class)
+    public void canNotInsertIntoSerialColumn() throws SQLException, IOException {
+        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
+        try (Connection conn = connectionProvider.get()) {
+            try (Statement stmt = conn.createStatement()) {
+                PgConnection unwrapped = conn.unwrap(PgConnection.class);
+                stmt.execute("DROP TABLE IF EXISTS simple_table");
+                stmt.execute("CREATE TABLE simple_table (id SERIAL, name VARCHAR(255), PRIMARY KEY (id))");
+
+                CopyManager copyManager = unwrapped.getCopyAPI();
+
+                String sql = "COPY simple_table (id, name) FROM STDIN WITH ("
+                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false" + ")";
+
+                String row1 = "\\N\tJohn\n";
+                String row2 = "\\N\tSmith\n";
+                Reader reader = new StringBuilderReader(new StringBuilder(row1).append(row2));
+                copyManager.copyIn(sql, reader);
+            }
+        }
+    }
+
+    @Test
+    public void canInsertIntoSerialColumn() throws SQLException, IOException {
+        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
+        try (Connection conn = connectionProvider.get()) {
+            try (Statement stmt = conn.createStatement()) {
+                PgConnection unwrapped = conn.unwrap(PgConnection.class);
+                stmt.execute("DROP TABLE IF EXISTS simple_table");
+                stmt.execute("CREATE TABLE simple_table (id SERIAL, name VARCHAR(255), PRIMARY KEY (id))");
+
+                CopyManager copyManager = unwrapped.getCopyAPI();
+
+                String sql = "COPY simple_table (id, name) FROM STDIN WITH ("
+                        + "ENCODING 'UTF-8', DELIMITER '\t', HEADER false" + ")";
+
+                String row1 = "1\tJohn\n";
+                String row2 = "2\tSmith\n";
+                Reader reader = new StringBuilderReader(new StringBuilder(row1).append(row2));
+                copyManager.copyIn(sql, reader);
+
+                try (ResultSet rs = stmt.executeQuery("SELECT id, name FROM simple_table ORDER BY id")) {
+                    assertTrue(rs.next());
+                    assertEquals(1, rs.getInt("id"));
+                    assertEquals("John", rs.getString("name"));
+                    assertTrue(rs.next());
+                    assertEquals(2, rs.getInt("id"));
+                    assertEquals("Smith", rs.getString("name"));
+                }
+            }
+        }
+    }
+
 }

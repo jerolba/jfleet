@@ -44,13 +44,14 @@ public class PgCopyContentWriter implements ContentWriter {
 
     @Override
     public void writeContent(StringContent stringContent) throws SQLException {
-        if (stringContent.getContentSize() > 0) {
+        int contentSize = stringContent.getContentSize();
+        if (contentSize > 0) {
             try {
                 long init = System.nanoTime();
                 Reader reader = new StringBuilderReader(stringContent.getContent());
                 copyManager.copyIn(mainSql, reader);
                 logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
-                        stringContent.getContentSize(), stringContent.getRecords());
+                        contentSize, stringContent.getRecords());
                 stringContent.reset();
                 txPolicy.commit();
             } catch (IOException e) {

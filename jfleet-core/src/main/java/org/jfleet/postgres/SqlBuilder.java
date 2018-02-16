@@ -42,7 +42,7 @@ public class SqlBuilder {
 
     public void addColumnNames() {
         sb.append("(");
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = entityInfo.getNotIdentityField();
         for (int i = 0; i < fields.size(); i++) {
             FieldInfo fieldInfo = fields.get(i);
             sb.append(fieldInfo.getColumnName());
