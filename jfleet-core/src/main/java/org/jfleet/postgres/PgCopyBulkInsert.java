@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyBulkInsert.class);
-    private static final int DEFAULT_BATCH_SIZE = 50 * 1_024 * 1_024;
+    private static final int DEFAULT_BATCH_SIZE = 10 * 1_024 * 1_024;
 
     private final EntityInfo entityInfo;
     private final String mainSql;
