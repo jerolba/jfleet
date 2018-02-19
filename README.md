@@ -1,5 +1,5 @@
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
+[![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)]()
 [![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
 [ ![Download](https://api.bintray.com/packages/jerolba/JFleet/jfleet/images/download.svg) ](https://bintray.com/jerolba/JFleet/jfleet/_latestVersion)
@@ -254,7 +254,7 @@ JFleet is configured to execute continuous integration tests against [CircleCI](
 
 PostgreSQL 10.1 release has been manually tested without any problem.
 
-MySQL 8 is not yet supported by JFleet because requires the lastest JDBC driver which it is completely rewritten, and all internal classes used by JFleet change from 5.x versions.
+MySQL 8 is not yet supported by JFleet because requires the latest JDBC driver which it is completely rewritten, and all internal classes used by JFleet change from 5.x versions.
 
 Any database engine with a standard JDBC driver should be used with the `JdbcBulkInsert` implementation.
 
