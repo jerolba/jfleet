@@ -19,13 +19,13 @@ Despite using basic JPA annotations to map Java objects to tables and columns, *
 - [Usage](#usage)
 - [Dependency](#dependency)
 - [Advanced topics](#advanced-topics)
-    - [IDs](ids)
-    - [Annotations](annotations)
-    - [BulkInsert configuration](bulkInsert-configuration)
-    - [Supported database versions](supported-database-versions)
-- [Running the tests](running-the-tests)
-- [Contribute](contribute)
-- [License](license)
+    - [IDs](#ids)
+    - [Annotations](#annotations)
+    - [BulkInsert configuration](#bulkinsert-configuration)
+    - [Supported database versions](#supported-database-versions)
+- [Running the tests](#running-the-tests)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Supported databases
 
