@@ -1,5 +1,5 @@
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
+[![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)]()
 [![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
 [ ![Download](https://api.bintray.com/packages/jerolba/JFleet/jfleet/images/download.svg) ](https://bintray.com/jerolba/JFleet/jfleet/_latestVersion)
@@ -9,9 +9,23 @@
 
 JFleet is a Java library which persist in database large collections of Java POJOs, as fast as possible using the best available technique in each database provider, achieving it with alternate persistence methods from each JDBC driver implementation.
 
-It is oriented to persist a large amount of information in batches in **single table**.
+It is oriented to persist a large amount of information in a **single table** using available batch persistence techniques.  
 
-Despite using basic JPA annotations to map Java objects to tables and columns, JFleet is not an ORM.
+Despite using basic JPA annotations to map Java objects to tables and columns, **JFleet is not an ORM**.
+
+## Table of Contents
+
+- [Supported databases](#supported-databases)
+- [Usage](#usage)
+- [Dependency](#dependency)
+- [Advanced topics](#advanced-topics)
+    - [IDs](#ids)
+    - [Annotations](#annotations)
+    - [BulkInsert configuration](#bulkinsert-configuration)
+    - [Supported database versions](#supported-database-versions)
+- [Running the tests](#running-the-tests)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Supported databases
 
@@ -61,7 +75,7 @@ public class City {
 
 ```
 
-As JPA, JFleet follows the convention of using the field name if no @Column name is provided, or the class name if no @Table name is provided. 
+As JPA, JFleet follows the convention of using the field name if no `@Column` name is provided, or the class name if no `@Table` name is provided. 
 
 Given a collection of objects Customer to persist in MySQL with the Load Data technique, you only need to provide a JDBC Connection:
 
@@ -89,15 +103,15 @@ JFleet is uploaded to Maven Central Repository and to use it, you need to add th
 <dependency>
     <groupId>org.jfleet</groupId>
     <artifactId>jfleet</artifactId>
-    <version>0.5.9</version>
+    <version>0.5.10</version>
 </dependency>
 ```
 
-or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.5.9/jfleet-0.5.9.jar) from Maven repository.
+or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.5.10/jfleet-0.5.10.jar) from Maven repository.
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
-As JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must need to add the Javax Persistence API dependency:
+As JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
 
 ```xml
 <dependency>
@@ -113,7 +127,7 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 ### IDs
 
-JFleet does not manage the @Id of your entities as other ORMs do. You are responsible of it, and you have some strategies to deal with it:
+JFleet does not manage the `@Id` of your entities as other ORMs do and you are responsible of it. You have some strategies to deal with it:
 
 - Use the mechanism provided by each database to autogenerate primary keys: 
    - **MySQL**: [AUTO_INCREMENT](https://dev.mysql.com/doc/refman/5.7/en/example-auto-increment.html) attribute
@@ -123,15 +137,15 @@ JFleet does not manage the @Id of your entities as other ORMs do. You are respon
    - Use an [UUID generator](https://en.wikipedia.org/wiki/Universally_unique_identifier)
    - If your domain allows it, use a [natural key](https://en.wikipedia.org/wiki/Natural_key)
    - Use a composite key as primary key if the domain also allows it
-   - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value and, from Java, increment and set a new Id value to each object
+   - If you control the concurrency access to the table, at the beginning of insertion process, get the max Id value in database and, from Java, increment and set a new Id value to each object
 
 If you opt for an autogenerate strategy, breaking the [JPA specification](http://download.oracle.com/otn-pub/jcp/persistence-2.0-fr-eval-oth-JSpec/persistence-2_0-final-spec.pdf?AuthParam=1517785731_05caec473636207cb2f5000798645aba), you can avoid creating a field with the @Id column because it will be always null. But you can keep it if you want, or you are reusing a class from a existing JPA model. 
 
 In an autogenerate strategy, ORMs like JPA populate the @Id field of your objects as they insert rows in the database. But due to the insertion technique used by JFleet, primary keys created by the database can not be retrieved for each inserted row, and is not possible to set it back to each object.
 
-In PostgreSQL, if you have a field in an entity which the corresponding database column is declared as SERIAL, you must annotate the field with `@Id` and `@GeneratedValue(strategy = GenerationType.IDENTITY)`. Otherwise JFleet will try to insert a null value and the database will raise an error. SERIAL is an alias to NOT NULL with a DEFAULT value implemented as a sequence, and does not accept to insert a null value, even when afterwards it will assign one.
+In PostgreSQL, if you have a field in an entity which the corresponding database column is declared as `SERIAL`, you must annotate the field with `@Id` and `@GeneratedValue(strategy = GenerationType.IDENTITY)`. Otherwise JFleet will try to insert a null value and the database will raise an error. Internally `SERIAL` is an alias to NOT NULL with a DEFAULT value implemented as a sequence, and does not accept to insert a null value, even when afterwards it will assign one.
 
-JFleet needs to know if a field is SERIAL, and the convention used is annotating it with IDENTITY strategy.    
+JFleet needs to know if a field is `SERIAL`, and the convention used is annotating it with `IDENTITY` strategy.    
 
 ### Annotations
 
@@ -141,15 +155,15 @@ JPA allows to define how to map your entities in [two ways](https://docs.jboss.o
 - entity attributes (instance fields) 
 - or the accessors (instance properties)
 
-In JPA by default, the placement of the @Id annotation gives the default access strategy. 
+In JPA by default, the placement of the `@Id` annotation gives the default access strategy. 
 
 **JFleet only support access by entity attributes**, and expect annotations on fields.
 
 The supported annotations are:
-- **[@Entity](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Entity.java)**: Specifies that the class is an entity
+- **[@Entity](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Entity.java)**: Specifies that the class is an entity.
 - **[@Table](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Table.java)**: Specifies the table name. If no value is specified, the class name in lower case is used.
 - **[@Column](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Column.java)**: Is used to specify a mapped column for a persistent field. If no value is specified, the field name is used.
-- **[@Id](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Id.java)**: Specifies the primary key field of an entity. It is only used to fetch foreign key values in ManyToOne relationships.
+- **[@Id](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Id.java)**: Specifies the primary key field of an entity. It is only used to fetch foreign key values in ManyToOne and OneToOne relationships.
 - **[@MappedSuperclass](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/MappedSuperclass.java)**: Designates a class whose mapping information is applied to the entities that inherit from it. A mapped superclass has no separate table defined for it.
 - **[@Transient](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Transient.java)**: This annotation specifies that field is not persistent.
 - **[@Embedded](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Embedded.java)**: Defines a persistent field of an entity whose value is an instance of an embeddable class.
@@ -164,11 +178,11 @@ The supported annotations are:
 
 Some common annotations which are not unsupported are: [@GeneratedValue](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/GeneratedValue.java), [@OneToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/OneToMany.java), [@ManyToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/ManyToMany.java), [@JoinColumns]() and [@JoinTable](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/JoinTable.java).
 
-These annotations, and many configuration properties in _supported_ annotations, are ignored mainly because has no effect o meaning in the purpose and limitations of JFleet. If you find a relevant annotation or property to be included create an issue.
+These annotations, and many configuration properties in _supported_ annotations, are ignored mainly because has no effect o meaning in the purpose and limitations of JFleet. If you find a relevant annotation or property which could be included create an issue.
 
 ### BulkInsert configuration
 
-Load Data and Copy methods are based on serializing to a _CSVlike_ StringBuilder a batch of rows, and when serialized information reach a limit of chars, flush it to the database. Depending on the available memory and the size of each row you can tune this limit.
+[Load Data](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) and [Copy](https://www.postgresql.org/docs/9.6/static/sql-copy.html) methods are based on serializing a batch of rows to a _CSVlike_ StringBuilder, and when serialized information reach a limit of characters, flush it to the database. Depending on the available memory and the size of each row you can tune this limit.
 
 In the JDBC batch insert method you can configure the numbers of rows of each batch operation.
 
@@ -176,7 +190,7 @@ You can also configure how transactions are managed persisting your Stream or Co
  - Let JFleet commit to database each time a batch of rows is flushed. 
  - Join to the existing transaction in the provided connection, and deciding on your own code when to commit or rollback it.
 
-If you override the default values (50MB and autocommit), you must use a different BulkInsert constructor.
+If you override the default values (10MB and autocommit), you must use a different BulkInsert constructor.
 
 For `LoadDataBulkInsert` version, with 5MB batch size and no autocommit:
 
@@ -240,9 +254,9 @@ JFleet is configured to execute continuous integration tests against [CircleCI](
 
 PostgreSQL 10.1 release has been manually tested without any problem.
 
-MySQL 8 is not yet supported by JFleet because requires the lastest JDBC driver version, and all internal classes used by JFleet change from 5.x versions.
+MySQL 8 is not yet supported by JFleet because requires the latest JDBC driver which it is completely rewritten, and all internal classes used by JFleet change from 5.x versions.
 
-All database engines with a standard JDBC driver can be used with the `JdbcBulkInsert` implementation.
+Any database engine with a standard JDBC driver should be used with the `JdbcBulkInsert` implementation.
 
 ## Running the tests
 
@@ -253,9 +267,15 @@ You can modify this settings changing locally [mysql-test.properties](https://gi
 To execute all test you must execute the command:
 
 ```bash
-gradle test
+$ gradle test
 ```
 
 You can also fork the project and test it in your [CircleCI](https://circleci.com/signup/) free account.
 
+## Contribute
+Feel free to dive in! [Open an issue](https://github.com/jerolba/jfleet/issues/new) or submit PRs.
 
+Any contributor and maintainer of this project follows the [Contributor Covenant Code of Conduct](https://github.com/jerolba/jfleet/blob/master/CODE_OF_CONDUCT.md).
+
+## License
+[Apache 2](https://github.com/jerolba/jfleet/blob/master/LICENSE.txt) © Jerónimo López
