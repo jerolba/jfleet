@@ -21,6 +21,8 @@ import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -46,6 +48,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     private final boolean concurrent;
     private final boolean errorOnMissingRow;
     private final Charset encoding;
+    private final Executor executor;
 
     public LoadDataBulkInsert(Class<T> clazz) {
         this(new Configuration<>(clazz));
@@ -59,6 +62,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         this.autocommit = config.autocommit;
         this.concurrent = config.concurrent;
         this.errorOnMissingRow = config.errorOnMissingRow;
+        this.executor = config.getExecutor();
         SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
         mainSql = sqlBuiler.build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
@@ -72,7 +76,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
             if (concurrent) {
-                contentWriter = new ParallelContentWriter(contentWriter);
+                contentWriter = new ParallelContentWriter(executor, contentWriter);
             }
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
@@ -111,6 +115,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         private boolean autocommit = true;
         private boolean concurrent = true;
         private boolean errorOnMissingRow = false;
+        private Executor executor;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
@@ -139,6 +144,18 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         public Configuration<T> errorOnMissingRow(boolean errorOnMissingRow) {
             this.errorOnMissingRow = errorOnMissingRow;
             return this;
+        }
+
+        public Configuration<T> executor(Executor executor) {
+            this.executor = executor;
+            return this;
+        }
+
+        private Executor getExecutor() {
+            if (executor == null) {
+                return ForkJoinPool.commonPool();
+            }
+            return executor;
         }
 
     }

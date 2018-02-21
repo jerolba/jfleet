@@ -18,6 +18,8 @@ package org.jfleet.postgres;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -43,6 +45,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private final int batchSize;
     private final boolean autocommit;
     private final boolean concurrent;
+    private final Executor executor;
 
     public PgCopyBulkInsert(Class<T> clazz) {
         this(new Configuration<>(clazz));
@@ -54,6 +57,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
         this.concurrent = config.concurrent;
+        this.executor = config.getExecutor();
         this.mainSql = new SqlBuilder(entityInfo).build();
         logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
         logger.debug("Batch size: {} bytes", batchSize);
@@ -68,7 +72,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
             try {
                 ContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
                 if (concurrent) {
-                    contentWriter = new ParallelContentWriter(contentWriter);
+                    contentWriter = new ParallelContentWriter(executor, contentWriter);
                 }
                 Iterator<T> iterator = stream.iterator();
                 while (iterator.hasNext()) {
@@ -102,6 +106,7 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
         private boolean concurrent = true;
+        private Executor executor;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
@@ -120,6 +125,18 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
         public Configuration<T> concurrent(boolean concurrent) {
             this.concurrent = concurrent;
             return this;
+        }
+
+        public Configuration<T> executor(Executor executor) {
+            this.executor = executor;
+            return this;
+        }
+
+        private Executor getExecutor() {
+            if (executor == null) {
+                return ForkJoinPool.commonPool();
+            }
+            return executor;
         }
 
     }
