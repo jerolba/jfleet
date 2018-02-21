@@ -5,6 +5,8 @@ This project contains some examples of how to use JFleet.
 
 The most completed one is the [Citi Bike NYC](https://github.com/jerolba/jfleet/tree/master/jfleet-samples/src/main/java/org/jfleet/citibikenyc) with different techniques (MySQL Load Data, Batch JDBC or JPA with Hibernate), or persisted entity as a _flat_ POJO vs with embedded fields.   
 
+All examples load information from files, but JFleet is not a file loader.
+
 Citi Bike NYC
 ------
 
@@ -13,7 +15,7 @@ These examples works with the dataset provided by Citi Bike NYC about each trip 
 The dataset can be downloaded from: `https://s3.amazonaws.com/tripdata/index.html`, and you can download as many files as data you need to load.
 
  ```bash
-wget https://s3.amazonaws.com/tripdata/201709-citibike-tripdata.csv.zip /tmp
+wget https://s3.amazonaws.com/tripdata/201709-citibike-tripdata.csv.zip -P /tmp
  ```
 
 All examples read and parse all files located in `/tmp` directory and each CSV file is inserted into the database. You don't need to uncompress it, the code reads Zip files directly.

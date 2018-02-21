@@ -7,9 +7,9 @@
 
 # JFleet
 
-JFleet is a Java library which persist in database large collections of Java POJOs, as fast as possible using the best available technique in each database provider, achieving it with alternate persistence methods from each JDBC driver implementation.
+JFleet is a Java library which persist in database large collections of Java POJOs as fast as possible, using the best available technique in each database provider, achieving it with alternate persistence methods from each JDBC driver implementation.
 
-It is oriented to persist a large amount of information in a **single table** using available batch persistence techniques.  
+Its goal is to store a large amount of information in a **single table** using available batch persistence techniques.
 
 Despite using basic JPA annotations to map Java objects to tables and columns, **JFleet is not an ORM**.
 
@@ -75,7 +75,7 @@ public class City {
 
 ```
 
-As JPA, JFleet follows the convention of using the field name if no `@Column` name is provided, or the class name if no `@Table` name is provided. 
+Like JPA, JFleet follows the convention of using the field name if no `@Column` name is provided, or the class name if no `@Table` name is provided. 
 
 Given a collection of objects Customer to persist in MySQL with the Load Data technique, you only need to provide a JDBC Connection:
 
@@ -111,7 +111,7 @@ or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
-As JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
+Because JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
 
 ```xml
 <dependency>
@@ -149,7 +149,7 @@ JFleet needs to know if a field is `SERIAL`, and the convention used is annotati
 
 ### Annotations
 
-JFleet reuse existing JPA annotations to map Java object to tables. 
+JFleet reuses existing JPA annotations to map Java object to tables. 
 
 JPA allows to define how to map your entities in [two ways](https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#access):
 - entity attributes (instance fields) 
@@ -157,7 +157,7 @@ JPA allows to define how to map your entities in [two ways](https://docs.jboss.o
 
 In JPA by default, the placement of the `@Id` annotation gives the default access strategy. 
 
-**JFleet only support access by entity attributes**, and expect annotations on fields.
+**JFleet only supports access by entity attributes**, and it expects annotations on fields.
 
 The supported annotations are:
 - **[@Entity](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Entity.java)**: Specifies that the class is an entity.
@@ -176,7 +176,7 @@ The supported annotations are:
 - **[@Enumerated](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Enumerated.java)**: Specifies that a persistent field should be persisted as a enumerated type. The used value is specified by the EnumType value. If no annotation is used or no EnumType is used, the default enum type is ORDINAL.
 - **[@Temporal](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/Temporal.java)**: This annotation must be specified for persistent fields of type `java.util.Date`. DATE, TIME and TIMESTAMP values are accepted.
 
-Some common annotations which are not unsupported are: [@GeneratedValue](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/GeneratedValue.java), [@OneToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/OneToMany.java), [@ManyToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/ManyToMany.java), [@JoinColumns]() and [@JoinTable](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/JoinTable.java).
+Some common annotations which are not supported are: [@GeneratedValue](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/GeneratedValue.java), [@OneToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/OneToMany.java), [@ManyToMany](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/ManyToMany.java), [@JoinColumns]() and [@JoinTable](https://github.com/eclipse/javax.persistence/blob/master/src/javax/persistence/JoinTable.java).
 
 These annotations, and many configuration properties in _supported_ annotations, are ignored mainly because has no effect o meaning in the purpose and limitations of JFleet. If you find a relevant annotation or property which could be included create an issue.
 
@@ -260,7 +260,7 @@ Any database engine with a standard JDBC driver should be used with the `JdbcBul
 
 ## Running the tests
 
-Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exists and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
+Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exist and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
 
 You can modify this settings changing locally [mysql-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/mysql-test.properties) and [postgres-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/postgres-test.properties) files.
 
