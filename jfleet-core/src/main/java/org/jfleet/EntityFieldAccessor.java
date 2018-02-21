@@ -20,9 +20,4 @@ public interface EntityFieldAccessor {
 
     Object getValue(Object obj);
 
-    static EntityFieldAccessor identity() {
-        return t -> t;
-    }
-
-
 }
