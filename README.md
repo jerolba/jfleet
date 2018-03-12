@@ -16,6 +16,7 @@ Despite using basic JPA annotations to map Java objects to tables and columns, *
 ## Table of Contents
 
 - [Supported databases](#supported-databases)
+- [Benchmark](#benchmark)
 - [Usage](#usage)
 - [Dependency](#dependency)
 - [Advanced topics](#advanced-topics)
@@ -34,6 +35,15 @@ Each database provides some technique to insert a bulk of information bypassing 
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
 In both cases, and in unsupported databases, you can use the default implementation based on the standard [JDBC executeBatch](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--) statement.
+
+## Benchmark 
+
+**JFleet performance is comparable to using the native database import tool, and is between 2.1X and 3.8X faster than using the JDBC driver directly.**
+
+[![mysql vs postgres](https://docs.google.com/spreadsheets/d/e/2PACX-1vTx61C0YNYlczo0S-ZTN56FH2mxvHPHf4jamTnY4wdMwjjF3TvxcW3Ti7VR83dd1R5EznB7xVhD1HD6/pubchart?oid=485493047&format=image)](https://docs.google.com/spreadsheets/d/e/2PACX-1vTx61C0YNYlczo0S-ZTN56FH2mxvHPHf4jamTnY4wdMwjjF3TvxcW3Ti7VR83dd1R5EznB7xVhD1HD6/pubchart?oid=485493047&format=interactive)
+
+You can find all the benchmarks numbers and results [here](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark)
+
 
 ## Usage
 
