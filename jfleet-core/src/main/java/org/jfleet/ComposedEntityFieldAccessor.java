@@ -17,13 +17,13 @@ package org.jfleet;
 
 public class ComposedEntityFieldAccessor implements EntityFieldAccessor {
 
-    private static final EntityFieldAccessor identity = t -> t;
+    private static final EntityFieldAccessor IDENTITY = t -> t;
 
     private final EntityFieldAccessor baseAccessor;
     private EntityFieldAccessor nextAccessor;
 
     public ComposedEntityFieldAccessor() {
-        this(identity);
+        this(IDENTITY);
     }
 
     private ComposedEntityFieldAccessor(EntityFieldAccessor baseAccessor) {
