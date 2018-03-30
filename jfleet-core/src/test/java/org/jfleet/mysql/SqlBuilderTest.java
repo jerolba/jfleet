@@ -44,7 +44,7 @@ public class SqlBuilderTest {
         sqlBuilder.addLoadDataIntoTable();
 
         String sql = sqlBuilder.getSql();
-        assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` ", sql);
+        assertEquals("LOAD DATA LOCAL INFILE '' INTO TABLE simple_table ", sql);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SqlBuilderTest {
         sqlBuilder.addColumnNames();
 
         String sql = sqlBuilder.getSql();
-        assertEquals("(`column1`, `column2`)", sql);
+        assertEquals("(column1, column2)", sql);
     }
 
     @Test
@@ -72,9 +72,9 @@ public class SqlBuilderTest {
         SqlBuilder sqlBuilder = new SqlBuilder(buildEntity());
 
         String sql = sqlBuilder.build();
-        String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE `simple_table` "
+        String expectedSql = "LOAD DATA LOCAL INFILE '' INTO TABLE simple_table "
                 + "CHARACTER SET UTF8 FIELDS TERMINATED BY '\t' ENCLOSED BY '' "
-                + "ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' " + "(`column1`, `column2`)";
+                + "ESCAPED BY '\\\\' LINES TERMINATED BY '\n' STARTING BY '' " + "(column1, column2)";
         assertEquals(expectedSql, sql);
     }
 

@@ -33,14 +33,14 @@ public class MysqlDDLHelper implements DDLHelper {
     @Override
     public String dropTableSentence(EntityInfo entityInfo) {
         StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ");
-        sb.append('`').append(entityInfo.getTableName()).append('`');
+        sb.append(scapeName(entityInfo.getTableName()));
         return sb.toString();
     }
 
     @Override
     public String createTableSentence(EntityInfo entityInfo) {
         StringBuilder sb = new StringBuilder("CREATE TABLE ");
-        sb.append('`').append(entityInfo.getTableName()).append('`');
+        sb.append(scapeName(entityInfo.getTableName()));
         sb.append(" (");
         List<FieldInfo> fields = entityInfo.getFields();
         for (int i = 0; i < fields.size(); i++) {
@@ -49,7 +49,7 @@ public class MysqlDDLHelper implements DDLHelper {
             if (dbType == null) {
                 throw new RuntimeException("Type not found for " + fieldInfo.getFieldType().getFieldType().name());
             }
-            sb.append("`").append(fieldInfo.getColumnName()).append("` ");
+            sb.append(scapeName(fieldInfo.getColumnName())).append(" ");
             sb.append(dbType);
             if (fieldInfo.getFieldType().isPrimitive()) {
                 sb.append(" NOT NULL");
@@ -133,4 +133,10 @@ public class MysqlDDLHelper implements DDLHelper {
         return id.map(f -> ", PRIMARY KEY (`" + f.getColumnName() + "`)").orElse("");
     }
 
+    private String scapeName(String name) {
+        if (name.startsWith("\"") && name.endsWith("\"")) {
+            return "`" + name.substring(1, name.length() - 1) + "`";
+        }
+        return name;
+    }
 }

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
@@ -79,20 +80,9 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     private String createInsertQuery(String tableName, List<FieldInfo> fields) {
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ").append(tableName).append(" (");
-        for (int i = 0; i < fields.size(); i++) {
-            FieldInfo fieldInfo = fields.get(i);
-            sb.append(fieldInfo.getColumnName());
-            if (i < fields.size() - 1) {
-                sb.append(", ");
-            }
-        }
+        sb.append(fields.stream().map(FieldInfo::getColumnName).collect(Collectors.joining(", ")));
         sb.append(") values (");
-        for (int i = 0; i < fields.size(); i++) {
-            sb.append('?');
-            if (i < fields.size() - 1) {
-                sb.append(", ");
-            }
-        }
+        sb.append(fields.stream().map(f -> "?").collect(Collectors.joining(", ")));
         sb.append(")");
         return sb.toString();
     }
