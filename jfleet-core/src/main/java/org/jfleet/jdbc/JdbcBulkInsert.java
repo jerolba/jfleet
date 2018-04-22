@@ -38,8 +38,8 @@ import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.JFleetException;
-import org.jfleet.JpaEntityInspector;
 import org.jfleet.common.TransactionPolicy;
+import org.jfleet.inspection.JpaEntityInspector;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 

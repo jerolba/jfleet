@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,6 +25,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
+import org.jfleet.EntityInfo;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class HierarchyEntityInspectorTest {

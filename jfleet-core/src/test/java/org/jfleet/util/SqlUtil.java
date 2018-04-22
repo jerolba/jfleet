@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jfleet.EntityInfo;
-import org.jfleet.JpaEntityInspector;
+import org.jfleet.inspection.JpaEntityInspector;
 import org.jfleet.util.Dialect.DDLHelper;
 import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
