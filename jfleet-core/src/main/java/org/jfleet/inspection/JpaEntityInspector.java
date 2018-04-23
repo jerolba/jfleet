@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.inspection;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -21,11 +21,6 @@ import static java.util.stream.Collectors.toMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +51,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.jfleet.EntityFieldType;
+import org.jfleet.EntityInfo;
+import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +62,19 @@ public class JpaEntityInspector {
 
     private static Logger logger = LoggerFactory.getLogger(JpaEntityInspector.class);
 
+    private static FieldTypeInspector fieldTypeInspector = new FieldTypeInspector();
     private final Class<?> entityClass;
 
     public JpaEntityInspector(Class<?> entityClass) {
+        try {
+            Class.forName("javax.persistence.Entity");
+        } catch (ClassNotFoundException e) {
+            logger.error("javax.persistence dependency not found. Add it to your project "
+                    + "https://mvnrepository.com/artifact/javax.persistence/persistence-api/1.0.2 "
+                    + "or configure the entity with org.jfleet.EntityInfoBuilder");
+            throw new RuntimeException("javax.persistence dependency not found. Add it to your project "
+                    + "or configure the entity with org.jfleet.EntityInfoBuilder");
+        }
         this.entityClass = entityClass;
         ensureHasEntity();
     }
@@ -173,44 +181,9 @@ public class JpaEntityInspector {
 
         private EntityFieldType getFieldType() {
             Class<?> javaType = field.getType();
-            EntityFieldType type = new EntityFieldType();
-            boolean primitive = javaType.isPrimitive();
-            type.setPrimitive(primitive);
-            if (Long.class.equals(javaType) || long.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.LONG);
-            } else if (Boolean.class.equals(javaType) || boolean.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.BOOLEAN);
-            } else if (Byte.class.equals(javaType) || byte.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.BYTE);
-            } else if (Character.class.equals(javaType) || char.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.CHAR);
-            } else if (Double.class.equals(javaType) || double.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.DOUBLE);
-            } else if (Float.class.equals(javaType) || float.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.FLOAT);
-            } else if (Integer.class.equals(javaType) || int.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.INT);
-            } else if (Short.class.equals(javaType) || short.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.SHORT);
-            } else if (String.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.STRING);
-            } else if (Date.class.isAssignableFrom(javaType)) {
-                type.setFieldType(getDateFieldType(javaType));
-            } else if (BigDecimal.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.BIGDECIMAL);
-            } else if (BigInteger.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.BIGINTEGER);
-            } else if (LocalDate.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.LOCALDATE);
-            } else if (LocalTime.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.LOCALTIME);
-            } else if (LocalDateTime.class.equals(javaType)) {
-                type.setFieldType(FieldTypeEnum.LOCALDATETIME);
-            } else if (javaType.isEnum()) {
-                type.setFieldType(getEnumType(field.getAnnotation(Enumerated.class)));
-            } else {
-                throw new RuntimeException("Unexpected type on " + field.toString());
-            }
+            Optional<EntityFieldType> fieldType = fieldTypeInspector.getFieldType(javaType);
+            EntityFieldType type = fieldType.orElseGet(() -> getAnnotatedType(javaType)
+                    .orElseThrow(() -> new RuntimeException("Unexpected type on " + field.toString())));
             type.setIdentityId(isIdentityId());
             return type;
         }
@@ -224,16 +197,16 @@ public class JpaEntityInspector {
             return false;
         }
 
+        private Optional<EntityFieldType> getAnnotatedType(Class<?> javaType) {
+            if (javaType.isEnum()) {
+                return Optional.of(new EntityFieldType(getEnumType(field.getAnnotation(Enumerated.class)), false));
+            } else if (Date.class.isAssignableFrom(javaType)) {
+                return Optional.of(new EntityFieldType(getDateFieldType(javaType), false));
+            }
+            return Optional.empty();
+        }
+
         private FieldTypeEnum getDateFieldType(Class<?> javaType) {
-            if (java.sql.Timestamp.class.isAssignableFrom(javaType)) {
-                return FieldTypeEnum.TIMESTAMP;
-            }
-            if (java.sql.Time.class.isAssignableFrom(javaType)) {
-                return FieldTypeEnum.TIME;
-            }
-            if (java.sql.Date.class.isAssignableFrom(javaType)) {
-                return FieldTypeEnum.DATE;
-            }
             Temporal temporal = field.getAnnotation(Temporal.class);
             if (temporal != null) {
                 TemporalType temporalType = temporal.value();

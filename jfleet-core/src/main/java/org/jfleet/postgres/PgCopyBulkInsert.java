@@ -23,11 +23,11 @@ import java.util.stream.Stream;
 import org.jfleet.BulkInsert;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
-import org.jfleet.JpaEntityInspector;
 import org.jfleet.WrappedException;
 import org.jfleet.common.ContentWriter;
 import org.jfleet.common.ParallelContentWriter;
 import org.jfleet.common.TransactionPolicy;
+import org.jfleet.inspection.JpaEntityInspector;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
@@ -49,8 +49,12 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     }
 
     public PgCopyBulkInsert(Configuration<T> config) {
-        JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
-        this.entityInfo = inspector.inspect();
+        EntityInfo entityInfo = config.entityInfo;
+        if (entityInfo == null) {
+            JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
+            entityInfo = inspector.inspect();
+        }
+        this.entityInfo = entityInfo;
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
         this.concurrent = config.concurrent;
@@ -99,12 +103,17 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     public static class Configuration<T> {
 
         private Class<T> clazz;
+        private EntityInfo entityInfo;
         private int batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
         private boolean concurrent = true;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
+        }
+
+        public Configuration(EntityInfo entityInfo) {
+            this.entityInfo = entityInfo;
         }
 
         public Configuration<T> batchSize(int batchSize) {

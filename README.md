@@ -23,6 +23,7 @@ Despite using basic JPA annotations to map Java objects to tables and columns, *
     - [IDs](#ids)
     - [Annotations](#annotations)
     - [BulkInsert configuration](#bulkinsert-configuration)
+    - [Avoid javax.persistence annotations and dependency](#avoid-javaxpersistence-annotations-and-dependency)
     - [Supported database versions](#supported-database-versions)
 - [Running the tests](#running-the-tests)
 - [Contribute](#contribute)
@@ -47,7 +48,7 @@ You can find all the benchmarks numbers and results [here](https://github.com/je
 
 ## Usage
 
-JFleet needs to know how to map your Java objects or entities to a table. The mechanism used is standard [JPA annotations](https://docs.oracle.com/javaee/6/api/javax/persistence/package-summary.html) like [@Entity](https://docs.oracle.com/javaee/6/api/javax/persistence/Entity.html), [@Column](https://docs.oracle.com/javaee/6/api/javax/persistence/Column.html) or [@ManyToOne](https://docs.oracle.com/javaee/6/api/javax/persistence/ManyToOne.html). 
+JFleet needs to know how to map your Java objects or entities to a table. The default mechanism used is standard [JPA annotations](https://docs.oracle.com/javaee/6/api/javax/persistence/package-summary.html) like [@Entity](https://docs.oracle.com/javaee/6/api/javax/persistence/Entity.html), [@Column](https://docs.oracle.com/javaee/6/api/javax/persistence/Column.html) or [@ManyToOne](https://docs.oracle.com/javaee/6/api/javax/persistence/ManyToOne.html). 
 
 ```java
 
@@ -121,7 +122,7 @@ or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
-Because JFleed uses basic `javax.persistence` annotations, if you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
+By default JFleet uses basic `javax.persistence` annotations. If you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
 
 ```xml
 <dependency>
@@ -159,7 +160,7 @@ JFleet needs to know if a field is `SERIAL`, and the convention used is annotati
 
 ### Annotations
 
-JFleet reuses existing JPA annotations to map Java object to tables. 
+By default JFleet reuses existing JPA annotations to map Java object to tables. 
 
 JPA allows to define how to map your entities in [two ways](https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#access):
 - entity attributes (instance fields) 
@@ -236,6 +237,48 @@ Configuration<Employee> config = new Configuration<>(Employee.class)
         .autocommit(true);
 BulkInsert<Employee> bulkInsert = new JdbcBulkInsert<>(config);
 bulkInsert.insertAll(connection, stream);
+```
+### Avoid javax.persistence annotations and dependency
+
+If you have any problem using JPA annotations in your domain objects or directly you don't want to add `javax.persistence` dependency to your project, you can configure it manually mapping each column to a field path.
+
+Given the same domain objects:
+
+```java
+
+public class Customer {
+
+    private Long id;
+    private String contactName;
+    private String name;
+    private City city;
+    
+    //Getters and setters
+}
+
+public class City {
+    private Integer id;
+    private String name;
+    
+    //Getters and setters
+}
+
+```
+
+You configure JFleet with the mapping info:
+
+```java
+
+EntityInfo customerMap = new EntityInfoBuilder(Customer.class, "customer_contact")
+	.addField("id", "id")
+	.addField("contactName", "contactname")
+	.addField("name", "customer_name")
+	.addField("city.id", "city_id")
+	.build();
+    
+Configuration<Customer> config = new Configuration<>(customerMap);
+BulkInsert<Customer> bulkInsert = new LoadDataBulkInsert<>(config);
+
 ```
 
 #### MySQL LOAD DATA error handling

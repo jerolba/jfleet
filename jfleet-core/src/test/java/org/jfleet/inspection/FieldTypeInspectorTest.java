@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,6 +30,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.jfleet.EntityFieldType;
+import org.jfleet.EntityInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 

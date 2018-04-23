@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet;
+package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,6 +24,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
+import org.jfleet.EntityInfo;
+import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 

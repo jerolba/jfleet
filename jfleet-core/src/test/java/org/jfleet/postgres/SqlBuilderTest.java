@@ -31,8 +31,7 @@ public class SqlBuilderTest {
 
         FieldInfo f1 = new FieldInfo();
         f1.setColumnName("column1");
-        EntityFieldType type1 = new EntityFieldType();
-        type1.setFieldType(FieldTypeEnum.INT);
+        EntityFieldType type1 = new EntityFieldType(FieldTypeEnum.INT, false);
         type1.setPrimitive(false);
         type1.setIdentityId(false);
         f1.setFieldType(type1);
@@ -40,8 +39,7 @@ public class SqlBuilderTest {
 
         FieldInfo f2 = new FieldInfo();
         f2.setColumnName("column2");
-        EntityFieldType type2 = new EntityFieldType();
-        type2.setFieldType(FieldTypeEnum.STRING);
+        EntityFieldType type2 = new EntityFieldType(FieldTypeEnum.STRING, false);
         type2.setPrimitive(false);
         type2.setIdentityId(false);
         f2.setFieldType(type2);
