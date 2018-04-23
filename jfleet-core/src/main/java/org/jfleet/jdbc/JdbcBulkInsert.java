@@ -44,7 +44,6 @@ import org.jfleet.inspection.JpaEntityInspector;
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     private static final int DEFAULT_BATCH_SIZE = 10_000;
-    private final EntityInfo entityInfo;
     private final String insertSql;
 
     private final long batchSize;
@@ -60,8 +59,11 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     public JdbcBulkInsert(Configuration<T> config) {
-        JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
-        this.entityInfo = inspector.inspect();
+        EntityInfo entityInfo = config.entityInfo;
+        if (entityInfo == null) {
+            JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
+            entityInfo = inspector.inspect();
+        }
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
         this.fields = entityInfo.getNotIdentityField();
@@ -200,11 +202,16 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     public static class Configuration<T> {
 
         private Class<T> clazz;
+        private EntityInfo entityInfo;
         private long batchSize = DEFAULT_BATCH_SIZE;
         private boolean autocommit = true;
 
         public Configuration(Class<T> clazz) {
             this.clazz = clazz;
+        }
+
+        public Configuration(EntityInfo entityInfo) {
+            this.entityInfo = entityInfo;
         }
 
         public Configuration<T> batchSize(long batchSize) {
