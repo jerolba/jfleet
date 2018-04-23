@@ -66,6 +66,15 @@ public class JpaEntityInspector {
     private final Class<?> entityClass;
 
     public JpaEntityInspector(Class<?> entityClass) {
+        try {
+            Class.forName("javax.persistence.Entity");
+        } catch (ClassNotFoundException e) {
+            logger.error("javax.persistence dependency not found. Add it to your project "
+                    + "https://mvnrepository.com/artifact/javax.persistence/persistence-api/1.0.2 "
+                    + "or configure the entity with org.jfleet.EntityInfoBuilder");
+            throw new RuntimeException("javax.persistence dependency not found. Add it to your project "
+                    + "or configure the entity with org.jfleet.EntityInfoBuilder");
+        }
         this.entityClass = entityClass;
         ensureHasEntity();
     }
