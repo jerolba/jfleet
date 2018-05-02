@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.inspection.EntityFieldAccesorFactory;
+import org.jfleet.inspection.FieldInfo;
 import org.jfleet.inspection.JFleetEntityInspector;
 
 public class EntityInfoBuilder<T> {

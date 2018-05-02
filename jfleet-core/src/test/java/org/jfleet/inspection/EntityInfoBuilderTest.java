@@ -25,6 +25,7 @@ import org.jfleet.ColumnInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
+import org.jfleet.inspection.JFleetEntityInspector.NoSuchFieldException;
 import org.jfleet.metadata.JFleetEnumType;
 import org.jfleet.metadata.JFleetEnumerated;
 import org.jfleet.metadata.JFleetTemporal;

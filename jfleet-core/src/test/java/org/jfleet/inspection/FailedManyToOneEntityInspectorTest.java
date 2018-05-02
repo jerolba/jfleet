@@ -26,7 +26,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class FailedManyToOneEntityInspectorTest {

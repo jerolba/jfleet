@@ -17,8 +17,6 @@ package org.jfleet.inspection;
 
 import java.util.List;
 
-import org.jfleet.FieldInfo;
-
 public class EntityInspectHelper {
 
     private static JpaFieldsInspector fieldsInspector = new JpaFieldsInspector();

@@ -64,4 +64,13 @@ public class JFleetEntityInspector {
         }
     }
 
+    public static class NoSuchFieldException extends RuntimeException {
+
+        private static final long serialVersionUID = 8592913850681315823L;
+
+        public NoSuchFieldException(String message) {
+            super(message);
+        }
+    }
+
 }

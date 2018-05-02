@@ -23,9 +23,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.ColumnInfo;
-import org.jfleet.EntityFieldAccesorFactory;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

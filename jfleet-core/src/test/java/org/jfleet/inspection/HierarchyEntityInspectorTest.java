@@ -25,7 +25,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class HierarchyEntityInspectorTest {

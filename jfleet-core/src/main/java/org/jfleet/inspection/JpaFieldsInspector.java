@@ -52,7 +52,6 @@ import javax.persistence.Transient;
 
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.jfleet.FieldInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

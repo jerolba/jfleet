@@ -25,7 +25,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class EmbeddedIdInspectorTest {

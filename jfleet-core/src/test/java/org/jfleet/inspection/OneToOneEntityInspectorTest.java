@@ -23,7 +23,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class OneToOneEntityInspectorTest {

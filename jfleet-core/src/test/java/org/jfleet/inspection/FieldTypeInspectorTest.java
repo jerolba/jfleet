@@ -33,7 +33,6 @@ import javax.persistence.TemporalType;
 
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class FieldTypeInspectorTest {
