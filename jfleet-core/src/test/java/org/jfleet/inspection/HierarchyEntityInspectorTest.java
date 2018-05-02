@@ -25,11 +25,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
-import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class HierarchyEntityInspectorTest {
+
+    private JpaFieldsInspector fieldsInspector = new JpaFieldsInspector();
 
     @Entity
     public class BaseClass {
@@ -63,9 +64,7 @@ public class HierarchyEntityInspectorTest {
 
     @Test
     public void inspectEntityWithHierarchy() {
-        JpaEntityInspector inspector = new JpaEntityInspector(ChildClass.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(ChildClass.class);
         assertEquals(2, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
         assertEquals("someField", fields.get(1).getFieldName());
@@ -103,9 +102,7 @@ public class HierarchyEntityInspectorTest {
 
     @Test
     public void inspectEntityWithHierarchyMapped() {
-        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithMapped.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(ChildClassWithMapped.class);
         assertEquals(2, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
         assertEquals("someField", fields.get(1).getFieldName());
@@ -142,9 +139,7 @@ public class HierarchyEntityInspectorTest {
 
     @Test
     public void inspectEntityWithNonEntityParent() {
-        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassNonEntity.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(ChildClassNonEntity.class);
         assertEquals(1, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
     }
@@ -169,9 +164,7 @@ public class HierarchyEntityInspectorTest {
 
     @Test
     public void inspectEntityWithAttributeOverrides() {
-        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverrides.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(ChildClassWithAttributeOverrides.class);
         assertEquals(2, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
         assertEquals("someField", fields.get(1).getFieldName());
@@ -197,9 +190,7 @@ public class HierarchyEntityInspectorTest {
 
     @Test
     public void inspectEntityWithAttributeOverride() {
-        JpaEntityInspector inspector = new JpaEntityInspector(ChildClassWithAttributeOverride.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(ChildClassWithAttributeOverride.class);
         assertEquals(2, fields.size());
         assertEquals("otherField", fields.get(0).getFieldName());
         assertEquals("someField", fields.get(1).getFieldName());

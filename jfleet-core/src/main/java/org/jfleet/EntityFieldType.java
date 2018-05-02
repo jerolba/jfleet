@@ -22,13 +22,18 @@ public class EntityFieldType {
         BIGDECIMAL, BIGINTEGER, LOCALDATE, LOCALTIME, LOCALDATETIME, ENUMSTRING, ENUMORDINAL;
     }
 
-    private boolean primitive;
-    private FieldTypeEnum fieldType;
-    private boolean identityId;
+    private final boolean primitive;
+    private final FieldTypeEnum fieldType;
+    private final boolean identityId;
 
-    public EntityFieldType(FieldTypeEnum fieldType, boolean primitive) {
+    public EntityFieldType(FieldTypeEnum fieldType, boolean primitive, boolean identityId) {
         this.fieldType = fieldType;
         this.primitive = primitive;
+        this.identityId = identityId;
+    }
+
+    public EntityFieldType(FieldTypeEnum fieldType, boolean primitive) {
+        this(fieldType, primitive, false);
     }
 
     public EntityFieldType(FieldTypeEnum fieldType) {
@@ -39,24 +44,12 @@ public class EntityFieldType {
         return primitive;
     }
 
-    public void setPrimitive(boolean primitive) {
-        this.primitive = primitive;
-    }
-
     public FieldTypeEnum getFieldType() {
         return fieldType;
     }
 
-    public void setFieldType(FieldTypeEnum fieldType) {
-        this.fieldType = fieldType;
-    }
-
     public boolean isIdentityId() {
         return identityId;
-    }
-
-    public void setIdentityId(boolean identityId) {
-        this.identityId = identityId;
     }
 
 }

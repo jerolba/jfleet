@@ -27,8 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO: Look for better, fastest and safest method. May be with bytecode
- * generator.
+ * TODO: Look for better, fastest and safest method. May be with bytecode generator.
  */
 public class EntityFieldAccesorFactory {
 

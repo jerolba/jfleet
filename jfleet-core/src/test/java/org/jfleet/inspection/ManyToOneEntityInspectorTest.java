@@ -22,9 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class ManyToOneEntityInspectorTest {
@@ -118,8 +117,7 @@ public class ManyToOneEntityInspectorTest {
 
     @Test
     public void inspectAnEntityWithManyToOneRelationship() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Sku.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(Sku.class);
 
         FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
@@ -136,8 +134,7 @@ public class ManyToOneEntityInspectorTest {
 
     @Test
     public void inspectAnEntityWithManyToOneJoinColumn() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Foo.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(Foo.class);
 
         FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());

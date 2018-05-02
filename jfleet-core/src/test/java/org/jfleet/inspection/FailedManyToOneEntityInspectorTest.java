@@ -17,15 +17,16 @@ package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 
-import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class FailedManyToOneEntityInspectorTest {
@@ -103,35 +104,31 @@ public class FailedManyToOneEntityInspectorTest {
         }
     }
 
+    private JpaFieldsInspector fieldsInspector = new JpaFieldsInspector();
+
     @Test
     public void nonIdentifiedIsNotMapped() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Foo.class);
-        EntityInfo entityInfo = inspector.inspect();
-
-        assertEquals(1, entityInfo.getFields().size());
-        FieldInfo id = entityInfo.getFields().get(0);
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(Foo.class);
+        assertEquals(1, fields.size());
+        FieldInfo id = fields.get(0);
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
         assertEquals("id", id.getColumnName());
     }
 
     @Test
     public void joinTableIsNotMapped() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Bar.class);
-        EntityInfo entityInfo = inspector.inspect();
-
-        assertEquals(1, entityInfo.getFields().size());
-        FieldInfo id = entityInfo.getFields().get(0);
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(Bar.class);
+        assertEquals(1, fields.size());
+        FieldInfo id = fields.get(0);
         assertEquals(FieldTypeEnum.STRING, id.getFieldType().getFieldType());
         assertEquals("uuid", id.getColumnName());
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void joinColumnsIsNotMapped() {
-        JpaEntityInspector inspector = new JpaEntityInspector(FooBar.class);
-        EntityInfo entityInfo = inspector.inspect();
-
-        assertEquals(1, entityInfo.getFields().size());
-        FieldInfo id = entityInfo.getFields().get(0);
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(FooBar.class);
+        assertEquals(1, fields.size());
+        FieldInfo id = fields.get(0);
         assertEquals(FieldTypeEnum.INT, id.getFieldType().getFieldType());
         assertEquals("serialId", id.getColumnName());
     }

@@ -21,14 +21,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
+import org.jfleet.ColumnInfo;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
-import org.jfleet.FieldInfo;
-import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.metadata.JFleetEnumType;
 import org.jfleet.metadata.JFleetEnumerated;
 import org.jfleet.metadata.JFleetTemporal;
 import org.jfleet.metadata.JFleetTemporalType;
+import org.junit.Before;
 import org.junit.Test;
 
 public class EntityInfoBuilderTest {
@@ -135,118 +136,222 @@ public class EntityInfoBuilderTest {
 
     }
 
+    private City city;
+    private SimpleEntity simple;
+    private SimpleEntityEx simpleEx;
+
+    @Before
+    public void setup() {
+        city = new City();
+        city.setId(1);
+        city.setName("Madrid");
+        simple = new SimpleEntity();
+        simple.setBirthDay(new Date());
+        simple.setCity(city);
+        simple.setFloor(Numbers.three);
+        simple.setName("John");
+
+        simpleEx = new SimpleEntityEx();
+        simpleEx.setBirthDay(new Date());
+        simpleEx.setCity(city);
+        simpleEx.setCreated(new Date());
+        simpleEx.setFloor(Numbers.two);
+        simpleEx.setHeight(100);
+        simpleEx.setName("Peter");
+        simpleEx.setOrder(Numbers.one);
+    }
+
     @Test(expected = NoSuchFieldException.class)
     public void testNonExistentField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("noField", "someName");
     }
 
     @Test(expected = NoSuchFieldException.class)
     public void testNonExistentFieldInHierarchy() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntityEx.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntityEx> builder = new EntityInfoBuilder<>(SimpleEntityEx.class, "simple_entity");
         builder.addField("noField", "someName");
     }
 
     @Test
     public void testExistentField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("name", "name");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("name");
-        assertEquals("name", field.getFieldName());
-        assertEquals("name", field.getColumnName());
-        assertEquals(FieldTypeEnum.STRING, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("name");
+        assertEquals("name", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getName(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testExistentFieldInHierarchy() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntityEx.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntityEx> builder = new EntityInfoBuilder<>(SimpleEntityEx.class, "simple_entity");
         builder.addField("height", "height");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("height");
-        assertEquals("height", field.getFieldName());
-        assertEquals("height", field.getColumnName());
-        assertEquals(FieldTypeEnum.INT, field.getFieldType().getFieldType());
-        assertTrue(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("height");
+        assertEquals("height", column.getColumnName());
+        assertEquals(FieldTypeEnum.INT, column.getFieldType().getFieldType());
+        assertTrue(column.getFieldType().isPrimitive());
+        assertEquals(simpleEx.getHeight(), column.getAccessor().apply(simpleEx));
     }
 
     @Test
     public void testExistentPathField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("city.name", "city_name");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("city.name");
-        assertEquals("city.name", field.getFieldName());
-        assertEquals("city_name", field.getColumnName());
-        assertEquals(FieldTypeEnum.STRING, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("city_name");
+        assertEquals("city_name", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(city.getName(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testImplicitColumnName() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("birthDay");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("birthDay");
-        assertEquals("birthday", field.getColumnName());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("birthday");
+        assertEquals("birthday", column.getColumnName());
+        assertEquals(simple.getBirthDay(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testImplicitColumnNameComposed() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("city.name");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("city.name");
-        assertEquals("city_name", field.getColumnName());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("city_name");
+        assertEquals("city_name", column.getColumnName());
+        assertEquals(city.getName(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testExplicitEnumField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("floor", "floor", FieldTypeEnum.ENUMSTRING);
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("floor");
-        assertEquals("floor", field.getFieldName());
-        assertEquals("floor", field.getColumnName());
-        assertEquals(FieldTypeEnum.ENUMSTRING, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("floor");
+        assertEquals("floor", column.getColumnName());
+        assertEquals(FieldTypeEnum.ENUMSTRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getFloor(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testExplicitDateField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntity.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("birthDay", "birthday", FieldTypeEnum.DATE);
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("birthDay");
-        assertEquals("birthDay", field.getFieldName());
-        assertEquals("birthday", field.getColumnName());
-        assertEquals(FieldTypeEnum.DATE, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("birthday");
+        assertEquals("birthday", column.getColumnName());
+        assertEquals(FieldTypeEnum.DATE, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getBirthDay(), column.getAccessor().apply(simple));
     }
 
     @Test
     public void testAnnotatedEnumField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntityEx.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntityEx> builder = new EntityInfoBuilder<>(SimpleEntityEx.class, "simple_entity");
         builder.addField("order", "order");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("order");
-        assertEquals("order", field.getFieldName());
-        assertEquals("order", field.getColumnName());
-        assertEquals(FieldTypeEnum.ENUMORDINAL, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("order");
+        assertEquals("order", column.getColumnName());
+        assertEquals(FieldTypeEnum.ENUMORDINAL, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simpleEx.getOrder(), column.getAccessor().apply(simpleEx));
     }
 
     @Test
     public void testAnnotatedDateField() {
-        EntityInfoBuilder builder = new EntityInfoBuilder(SimpleEntityEx.class, "simple_entity");
+        EntityInfoBuilder<SimpleEntityEx> builder = new EntityInfoBuilder<>(SimpleEntityEx.class, "simple_entity");
         builder.addField("created", "created");
-        EntityInfo entityInfo = builder.build();
-        FieldInfo field = entityInfo.findField("created");
-        assertEquals("created", field.getFieldName());
-        assertEquals("created", field.getColumnName());
-        assertEquals(FieldTypeEnum.TIMESTAMP, field.getFieldType().getFieldType());
-        assertFalse(field.getFieldType().isPrimitive());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("created");
+        assertEquals("created", column.getColumnName());
+        assertEquals(FieldTypeEnum.TIMESTAMP, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simpleEx.getCreated(), column.getAccessor().apply(simpleEx));
+    }
+
+    @Test
+    public void testSimpleColumnDeclaration() {
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
+        builder.addColumn("name", FieldTypeEnum.STRING, SimpleEntity::getName);
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("name");
+        assertEquals("name", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getName(), column.getAccessor().apply(simple));
+    }
+
+    @Test
+    public void testColumnChildEntity() {
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
+        builder.addColumn("city_name", FieldTypeEnum.STRING, obj -> obj.getCity().getName());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("city_name");
+        assertEquals("city_name", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getCity().getName(), column.getAccessor().apply(simple));
+    }
+
+    @Test
+    public void testSyntheticColumn() {
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
+        builder.addColumn("city_code", FieldTypeEnum.STRING,
+                obj -> obj.getCity().getId() + ": " + obj.getCity().getName());
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("city_code");
+        assertEquals("city_code", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(simple.getCity().getId() + ": " + simple.getCity().getName(), column.getAccessor().apply(simple));
+    }
+
+    @Test
+    public void testColumnCapturedValue() {
+        String value = "Some Value";
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
+        builder.addColumn("some_column", FieldTypeEnum.STRING, obj -> value);
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo column = entityInfo.findColumn("some_column");
+        assertEquals("some_column", column.getColumnName());
+        assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
+        assertFalse(column.getFieldType().isPrimitive());
+        assertEquals(value, column.getAccessor().apply(simple));
+    }
+
+    private class EntityInfoHelper {
+
+        private final EntityInfo entityInfo;
+
+        EntityInfoHelper(EntityInfoBuilder<?> builder) {
+            entityInfo = builder.build();
+        }
+
+        public ColumnInfo findColumn(String columnName) {
+            return entityInfo.getColumns().stream().filter(c -> c.getColumnName().equals(columnName)).findFirst().get();
+        }
+
     }
 
 }

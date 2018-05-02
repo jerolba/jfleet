@@ -17,35 +17,24 @@ package org.jfleet.postgres;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class SqlBuilderTest {
 
     public EntityInfo buildEntity() {
-        EntityInfo entityInfo = new EntityInfo();
-        entityInfo.setTableName("simple_table");
+        EntityFieldType type1 = new EntityFieldType(FieldTypeEnum.INT);
+        ColumnInfo c1 = new ColumnInfo("column1", type1, null);
 
-        FieldInfo f1 = new FieldInfo();
-        f1.setColumnName("column1");
-        EntityFieldType type1 = new EntityFieldType(FieldTypeEnum.INT, false);
-        type1.setPrimitive(false);
-        type1.setIdentityId(false);
-        f1.setFieldType(type1);
-        entityInfo.addField(f1);
+        EntityFieldType type2 = new EntityFieldType(FieldTypeEnum.STRING);
+        ColumnInfo c2 = new ColumnInfo("column2", type2, null);
 
-        FieldInfo f2 = new FieldInfo();
-        f2.setColumnName("column2");
-        EntityFieldType type2 = new EntityFieldType(FieldTypeEnum.STRING, false);
-        type2.setPrimitive(false);
-        type2.setIdentityId(false);
-        f2.setFieldType(type2);
-        entityInfo.addField(f2);
-
-        return entityInfo;
+        return new EntityInfo(null, "simple_table", Arrays.asList(c1, c2));
     }
 
     @Test

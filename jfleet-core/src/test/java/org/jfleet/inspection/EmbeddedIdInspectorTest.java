@@ -24,9 +24,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
-import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class EmbeddedIdInspectorTest {
@@ -109,11 +108,9 @@ public class EmbeddedIdInspectorTest {
 
     }
 
-
     @Test
     public void inspectEmbeddedIdEntity() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SomeClass.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(SomeClass.class);
 
         FieldInfo someId = entityInfo.findField("key.someId");
         assertEquals(FieldTypeEnum.STRING, someId.getFieldType().getFieldType());
@@ -128,11 +125,9 @@ public class EmbeddedIdInspectorTest {
         assertEquals("someValue", someValue.getColumnName());
     }
 
-
     @Test
     public void inspectEmbeddedIdEntityWithOverride() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SomeClassWithOverride.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(SomeClassWithOverride.class);
 
         FieldInfo someId = entityInfo.findField("key.someId");
         assertEquals(FieldTypeEnum.STRING, someId.getFieldType().getFieldType());

@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,8 +32,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.jfleet.EntityFieldType;
-import org.jfleet.EntityInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class FieldTypeInspectorTest {
@@ -95,7 +96,7 @@ public class FieldTypeInspectorTest {
         public EnumField enumOrdinal;
     }
 
-    private EntityInfo entityInfo = new JpaEntityInspector(EntityWithTypes.class).inspect();
+    private List<FieldInfo> fields = new JpaFieldsInspector().getFieldsFromClass(EntityWithTypes.class);
 
     @Test
     public void booleanPrimitiveTest() {
@@ -315,7 +316,6 @@ public class FieldTypeInspectorTest {
     }
 
     private EntityFieldType getField(String fieldName) {
-        return entityInfo.getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get()
-                .getFieldType();
+        return fields.stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get().getFieldType();
     }
 }

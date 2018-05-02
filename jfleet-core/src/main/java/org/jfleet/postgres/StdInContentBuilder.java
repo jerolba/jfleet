@@ -18,13 +18,10 @@ package org.jfleet.postgres;
 import static org.jfleet.postgres.PgCopyConstants.DELIMITER_CHAR;
 import static org.jfleet.postgres.PgCopyConstants.NEWLINE_CHAR;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-import org.jfleet.EntityFieldAccesorFactory;
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.common.DoubleBufferStringContent;
 import org.jfleet.common.StringContent;
 
@@ -32,61 +29,54 @@ public class StdInContentBuilder {
 
     private final PgCopyEscaper escaper = new PgCopyEscaper();
     private final PostgresTypeSerializer typeSerializer = new PostgresTypeSerializer();
-    private final List<Function<Object, Object>> accessors = new ArrayList<>();
+    private final List<ColumnInfo> columns;
 
-    private final List<FieldInfo> fields = new ArrayList<>();
-
-    private DoubleBufferStringContent df;
-    private StringContent sc;
+    private DoubleBufferStringContent doubleBuffer;
+    private StringContent stringContent;
 
     public StdInContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
-        this.df = new DoubleBufferStringContent(batchSize, concurrent);
-        this.sc = df.next();
-        EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        for (FieldInfo f : entityInfo.getNotIdentityField()) {
-            fields.add(f);
-            accessors.add(factory.getAccessor(entityInfo.getEntityClass(), f));
-        }
-    }
-
-    public void reset() {
-        this.sc = df.next();
+        this.doubleBuffer = new DoubleBufferStringContent(batchSize, concurrent);
+        this.stringContent = doubleBuffer.next();
+        this.columns = entityInfo.getNotIdentityColumns();
     }
 
     public <T> void add(T entity) {
-        for (int i = 0; i < fields.size(); i++) {
-            Function<Object, Object> accessor = accessors.get(i);
-            Object value = accessor.apply(entity);
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnInfo info = columns.get(i);
+            Object value = info.getAccessor().apply(entity);
             if (value != null) {
-                FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForStdIn(valueStr);
-                sc.append(escapedValue);
+                stringContent.append(escapedValue);
             } else {
-                sc.append("\\N");
+                stringContent.append("\\N");
             }
-            if (i < fields.size() - 1) {
-                sc.append(DELIMITER_CHAR);
+            if (i < columns.size() - 1) {
+                stringContent.append(DELIMITER_CHAR);
             }
         }
-        sc.append(NEWLINE_CHAR);
-        sc.inc();
+        stringContent.append(NEWLINE_CHAR);
+        stringContent.inc();
+    }
+
+    public void reset() {
+        this.stringContent = doubleBuffer.next();
     }
 
     public boolean isFilled() {
-        return sc.isFilled();
+        return stringContent.isFilled();
     }
 
     public int getContentSize() {
-        return sc.getContentSize();
+        return stringContent.getContentSize();
     }
 
     public int getRecords() {
-        return sc.getRecords();
+        return stringContent.getRecords();
     }
 
     public StringContent getContent() {
-        return sc;
+        return stringContent;
     }
 
 }

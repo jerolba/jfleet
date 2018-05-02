@@ -29,12 +29,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.jfleet.EntityFieldType;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
-import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 
 public class EntityInspectorTest {
+
+    private JpaFieldsInspector fieldsInspector = new JpaFieldsInspector();
 
     public class SimpleClass {
 
@@ -77,9 +79,7 @@ public class EntityInspectorTest {
 
     @Test
     public void inspectColumnByPropertyName() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SimpleEntityUnannotated.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(SimpleEntityUnannotated.class);
         assertEquals(1, fields.size());
         FieldInfo field = fields.get(0);
         assertEquals("someField", field.getColumnName());
@@ -112,9 +112,7 @@ public class EntityInspectorTest {
 
     @Test
     public void inspectColumnByColumnAnnotation() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SimpleEntityAnnotated.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(SimpleEntityAnnotated.class);
         assertEquals(1, fields.size());
         FieldInfo field = fields.get(0);
         assertEquals("some_column", field.getColumnName());
@@ -123,9 +121,7 @@ public class EntityInspectorTest {
 
     @Test
     public void inspectFieldType() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SimpleEntityAnnotated.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(SimpleEntityAnnotated.class);
         assertEquals(1, fields.size());
         FieldInfo field = fields.get(0);
         EntityFieldType fieldType = field.getFieldType();
@@ -164,9 +160,7 @@ public class EntityInspectorTest {
 
     @Test
     public void inspectEntitySequenceId() {
-        JpaEntityInspector inspector = new JpaEntityInspector(EntityWithGeneratedSequenceId.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(EntityWithGeneratedSequenceId.class);
         assertEquals(2, fields.size());
         FieldInfo field = fields.get(0);
         EntityFieldType fieldType = field.getFieldType();
@@ -206,9 +200,7 @@ public class EntityInspectorTest {
 
     @Test
     public void inspectEntityIdetityId() {
-        JpaEntityInspector inspector = new JpaEntityInspector(EntityWithGeneratedIdentityId.class);
-        EntityInfo entityInfo = inspector.inspect();
-        List<FieldInfo> fields = entityInfo.getFields();
+        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(EntityWithGeneratedIdentityId.class);
         assertEquals(2, fields.size());
         FieldInfo field = fields.get(0);
         EntityFieldType fieldType = field.getFieldType();

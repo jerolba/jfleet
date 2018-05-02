@@ -17,25 +17,18 @@ package org.jfleet.mysql;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class SqlBuilderTest {
 
     public EntityInfo buildEntity() {
-        EntityInfo entityInfo = new EntityInfo();
-        entityInfo.setTableName("simple_table");
-
-        FieldInfo f1 = new FieldInfo();
-        f1.setColumnName("column1");
-        entityInfo.addField(f1);
-
-        FieldInfo f2 = new FieldInfo();
-        f2.setColumnName("column2");
-        entityInfo.addField(f2);
-
-        return entityInfo;
+        ColumnInfo c1 = new ColumnInfo("column1", null, null);
+        ColumnInfo c2 = new ColumnInfo("column2", null, null);
+        return new EntityInfo(null, "simple_table", Arrays.asList(c1, c2));
     }
 
     @Test

@@ -17,9 +17,8 @@ package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 
-import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
 import org.junit.Test;
@@ -28,8 +27,7 @@ public class EmbeddedInspectorTest {
 
     @Test
     public void inspectEmbeddedEntity() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Person.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(Person.class);
 
         FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());
@@ -50,8 +48,7 @@ public class EmbeddedInspectorTest {
 
     @Test
     public void inspectEmbeddedEntityWithAttributeOverrides() {
-        JpaEntityInspector inspector = new JpaEntityInspector(Company.class);
-        EntityInfo entityInfo = inspector.inspect();
+        EntityInspectHelper entityInfo = new EntityInspectHelper(Company.class);
 
         FieldInfo id = entityInfo.findField("id");
         assertEquals(FieldTypeEnum.LONG, id.getFieldType().getFieldType());

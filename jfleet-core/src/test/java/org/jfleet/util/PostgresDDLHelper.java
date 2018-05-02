@@ -18,10 +18,10 @@ package org.jfleet.util;
 import java.util.List;
 import java.util.Optional;
 
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.util.Dialect.DDLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,23 +42,23 @@ public class PostgresDDLHelper implements DDLHelper {
         StringBuilder sb = new StringBuilder("CREATE TABLE ");
         sb.append(entityInfo.getTableName());
         sb.append(" (");
-        List<FieldInfo> fields = entityInfo.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            FieldInfo fieldInfo = fields.get(i);
-            String dbType = getDbType(fieldInfo.getFieldType());
+        List<ColumnInfo> columns = entityInfo.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnInfo columnInfo = columns.get(i);
+            String dbType = getDbType(columnInfo.getFieldType());
             if (dbType == null) {
-                throw new RuntimeException("Type not found for " + fieldInfo.getFieldType().getFieldType().name());
+                throw new RuntimeException("Type not found for " + columnInfo.getFieldType().getFieldType().name());
             }
-            sb.append(fieldInfo.getColumnName()).append(" ");
+            sb.append(columnInfo.getColumnName()).append(" ");
             sb.append(dbType);
-            if (fieldInfo.getFieldType().isPrimitive()) {
+            if (columnInfo.getFieldType().isPrimitive()) {
                 sb.append(" NOT NULL");
             }
-            if (i < fields.size() - 1) {
+            if (i < columns.size() - 1) {
                 sb.append(", ");
             }
         }
-        sb.append(getPrimaryKey(fields));
+        sb.append(getPrimaryKey(columns));
         sb.append(")");
         return sb.toString();
     }
@@ -123,9 +123,9 @@ public class PostgresDDLHelper implements DDLHelper {
         }
     }
 
-    private String getPrimaryKey(List<FieldInfo> fields) {
-        Optional<FieldInfo> id = fields.stream().filter(f -> f.getFieldType().isIdentityId()).findFirst();
-        return id.map(f -> ", PRIMARY KEY (" + f.getColumnName() + ")").orElse("");
+    private String getPrimaryKey(List<ColumnInfo> columns) {
+        Optional<ColumnInfo> id = columns.stream().filter(col -> col.getFieldType().isIdentityId()).findFirst();
+        return id.map(col -> ", PRIMARY KEY (" + col.getColumnName() + ")").orElse("");
     }
 
 }

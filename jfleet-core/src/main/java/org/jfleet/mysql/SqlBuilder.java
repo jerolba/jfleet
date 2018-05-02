@@ -22,8 +22,8 @@ import static org.jfleet.mysql.LoadDataConstants.LINE_TERMINATED_CHAR;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 
 public class SqlBuilder {
 
@@ -57,8 +57,9 @@ public class SqlBuilder {
 
     public void addColumnNames() {
         sb.append("(");
-        List<FieldInfo> fields = entityInfo.getFields();
-        sb.append(fields.stream().map(FieldInfo::getColumnName).map(this::scapeName).collect(Collectors.joining(", ")));
+        List<ColumnInfo> columns = entityInfo.getColumns();
+        sb.append(columns.stream().map(ColumnInfo::getColumnName)
+                .map(this::scapeName).collect(Collectors.joining(", ")));
         sb.append(")");
     }
 

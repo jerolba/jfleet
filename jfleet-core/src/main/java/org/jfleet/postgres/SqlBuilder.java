@@ -18,8 +18,8 @@ package org.jfleet.postgres;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 
 public class SqlBuilder {
 
@@ -43,8 +43,8 @@ public class SqlBuilder {
 
     public void addColumnNames() {
         sb.append("(");
-        List<FieldInfo> fields = entityInfo.getNotIdentityField();
-        sb.append(fields.stream().map(FieldInfo::getColumnName).collect(Collectors.joining(", ")));
+        List<ColumnInfo> columns = entityInfo.getNotIdentityColumns();
+        sb.append(columns.stream().map(ColumnInfo::getColumnName).collect(Collectors.joining(", ")));
         sb.append(")");
     }
 

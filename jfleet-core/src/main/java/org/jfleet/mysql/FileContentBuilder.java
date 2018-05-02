@@ -18,13 +18,10 @@ package org.jfleet.mysql;
 import static org.jfleet.mysql.LoadDataConstants.FIELD_TERMINATED_CHAR;
 import static org.jfleet.mysql.LoadDataConstants.LINE_TERMINATED_CHAR;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-import org.jfleet.EntityFieldAccesorFactory;
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.common.DoubleBufferStringContent;
 import org.jfleet.common.StringContent;
 
@@ -32,60 +29,52 @@ public class FileContentBuilder {
 
     private final LoadDataEscaper escaper = new LoadDataEscaper();
     private final MySqlTypeSerializer typeSerializer = new MySqlTypeSerializer();
-    private final List<Function<Object, Object>> accessors = new ArrayList<>();
+    private final List<ColumnInfo> columns;
 
-    private final List<FieldInfo> fields;
-
-    private DoubleBufferStringContent df;
-    private StringContent sc;
+    private DoubleBufferStringContent doubleBuffer;
+    private StringContent stringContent;
 
     public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
-        this.fields = entityInfo.getFields();
-        this.df = new DoubleBufferStringContent(batchSize, concurrent);
-        this.sc = df.next();
-        EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        for (FieldInfo f : fields) {
-            Function<Object, Object> accesor = factory.getAccessor(entityInfo.getEntityClass(), f);
-            accessors.add(accesor);
-        }
-    }
-
-    public void reset() {
-        this.sc = df.next();
+        this.doubleBuffer = new DoubleBufferStringContent(batchSize, concurrent);
+        this.stringContent = doubleBuffer.next();
+        this.columns = entityInfo.getColumns();
     }
 
     public <T> void add(T entity) {
-        for (int i = 0; i < fields.size(); i++) {
-            Function<Object, Object> accessor = accessors.get(i);
-            Object value = accessor.apply(entity);
+        for (int i = 0; i < columns.size(); i++) {
+            ColumnInfo info = columns.get(i);
+            Object value = info.getAccessor().apply(entity);
             if (value != null) {
-                FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
                 String escapedValue = escaper.escapeForLoadFile(valueStr);
-                sc.append(escapedValue);
+                stringContent.append(escapedValue);
             } else {
-                sc.append("\\N");
+                stringContent.append("\\N");
             }
-            sc.append(FIELD_TERMINATED_CHAR);
+            stringContent.append(FIELD_TERMINATED_CHAR);
         }
-        sc.append(LINE_TERMINATED_CHAR);
-        sc.inc();
+        stringContent.append(LINE_TERMINATED_CHAR);
+        stringContent.inc();
+    }
+
+    public void reset() {
+        this.stringContent = doubleBuffer.next();
     }
 
     public boolean isFilled() {
-        return sc.isFilled();
+        return stringContent.isFilled();
     }
 
     public int getContentSize() {
-        return sc.getContentSize();
+        return stringContent.getContentSize();
     }
 
     public int getRecords() {
-        return sc.getRecords();
+        return stringContent.getRecords();
     }
 
     public StringContent getContent() {
-        return sc;
+        return stringContent;
     }
 
 }

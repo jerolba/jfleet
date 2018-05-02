@@ -15,50 +15,35 @@
  */
 package org.jfleet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EntityInfo {
 
-    private Class<?> entityClass;
-    private String tableName;
-    private List<FieldInfo> fields = new ArrayList<>();
+    private final Class<?> entityClass;
+    private final String tableName;
+    private final List<ColumnInfo> columns;
+
+    public EntityInfo(Class<?> entityClass, String tableName, List<ColumnInfo> columns) {
+        this.entityClass = entityClass;
+        this.tableName = tableName;
+        this.columns = columns;
+    }
 
     public Class<?> getEntityClass() {
         return entityClass;
-    }
-
-    public void setEntityClass(Class<?> entityClass) {
-        this.entityClass = entityClass;
     }
 
     public String getTableName() {
         return tableName;
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public List<ColumnInfo> getColumns() {
+        return columns;
     }
 
-    public List<FieldInfo> getFields() {
-        return fields;
-    }
-
-    public void addField(FieldInfo field) {
-        this.fields.add(field);
-    }
-
-    public void addFields(List<FieldInfo> fields) {
-        this.fields.addAll(fields);
-    }
-
-    public FieldInfo findField(String fieldName) {
-        return getFields().stream().filter(f -> f.getFieldName().equals(fieldName)).findFirst().get();
-    }
-
-    public List<FieldInfo> getNotIdentityField() {
-        return getFields().stream().filter(f -> !f.getFieldType().isIdentityId()).collect(Collectors.toList());
+    public List<ColumnInfo> getNotIdentityColumns() {
+        return columns.stream().filter(f -> !f.getFieldType().isIdentityId()).collect(Collectors.toList());
     }
 
 }

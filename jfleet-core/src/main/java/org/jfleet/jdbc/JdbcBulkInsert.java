@@ -33,9 +33,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.EntityFieldAccesorFactory;
+import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.FieldInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.common.TransactionPolicy;
 import org.jfleet.inspection.JpaEntityInspector;
@@ -51,7 +50,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     private final List<Function<Object, Object>> accessors = new ArrayList<>();
     private final List<Function<Object, Object>> preConvert = new ArrayList<>();
 
-    private final List<FieldInfo> fields;
+    private final List<ColumnInfo> columns;
 
     public JdbcBulkInsert(Class<T> clazz) {
         this(new Configuration<>(clazz));
@@ -65,25 +64,23 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
         this.batchSize = config.batchSize;
         this.autocommit = config.autocommit;
-        this.fields = entityInfo.getNotIdentityField();
-        this.insertSql = createInsertQuery(entityInfo.getTableName(), fields);
-        EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
-        Class<?> entityClass = entityInfo.getEntityClass();
-        for (FieldInfo field : fields) {
-            accessors.add(factory.getAccessor(entityClass, field));
+        this.columns = entityInfo.getNotIdentityColumns();
+        this.insertSql = createInsertQuery(entityInfo.getTableName(), columns);
+        for (ColumnInfo column : columns) {
+            accessors.add(column.getAccessor());
         }
         FieldPreConvert fieldPreConvert = new FieldPreConvert();
-        for (FieldInfo field : fields) {
-            preConvert.add(fieldPreConvert.preConvert(field.getFieldType()));
+        for (ColumnInfo column : columns) {
+            preConvert.add(fieldPreConvert.preConvert(column.getFieldType()));
         }
     }
 
-    private String createInsertQuery(String tableName, List<FieldInfo> fields) {
+    private String createInsertQuery(String tableName, List<ColumnInfo> columns) {
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO ").append(tableName).append(" (");
-        sb.append(fields.stream().map(FieldInfo::getColumnName).collect(Collectors.joining(", ")));
+        sb.append(columns.stream().map(ColumnInfo::getColumnName).collect(Collectors.joining(", ")));
         sb.append(") values (");
-        sb.append(fields.stream().map(f -> "?").collect(Collectors.joining(", ")));
+        sb.append(columns.stream().map(f -> "?").collect(Collectors.joining(", ")));
         sb.append(")");
         return sb.toString();
     }
@@ -138,7 +135,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     }
 
     public void setObjectValues(PreparedStatement pstmt, T entity) throws SQLException {
-        for (int i = 0; i < fields.size(); i++) {
+        for (int i = 0; i < columns.size(); i++) {
             Function<Object, Object> accessor = accessors.get(i);
             Object value = accessor.apply(entity);
             Function<Object, Object> f = preConvert.get(i);
