@@ -34,4 +34,14 @@ public class TableHelper {
         }
     };
 
+    public static void createTableDistance(Connection connection) throws SQLException {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS bike_trip_distance");
+            stmt.execute(
+                    "CREATE TABLE bike_trip_distance (id INT NOT NULL AUTO_INCREMENT, tripduration INT NOT NULL, distance DOUBLE, "
+                    + "bike_id BIGINT NOT NULL, user_type VARCHAR(255), "
+                    + "birth_year INT, gender CHAR, PRIMARY KEY (id))");
+        }
+    };
+
 }

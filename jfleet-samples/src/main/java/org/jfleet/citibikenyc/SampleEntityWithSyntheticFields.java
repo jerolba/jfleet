@@ -21,48 +21,42 @@ import java.sql.SQLException;
 import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
 import org.jfleet.JFleetException;
 import org.jfleet.citibikenyc.entities.Trip;
-import org.jfleet.citibikenyc.entities.Trip.Station;
 import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.util.MySqlTestConnectionProvider;
 
 
 /*
- * This example shows how to configure JFleet without javax.persistence annotations
- *
+ * This example shows how to configure JFleet with a synthetic column calculated in persistence
+ * time giving a function which calculates the distance between two coordinates.
  */
-public class SampleEntityInfobuilder {
+public class SampleEntityWithSyntheticFields {
 
     public static void main(String[] args) throws IOException, SQLException {
         Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
         try (Connection connection = connectionSuplier.get()) {
-            TableHelper.createTable(connection);
+            TableHelper.createTableDistance(connection);
             CitiBikeReader<Trip> reader = new CitiBikeReader<>("/tmp", str -> new TripParser(str));
-            
-            EntityInfo entityInfo= new EntityInfoBuilder(Trip.class, "bike_trip")
+
+            EntityInfo entityInfo= new EntityInfoBuilder<>(Trip.class, "bike_trip_distance")
                     .addField("id", "id", true)
                     .addField("tripDuration", "tripduration")
-                    .addField("startTime", "starttime")
-                    .addField("stopTime", "stoptime")
-                    .addField("startStation.id", "start_station_id")
-                    .addField("startStation.name", "start_station_name")
-                    .addField("startStation.latitude", "start_station_latitude")
-                    .addField("startStation.longitude", "start_station_longitude")
-                    .addField("endStation.id", "end_station_id")
-                    .addField("endStation.name", "end_station_name")
-                    .addField("endStation.latitude", "end_station_latitude")
-                    .addField("endStation.longitude", "end_station_longitude")
                     .addField("bikeId", "bike_id")
                     .addField("userType", "user_type")
                     .addField("birthYear", "birth_year")
                     .addField("gender", "gender")
+                    .addColumn("distance", FieldTypeEnum.DOUBLE,
+                            trip -> distance(trip.getStartStation().getLatitude(),
+                                    trip.getStartStation().getLongitude(), trip.getEndStation().getLatitude(),
+                                    trip.getEndStation().getLongitude()))
                     .build();
-            
+
             LoadDataBulkInsert.Configuration<Trip> config = new LoadDataBulkInsert.Configuration<>(entityInfo);
-            
+
             BulkInsert<Trip> bulkInsert = new LoadDataBulkInsert<>(config);
             reader.forEachCsvInZip(trips -> {
                 try {
@@ -73,37 +67,25 @@ public class SampleEntityInfobuilder {
             });
         }
     }
-    
-    private static class TripParser extends CSVParser<Trip> {
 
-        public TripParser(String line) {
-            super(line, 15);
+    public static Double distance(double lat1, double lon1, double lat2, double lon2) {
+
+        final int R = 6371; // Radius of the earth
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        distance = Math.pow(distance, 2);
+
+        double result = Math.sqrt(distance);
+        if (Math.abs(result) < 0.0001) {
+            return null;
         }
-
-        @Override
-        public Trip parse() {
-            Trip trip = new Trip();
-            trip.setTripDuration(nextInteger());
-            trip.setStartTime(nextDate());
-            trip.setStopTime(nextDate());
-            Station start = new Station();
-            start.setId(nextInteger());
-            start.setName(nextString());
-            start.setLatitude(nextDouble());
-            start.setLongitude(nextDouble());
-            trip.setStartStation(start);
-            Station end = new Station();
-            end.setId(nextInteger());
-            end.setName(nextString());
-            end.setLatitude(nextDouble());
-            end.setLongitude(nextDouble());
-            trip.setEndStation(end);
-            trip.setBikeId(nextLong());
-            trip.setUserType(nextString());
-            trip.setBirthYear(nextInteger());
-            trip.setGender(nextChar());
-            return trip;
-        }
-
+        return result;
     }
 }

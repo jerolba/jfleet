@@ -37,7 +37,7 @@ public class SampleStreamDataWithEmbeddedEntities {
         Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
         try (Connection connection = connectionSuplier.get()) {
             TableHelper.createTable(connection);
-            CitiBikeReader<TripEntity> reader = new CitiBikeReader<>("/tmp", str -> new TripParser(str));
+            CitiBikeReader<TripEntity> reader = new CitiBikeReader<>("/tmp", str -> new TripEntityParser(str));
             BulkInsert<TripEntity> bulkInsert = new LoadDataBulkInsert<>(TripEntity.class);
             reader.forEachCsvInZip(trips -> {
                 try {
