@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.EntityFieldAccesorFactory;
-import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.JFleetException;
@@ -49,7 +48,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
     private final long batchSize;
     private final boolean autocommit;
 
-    private final List<EntityFieldAccessor> accessors = new ArrayList<>();
+    private final List<Function<Object, Object>> accessors = new ArrayList<>();
     private final List<Function<Object, Object>> preConvert = new ArrayList<>();
 
     private final List<FieldInfo> fields;
@@ -140,8 +139,8 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     public void setObjectValues(PreparedStatement pstmt, T entity) throws SQLException {
         for (int i = 0; i < fields.size(); i++) {
-            EntityFieldAccessor accessor = accessors.get(i);
-            Object value = accessor.getValue(entity);
+            Function<Object, Object> accessor = accessors.get(i);
+            Object value = accessor.apply(entity);
             Function<Object, Object> f = preConvert.get(i);
             setParameter(pstmt, i + 1, f.apply(value));
         }

@@ -18,6 +18,8 @@ package org.jfleet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.function.Function;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -195,97 +197,99 @@ public class EntityFieldAccesorTest {
 
     @Test
     public void privateFieldOnPublicClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PublicClass.class, fieldFor("privateField"));
-        assertEquals("private", accessor.getValue(instancePublic));
+        Function<Object, Object> accessor = factory.getAccessor(PublicClass.class, fieldFor("privateField"));
+        assertEquals("private", accessor.apply(instancePublic));
     }
 
     @Test
     public void publicFieldOnPublicClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PublicClass.class, fieldFor("publicField"));
-        assertEquals("public", accessor.getValue(instancePublic));
+        Function<Object, Object> accessor = factory.getAccessor(PublicClass.class, fieldFor("publicField"));
+        assertEquals("public", accessor.apply(instancePublic));
     }
 
     @Test
     public void beanFieldOnPublicClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PublicClass.class, fieldFor("beanField"));
-        assertEquals("bean", accessor.getValue(instancePublic));
+        Function<Object, Object> accessor = factory.getAccessor(PublicClass.class, fieldFor("beanField"));
+        assertEquals("bean", accessor.apply(instancePublic));
     }
 
     @Test
     public void privateFieldOnPackageClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PackageClass.class, fieldFor("privateField"));
-        assertEquals("private", accessor.getValue(instancePackage));
+        Function<Object, Object> accessor = factory.getAccessor(PackageClass.class, fieldFor("privateField"));
+        assertEquals("private", accessor.apply(instancePackage));
     }
 
     @Test
     public void publicFieldOnPackageClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PackageClass.class, fieldFor("publicField"));
-        assertEquals("public", accessor.getValue(instancePackage));
+        Function<Object, Object> accessor = factory.getAccessor(PackageClass.class, fieldFor("publicField"));
+        assertEquals("public", accessor.apply(instancePackage));
     }
 
     @Test
     public void beanFieldOnPackageClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PackageClass.class, fieldFor("beanField"));
-        assertEquals("bean", accessor.getValue(instancePackage));
+        Function<Object, Object> accessor = factory.getAccessor(PackageClass.class, fieldFor("beanField"));
+        assertEquals("bean", accessor.apply(instancePackage));
     }
 
     @Test
     public void privateFieldOnPrivateClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PrivateClass.class, fieldFor("privateField"));
-        assertEquals("private", accessor.getValue(instancePrivate));
+        Function<Object, Object> accessor = factory.getAccessor(PrivateClass.class, fieldFor("privateField"));
+        assertEquals("private", accessor.apply(instancePrivate));
     }
 
     @Test
     public void publicFieldOnPrivateClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PrivateClass.class, fieldFor("publicField"));
-        assertEquals("public", accessor.getValue(instancePrivate));
+        Function<Object, Object> accessor = factory.getAccessor(PrivateClass.class, fieldFor("publicField"));
+        assertEquals("public", accessor.apply(instancePrivate));
     }
 
     @Test
     public void beanFieldOnPrivateClassTest() {
-        EntityFieldAccessor accessor = factory.getAccessor(PrivateClass.class, fieldFor("beanField"));
-        assertEquals("bean", accessor.getValue(instancePrivate));
+        Function<Object, Object> accessor = factory.getAccessor(PrivateClass.class, fieldFor("beanField"));
+        assertEquals("bean", accessor.apply(instancePrivate));
     }
 
     @Test
     public void parentFieldOnHierarchy() {
-        EntityFieldAccessor accessor = factory.getAccessor(ChildClass.class, fieldFor("beanField"));
-        assertEquals("bean value", accessor.getValue(instanceChild));
+        Function<Object, Object> accessor = factory.getAccessor(ChildClass.class, fieldFor("beanField"));
+        assertEquals("bean value", accessor.apply(instanceChild));
     }
 
     @Test
     public void parentPublicFieldOnHierarchy() {
-        EntityFieldAccessor accessor = factory.getAccessor(ChildClass.class, fieldFor("publicField"));
-        assertEquals("public one", accessor.getValue(instanceChild));
+        Function<Object, Object> accessor = factory.getAccessor(ChildClass.class, fieldFor("publicField"));
+        assertEquals("public one", accessor.apply(instanceChild));
     }
 
     @Test
     public void childFieldOnHierarchy() {
-        EntityFieldAccessor accessor = factory.getAccessor(ChildClass.class, fieldFor("otherField"));
-        assertEquals(1, accessor.getValue(instanceChild));
+        Function<Object, Object> accessor = factory.getAccessor(ChildClass.class, fieldFor("otherField"));
+        assertEquals(1, accessor.apply(instanceChild));
     }
 
     @Test
     public void composedField() {
-        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneClass.class, fieldFor("reference.privateField"));
-        assertEquals("private", accessor.getValue(intanceManyToOne));
+        Function<Object, Object> accessor = factory.getAccessor(ManyToOneClass.class,
+                fieldFor("reference.privateField"));
+        assertEquals("private", accessor.apply(intanceManyToOne));
     }
 
     @Test
     public void nonExistentField() {
-        EntityFieldAccessor accessor = factory.getAccessor(PublicClass.class, fieldFor("nonExistent"));
+        Function<Object, Object> accessor = factory.getAccessor(PublicClass.class, fieldFor("nonExistent"));
         assertNull(accessor);
     }
 
     @Test
     public void nonExistentComposedField() {
-        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneClass.class, fieldFor("nonExistent.privateField"));
+        Function<Object, Object> accessor = factory.getAccessor(ManyToOneClass.class,
+                fieldFor("nonExistent.privateField"));
         assertNull(accessor);
     }
 
     @Test
     public void nonExistentComposedFieldOnChildClass() {
-        EntityFieldAccessor accessor = factory.getAccessor(ManyToOneChildClass.class,
+        Function<Object, Object> accessor = factory.getAccessor(ManyToOneChildClass.class,
                 fieldFor("nonExistent.privateField"));
         assertNull(accessor);
     }
@@ -295,4 +299,5 @@ public class EntityFieldAccesorTest {
         fi.setFieldName(name);
         return fi;
     }
+
 }

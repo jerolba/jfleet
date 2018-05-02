@@ -15,37 +15,39 @@
  */
 package org.jfleet;
 
-public class ComposedEntityFieldAccessor implements EntityFieldAccessor {
+import java.util.function.Function;
 
-    private static final EntityFieldAccessor IDENTITY = t -> t;
+public class ComposedEntityFieldAccessor implements Function<Object, Object> {
 
-    private final EntityFieldAccessor baseAccessor;
-    private EntityFieldAccessor nextAccessor;
+    private static final Function<Object, Object> IDENTITY = t -> t;
+
+    private final Function<Object, Object> baseAccessor;
+    private Function<Object, Object> nextAccessor;
 
     public ComposedEntityFieldAccessor() {
         this(IDENTITY);
     }
 
-    private ComposedEntityFieldAccessor(EntityFieldAccessor baseAccessor) {
+    private ComposedEntityFieldAccessor(Function<Object, Object> baseAccessor) {
         this.baseAccessor = baseAccessor;
     }
 
     @Override
-    public Object getValue(Object obj) {
-        Object value = baseAccessor.getValue(obj);
+    public Object apply(Object obj) {
+        Object value = baseAccessor.apply(obj);
         if (value != null) {
-            return nextAccessor.getValue(value);
+            return nextAccessor.apply(value);
         }
         return null;
     }
 
-    public ComposedEntityFieldAccessor andThen(EntityFieldAccessor then) {
+    public ComposedEntityFieldAccessor andThenApply(Function<Object, Object> then) {
         ComposedEntityFieldAccessor composed = new ComposedEntityFieldAccessor(then);
         this.nextAccessor = composed;
         return composed;
     }
 
-    public void andFinally(EntityFieldAccessor accessor) {
+    public void andFinally(Function<Object, Object> accessor) {
         this.nextAccessor = accessor;
     }
 

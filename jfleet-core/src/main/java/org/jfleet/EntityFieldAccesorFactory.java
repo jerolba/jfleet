@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class EntityFieldAccesorFactory {
 
     private static Logger logger = LoggerFactory.getLogger(EntityFieldAccesorFactory.class);
 
-    public EntityFieldAccessor getAccessor(Class<?> entityClass, FieldInfo fieldInfo) {
+    public Function<Object, Object> getAccessor(Class<?> entityClass, FieldInfo fieldInfo) {
         String fieldName = fieldInfo.getFieldName();
         if (!fieldName.contains(".")) {
             return getAccessor(entityClass, fieldName);
@@ -41,15 +42,15 @@ public class EntityFieldAccesorFactory {
         return getComposedAccessor(entityClass, fieldName);
     }
 
-    private EntityFieldAccessor getComposedAccessor(Class<?> entityClass, String fieldNameSeq) {
+    private Function<Object, Object> getComposedAccessor(Class<?> entityClass, String fieldNameSeq) {
         String[] fieldSeq = fieldNameSeq.split("\\.");
         ComposedEntityFieldAccessor head = new ComposedEntityFieldAccessor();
         ComposedEntityFieldAccessor composed = head;
         for (int i = 0; i < fieldSeq.length; i++) {
             String fieldName = fieldSeq[i];
-            EntityFieldAccessor accessor = getAccessor(entityClass, fieldName);
+            Function<Object, Object> accessor = getAccessor(entityClass, fieldName);
             if (i < fieldSeq.length - 1) {
-                composed = composed.andThen(accessor);
+                composed = composed.andThenApply(accessor);
                 entityClass = getAccessorTarget(entityClass, fieldName);
                 if (entityClass == null) {
                     return null;
@@ -61,7 +62,7 @@ public class EntityFieldAccesorFactory {
         return head;
     }
 
-    private EntityFieldAccessor getAccessor(Class<?> entityClass, String fieldName) {
+    private Function<Object, Object> getAccessor(Class<?> entityClass, String fieldName) {
         return getAccessorByPublicField(entityClass, fieldName)
                 .orElseGet(() -> getAccessorByPropertyDescriptor(entityClass, fieldName)
                         .orElseGet(() -> getAccessorByPrivateField(entityClass, fieldName).orElse(null)));
@@ -79,7 +80,7 @@ public class EntityFieldAccesorFactory {
         }
     }
 
-    private Optional<EntityFieldAccessor> getAccessorByPropertyDescriptor(Class<?> entityClass, String fieldName) {
+    private Optional<Function<Object, Object>> getAccessorByPropertyDescriptor(Class<?> entityClass, String fieldName) {
         try {
             PropertyDescriptor objPropertyDescriptor = new PropertyDescriptor(fieldName, entityClass);
             Method readMethod = objPropertyDescriptor.getReadMethod();
@@ -88,8 +89,8 @@ public class EntityFieldAccesorFactory {
                 try {
                     return readMethod.invoke(obj);
                 } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-                    logger.error("Can not access to field getter: " + fieldName + " on class "
-                            + entityClass.getName() + ": " + e.getMessage());
+                    logger.error("Can not access to field getter: " + fieldName + " on class " + entityClass.getName()
+                            + ": " + e.getMessage());
                     return null;
                 }
             });
@@ -98,7 +99,7 @@ public class EntityFieldAccesorFactory {
         }
     }
 
-    private Optional<EntityFieldAccessor> getAccessorByPublicField(Class<?> entityClass, String fieldName) {
+    private Optional<Function<Object, Object>> getAccessorByPublicField(Class<?> entityClass, String fieldName) {
         try {
             Field field = entityClass.getField(fieldName);
             if (field.isAccessible()) {
@@ -110,7 +111,7 @@ public class EntityFieldAccesorFactory {
         return Optional.empty();
     }
 
-    private Optional<EntityFieldAccessor> getAccessorByPrivateField(Class<?> entityClass, String fieldName) {
+    private Optional<Function<Object, Object>> getAccessorByPrivateField(Class<?> entityClass, String fieldName) {
         try {
             Field field = entityClass.getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -124,7 +125,7 @@ public class EntityFieldAccesorFactory {
         return Optional.empty();
     }
 
-    private Optional<EntityFieldAccessor> newAccessorByField(Field field) {
+    private Optional<Function<Object, Object>> newAccessorByField(Field field) {
         return Optional.of(obj -> {
             try {
                 return field.get(obj);

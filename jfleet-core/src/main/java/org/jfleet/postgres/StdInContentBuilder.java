@@ -20,9 +20,9 @@ import static org.jfleet.postgres.PgCopyConstants.NEWLINE_CHAR;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.jfleet.EntityFieldAccesorFactory;
-import org.jfleet.EntityFieldAccessor;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
 import org.jfleet.common.DoubleBufferStringContent;
@@ -32,7 +32,7 @@ public class StdInContentBuilder {
 
     private final PgCopyEscaper escaper = new PgCopyEscaper();
     private final PostgresTypeSerializer typeSerializer = new PostgresTypeSerializer();
-    private final List<EntityFieldAccessor> accessors = new ArrayList<>();
+    private final List<Function<Object, Object>> accessors = new ArrayList<>();
 
     private final List<FieldInfo> fields = new ArrayList<>();
 
@@ -55,8 +55,8 @@ public class StdInContentBuilder {
 
     public <T> void add(T entity) {
         for (int i = 0; i < fields.size(); i++) {
-            EntityFieldAccessor accessor = accessors.get(i);
-            Object value = accessor.getValue(entity);
+            Function<Object, Object> accessor = accessors.get(i);
+            Object value = accessor.apply(entity);
             if (value != null) {
                 FieldInfo info = fields.get(i);
                 String valueStr = typeSerializer.toString(value, info.getFieldType());
