@@ -24,11 +24,15 @@ public class EntityFieldType {
 
     private boolean primitive;
     private FieldTypeEnum fieldType;
-    private boolean isIdentityId;
+    private boolean identityId;
 
     public EntityFieldType(FieldTypeEnum fieldType, boolean primitive) {
         this.fieldType = fieldType;
         this.primitive = primitive;
+    }
+
+    public EntityFieldType(FieldTypeEnum fieldType) {
+        this(fieldType, false);
     }
 
     public boolean isPrimitive() {
@@ -48,11 +52,11 @@ public class EntityFieldType {
     }
 
     public boolean isIdentityId() {
-        return isIdentityId;
+        return identityId;
     }
 
-    public void setIdentityId(boolean isIdentityId) {
-        this.isIdentityId = isIdentityId;
+    public void setIdentityId(boolean identityId) {
+        this.identityId = identityId;
     }
 
 }

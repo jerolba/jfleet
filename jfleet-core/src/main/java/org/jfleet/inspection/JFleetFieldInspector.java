@@ -45,14 +45,14 @@ public class JFleetFieldInspector {
 
     private Optional<EntityFieldType> getAnnotatedType(Class<?> javaType) {
         if (javaType.isEnum()) {
-            return Optional.of(new EntityFieldType(getEnumType(field.getAnnotation(JFleetEnumerated.class)), false));
+            return Optional.of(new EntityFieldType(getEnumType(field.getAnnotation(JFleetEnumerated.class))));
         } else if (Date.class.isAssignableFrom(javaType)) {
-            return Optional.of(new EntityFieldType(getDateFieldType(javaType), false));
+            return Optional.of(new EntityFieldType(getDateFieldType()));
         }
         return Optional.empty();
     }
 
-    private FieldTypeEnum getDateFieldType(Class<?> javaType) {
+    private FieldTypeEnum getDateFieldType() {
         JFleetTemporal temporal = field.getAnnotation(JFleetTemporal.class);
         if (temporal != null) {
             JFleetTemporalType temporalType = temporal.value();

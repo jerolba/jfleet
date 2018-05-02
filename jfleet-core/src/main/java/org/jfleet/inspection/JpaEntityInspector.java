@@ -52,9 +52,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.jfleet.EntityFieldType;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
-import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,14 +199,14 @@ public class JpaEntityInspector {
 
         private Optional<EntityFieldType> getAnnotatedType(Class<?> javaType) {
             if (javaType.isEnum()) {
-                return Optional.of(new EntityFieldType(getEnumType(field.getAnnotation(Enumerated.class)), false));
+                return Optional.of(new EntityFieldType(getEnumType(field.getAnnotation(Enumerated.class))));
             } else if (Date.class.isAssignableFrom(javaType)) {
-                return Optional.of(new EntityFieldType(getDateFieldType(javaType), false));
+                return Optional.of(new EntityFieldType(getDateFieldType()));
             }
             return Optional.empty();
         }
 
-        private FieldTypeEnum getDateFieldType(Class<?> javaType) {
+        private FieldTypeEnum getDateFieldType() {
             Temporal temporal = field.getAnnotation(Temporal.class);
             if (temporal != null) {
                 TemporalType temporalType = temporal.value();
