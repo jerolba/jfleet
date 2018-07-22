@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.common;
+package org.jfleet.csv;
 
-import org.jfleet.EntityFieldType;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BOOLEAN;
 
-public interface TypeSerializer {
+import org.jfleet.common.BaseTypeSerializer;
 
-    String toString(Object obj, EntityFieldType entityFieldType);
+public class CsvTypeSerializer extends BaseTypeSerializer {
+
+    public CsvTypeSerializer() {
+        super();
+        add(BOOLEAN, FROM_BOOLEAN);
+    }
+
+    private final Mapper FROM_BOOLEAN = (obj) -> ((Boolean) obj).booleanValue() ? "true" : "false";
 
 }
