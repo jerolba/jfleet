@@ -49,7 +49,7 @@ import java.util.function.Function;
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 
-public class BaseTypeSerializer {
+public class BaseTypeSerializer implements TypeSerializer {
 
     public interface Mapper extends Function<Object, String> {
     }
@@ -93,6 +93,7 @@ public class BaseTypeSerializer {
         mappers.put(type, mapper);
     }
 
+    @Override
     public String toString(Object obj, EntityFieldType entityFieldType) {
         if (obj == null) {
             return null;
