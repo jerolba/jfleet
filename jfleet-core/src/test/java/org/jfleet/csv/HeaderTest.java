@@ -75,7 +75,7 @@ public class HeaderTest {
         CsvWriter<T> writer = new CsvWriter<>(config);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writer.writeAll(baos, collection);
-        return baos.toString(Charset.defaultCharset());
+        return baos.toString(Charset.defaultCharset().name());
     }
 
     @Test
