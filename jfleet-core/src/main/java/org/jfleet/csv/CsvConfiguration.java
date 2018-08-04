@@ -26,7 +26,7 @@ public class CsvConfiguration<T> {
     private EntityInfo entityInfo;
     private Charset charset = Charset.forName("UTF-8");
     private TypeSerializer typeSerializer = new CsvTypeSerializer();
-    private boolean headers = true;
+    private boolean header = true;
     private char fieldSeparator = ',';
     private char textDelimiter = '"';
     private boolean alwaysDelimitText = false;
@@ -34,6 +34,12 @@ public class CsvConfiguration<T> {
 
     public CsvConfiguration(Class<T> clazz) {
         this.clazz = clazz;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public CsvConfiguration(EntityInfo entityInfo) {
+        this.entityInfo = entityInfo;
+        this.clazz = (Class<T>) entityInfo.getEntityClass();
     }
 
     public Class<T> getClazz() {
@@ -52,8 +58,8 @@ public class CsvConfiguration<T> {
         return typeSerializer;
     }
 
-    public boolean isHeaders() {
-        return headers;
+    public boolean isHeader() {
+        return header;
     }
 
     public char getFieldSeparator() {
@@ -78,7 +84,7 @@ public class CsvConfiguration<T> {
         private EntityInfo entityInfo;
         private Charset charset = Charset.forName("UTF-8");
         private TypeSerializer typeSerializer = new CsvTypeSerializer();
-        private boolean headers = true;
+        private boolean header = true;
         private char fieldSeparator = ',';
         private char textDelimiter = '"';
         private boolean alwaysDelimitText = false;
@@ -86,6 +92,12 @@ public class CsvConfiguration<T> {
 
         public Builder(Class<T> clazz) {
             this.clazz = clazz;
+        }
+        
+        @SuppressWarnings("unchecked")
+        public Builder(EntityInfo entityInfo) {
+            this.clazz = (Class<T>) entityInfo.getEntityClass();
+            this.entityInfo = entityInfo;
         }
 
         public Builder<T> entityInfo(EntityInfo entityInfo) {
@@ -103,8 +115,8 @@ public class CsvConfiguration<T> {
             return this;
         }
 
-        public Builder<T> headers(boolean headers) {
-            this.headers = headers;
+        public Builder<T> header(boolean header) {
+            this.header = header;
             return this;
         }
 
@@ -133,7 +145,7 @@ public class CsvConfiguration<T> {
             config.entityInfo = entityInfo;
             config.charset = charset;
             config.typeSerializer = typeSerializer;
-            config.headers = headers;
+            config.header = header;
             config.fieldSeparator = fieldSeparator;
             config.textDelimiter = textDelimiter;
             config.alwaysDelimitText = alwaysDelimitText;

@@ -57,13 +57,13 @@ public class CsvWriter<T> {
         return new JpaEntityInspector(config.getClazz()).inspect();
     }
 
-    public void writeAll(OutputStream conn, Collection<T> collection) throws IOException {
-        writeAll(conn, collection.stream());
+    public void writeAll(OutputStream output, Collection<T> collection) throws IOException {
+        writeAll(output, collection.stream());
     }
 
-    public void writeAll(OutputStream conn, Stream<T> stream) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(conn, config.getCharset()));
-        if (config.isHeaders()) {
+    public void writeAll(OutputStream output, Stream<T> stream) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, config.getCharset()));
+        if (config.isHeader()) {
             writeHeader(writer, columns);
         }
         Iterator<T> iterator = stream.iterator();
