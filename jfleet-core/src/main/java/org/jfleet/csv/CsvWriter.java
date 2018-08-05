@@ -48,7 +48,7 @@ public class CsvWriter<T> {
         this.csvEscaper = new CsvEscaper(config);
         this.emptyText = Character.toString(config.getTextDelimiter()) + config.getTextDelimiter();
     }
-    
+
     private EntityInfo getEntityInfo(CsvConfiguration<T> config) {
         EntityInfo entityInfo = config.getEntityInfo();
         if (entityInfo != null) {

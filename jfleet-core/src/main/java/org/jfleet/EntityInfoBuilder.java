@@ -50,7 +50,7 @@ public class EntityInfoBuilder<T> {
         String columnName = fieldPath.toLowerCase().replaceAll("\\.", "_");
         return addField(fieldPath, columnName, false);
     }
-    
+
     public EntityInfoBuilder<T> addFields(String ...fieldPaths) {
         for (String fieldPath : fieldPaths) {
             addField(fieldPath);

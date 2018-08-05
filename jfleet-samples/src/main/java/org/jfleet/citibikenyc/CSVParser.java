@@ -25,7 +25,7 @@ import org.jfleet.util.CsvSplit;
 public abstract class CSVParser<T> {
 
     private final SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-M-d HH:mm:ss");
-    private final SimpleDateFormat sdf2 = new SimpleDateFormat("M/d/yyyy H:mm");
+    private final SimpleDateFormat sdf2 = new SimpleDateFormat("M/d/yyyy HH:mm:ss");
 
     private int col = 0;
     private final String[] cols;

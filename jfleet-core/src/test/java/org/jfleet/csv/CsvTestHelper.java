@@ -33,13 +33,13 @@ public class CsvTestHelper {
     }
 
     @SafeVarargs
-    public static <T> String writeCsvToString(CsvConfiguration<T> config, T ...collection) throws IOException {
+    public static <T> String writeCsvToString(CsvConfiguration<T> config, T... collection) throws IOException {
         return writeCsvToString(config, Arrays.asList(collection));
     }
-    
+
     public static EntityInfoBuilder<SomeEntity> createBuilderForSomeEntity() {
         EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class);
-        entityBuilder.addFields("name","age");
+        entityBuilder.addFields("name", "age");
         return entityBuilder;
     }
 

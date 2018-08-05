@@ -362,12 +362,12 @@ public class EntityInfoBuilderTest {
         private String city_name;
         private City city;
 
-        public String getCity_name() {
+        public String getCityName() {
             return city_name;
         }
 
-        public void setCity_name(String city_name) {
-            this.city_name = city_name;
+        public void setCityName(String cityName) {
+            this.city_name = cityName;
         }
 
         public City getCity() {

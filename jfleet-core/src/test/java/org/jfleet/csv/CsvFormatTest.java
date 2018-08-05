@@ -59,7 +59,7 @@ public class CsvFormatTest {
     @Test
     public void mandatoryTextDelimiterUsedTest() throws IOException {
         config.textDelimiter('\'').alwaysDelimitText(true);
-        String result = writeCsvToString(config.build(), 
+        String result = writeCsvToString(config.build(),
                 new SomeEntity("John 'Smith'", 10),
                 new SomeEntity("Amanda", 20));
         assertEquals("'name','age'\n'John ''Smith''','10'\n'Amanda','20'\n", result);

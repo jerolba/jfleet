@@ -35,7 +35,7 @@ public class CsvConfiguration<T> {
     public CsvConfiguration(Class<T> clazz) {
         this.clazz = clazz;
     }
-    
+
     @SuppressWarnings("unchecked")
     public CsvConfiguration(EntityInfo entityInfo) {
         this.entityInfo = entityInfo;
@@ -93,7 +93,7 @@ public class CsvConfiguration<T> {
         public Builder(Class<T> clazz) {
             this.clazz = clazz;
         }
-        
+
         @SuppressWarnings("unchecked")
         public Builder(EntityInfo entityInfo) {
             this.clazz = (Class<T>) entityInfo.getEntityClass();
