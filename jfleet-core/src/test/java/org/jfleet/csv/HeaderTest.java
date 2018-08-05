@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
@@ -38,18 +40,21 @@ public class HeaderTest {
         }
 
     }
-    
+
     @Entity
     public class AnnotatedEntity {
 
-        @Column(name="title")
+        @Column(name = "title")
         private String name;
-        @Column(name="duration")
+        @Column(name = "duration")
         private int age;
+        @Embedded
+        private Address address;
 
-        public AnnotatedEntity(String name, int age) {
+        public AnnotatedEntity(String name, int age, Address address) {
             this.name = name;
             this.age = age;
+            this.address = address;
         }
 
         public String getName() {
@@ -60,9 +65,40 @@ public class HeaderTest {
             return age;
         }
 
+        public Address getAddress() {
+            return address;
+        }
     }
-    
-    
+
+    @Embeddable
+    public class Address {
+
+        private String street;
+
+        private String city;
+
+        public Address(String street, String city) {
+            this.street = street;
+            this.city = city;
+        }
+
+        public String getStreet() {
+            return street;
+        }
+
+        public void setStreet(String street) {
+            this.street = street;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.city = city;
+        }
+
+    }
 
     private EntityInfoBuilder<SomeEntity> createBuilderForSomeEntity() {
         EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
@@ -70,7 +106,7 @@ public class HeaderTest {
         entityBuilder.addColumn("age", FieldTypeEnum.INT, SomeEntity::getAge);
         return entityBuilder;
     }
-    
+
     private <T> String writeCsvToString(CsvConfiguration<T> config, List<T> collection) throws IOException {
         CsvWriter<T> writer = new CsvWriter<>(config);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -107,7 +143,7 @@ public class HeaderTest {
         String result = writeCsvToString(config.build(), Arrays.asList(new SomeEntity("John", 10)));
         assertEquals("John,10\n", result);
     }
-    
+
     @Test
     public void columnsMantainsDeclaredOrder() throws IOException {
         EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
@@ -117,14 +153,13 @@ public class HeaderTest {
         String result = writeCsvToString(config, Arrays.asList(new SomeEntity("John", 10)));
         assertEquals("age,name\n10,John\n", result);
     }
-    
-    
+
     @Test
     public void columnsMantainsDeclaredOrderInClass() throws IOException {
         CsvConfiguration<AnnotatedEntity> config = new CsvConfiguration<>(AnnotatedEntity.class);
-        String result = writeCsvToString(config, Arrays.asList(new AnnotatedEntity("John", 10)));
-        assertEquals("title,duration\nJohn,10\n", result);
+        Address address = new Address("221B Baker Street", "London");
+        String result = writeCsvToString(config, Arrays.asList(new AnnotatedEntity("Sherlock", 63, address)));
+        assertEquals("title,duration,street,city\nSherlock,63,221B Baker Street,London\n", result);
     }
 
-    
 }
