@@ -17,6 +17,7 @@ package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -354,6 +355,46 @@ public class EntityInfoBuilderTest {
         assertEquals(FieldTypeEnum.STRING, column.getFieldType().getFieldType());
         assertFalse(column.getFieldType().isPrimitive());
         assertEquals(value, column.getAccessor().apply(simple));
+    }
+
+    public static class Collision {
+
+        private String city_name;
+        private City city;
+
+        public String getCity_name() {
+            return city_name;
+        }
+
+        public void setCity_name(String city_name) {
+            this.city_name = city_name;
+        }
+
+        public City getCity() {
+            return city;
+        }
+
+        public void setCity(City city) {
+            this.city = city;
+        }
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void childColumnNamesCanCollision() {
+        EntityInfoBuilder<Collision> builder = new EntityInfoBuilder<>(Collision.class, "collision_entity");
+        builder.addField("city_name");
+        builder.addField("city.name");
+    }
+
+    public void childColumnNamesCollisionMustBeDisambiguated() {
+        EntityInfoBuilder<Collision> builder = new EntityInfoBuilder<>(Collision.class, "collision_entity");
+        builder.addField("city_name", "city_name_main");
+        builder.addField("city.name");
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        assertNotNull(entityInfo.findColumn("city_name_main"));
+        assertNotNull(entityInfo.findColumn("city_name"));
     }
 
     private class EntityInfoHelper {
