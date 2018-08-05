@@ -1,13 +1,26 @@
+/**
+ * Copyright 2017 Jerónimo López Bezanilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jfleet.csv;
 
+import static org.jfleet.csv.CsvTestHelper.createBuilderForSomeEntity;
+import static org.jfleet.csv.CsvTestHelper.writeCsvToString;
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -20,26 +33,6 @@ import org.jfleet.csv.CsvConfiguration.Builder;
 import org.junit.Test;
 
 public class HeaderTest {
-
-    public class SomeEntity {
-
-        private String name;
-        private int age;
-
-        public SomeEntity(String name, int age) {
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-    }
 
     @Entity
     public class AnnotatedEntity {
@@ -118,7 +111,7 @@ public class HeaderTest {
     @Test
     public void elementIsAfterHeader() throws IOException {
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(createBuilderForSomeEntity().build());
-        String result = writeCsvToString(config, Arrays.asList(new SomeEntity("John", 10)));
+        String result = writeCsvToString(config, new SomeEntity("John", 10));
         assertEquals("name,age\nJohn,10\n", result);
     }
 
@@ -126,17 +119,17 @@ public class HeaderTest {
     public void elementWithoutHeaderIsAlone() throws IOException {
         Builder<SomeEntity> config = new Builder<>(createBuilderForSomeEntity().build());
         config.header(false);
-        String result = writeCsvToString(config.build(), Arrays.asList(new SomeEntity("John", 10)));
+        String result = writeCsvToString(config.build(), new SomeEntity("John", 10));
         assertEquals("John,10\n", result);
     }
 
     @Test
     public void columnsMantainsDeclaredOrder() throws IOException {
-        EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
+        EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class);
         entityBuilder.addColumn("age", FieldTypeEnum.INT, SomeEntity::getAge);
         entityBuilder.addColumn("name", FieldTypeEnum.STRING, SomeEntity::getName);
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(entityBuilder.build());
-        String result = writeCsvToString(config, Arrays.asList(new SomeEntity("John", 10)));
+        String result = writeCsvToString(config, new SomeEntity("John", 10));
         assertEquals("age,name\n10,John\n", result);
     }
 
@@ -144,22 +137,8 @@ public class HeaderTest {
     public void columnsMantainsDeclaredOrderInClass() throws IOException {
         CsvConfiguration<AnnotatedEntity> config = new CsvConfiguration<>(AnnotatedEntity.class);
         Address address = new Address("221B Baker Street", "London");
-        String result = writeCsvToString(config, Arrays.asList(new AnnotatedEntity("Sherlock", 63, address)));
+        String result = writeCsvToString(config, new AnnotatedEntity("Sherlock", 63, address));
         assertEquals("title,duration,street,city\nSherlock,63,221B Baker Street,London\n", result);
-    }
-
-    private EntityInfoBuilder<SomeEntity> createBuilderForSomeEntity() {
-        EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
-        entityBuilder.addColumn("name", FieldTypeEnum.STRING, SomeEntity::getName);
-        entityBuilder.addColumn("age", FieldTypeEnum.INT, SomeEntity::getAge);
-        return entityBuilder;
-    }
-
-    private <T> String writeCsvToString(CsvConfiguration<T> config, List<T> collection) throws IOException {
-        CsvWriter<T> writer = new CsvWriter<>(config);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writer.writeAll(baos, collection);
-        return baos.toString(Charset.defaultCharset().name());
     }
 
 }
