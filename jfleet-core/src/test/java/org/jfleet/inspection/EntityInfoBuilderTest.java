@@ -225,6 +225,21 @@ public class EntityInfoBuilderTest {
     }
 
     @Test
+    public void testAddMultipleFields() {
+        EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
+        builder.addFields("name", "birthDay");
+        EntityInfoHelper entityInfo = new EntityInfoHelper(builder);
+
+        ColumnInfo columnName = entityInfo.findColumn("name");
+        assertEquals("name", columnName.getColumnName());
+        assertEquals(simple.getName(), columnName.getAccessor().apply(simple));
+
+        ColumnInfo columnBirthday = entityInfo.findColumn("birthday");
+        assertEquals("birthday", columnBirthday.getColumnName());
+        assertEquals(simple.getBirthDay(), columnBirthday.getAccessor().apply(simple));
+    }
+
+    @Test
     public void testImplicitColumnNameComposed() {
         EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
         builder.addField("city.name");
