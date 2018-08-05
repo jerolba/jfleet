@@ -100,20 +100,6 @@ public class HeaderTest {
 
     }
 
-    private EntityInfoBuilder<SomeEntity> createBuilderForSomeEntity() {
-        EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
-        entityBuilder.addColumn("name", FieldTypeEnum.STRING, SomeEntity::getName);
-        entityBuilder.addColumn("age", FieldTypeEnum.INT, SomeEntity::getAge);
-        return entityBuilder;
-    }
-
-    private <T> String writeCsvToString(CsvConfiguration<T> config, List<T> collection) throws IOException {
-        CsvWriter<T> writer = new CsvWriter<>(config);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writer.writeAll(baos, collection);
-        return baos.toString(Charset.defaultCharset().name());
-    }
-
     @Test
     public void emptyCollectionOnlyGeneratesHeader() throws IOException {
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(createBuilderForSomeEntity().build());
@@ -160,6 +146,20 @@ public class HeaderTest {
         Address address = new Address("221B Baker Street", "London");
         String result = writeCsvToString(config, Arrays.asList(new AnnotatedEntity("Sherlock", 63, address)));
         assertEquals("title,duration,street,city\nSherlock,63,221B Baker Street,London\n", result);
+    }
+
+    private EntityInfoBuilder<SomeEntity> createBuilderForSomeEntity() {
+        EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class, "");
+        entityBuilder.addColumn("name", FieldTypeEnum.STRING, SomeEntity::getName);
+        entityBuilder.addColumn("age", FieldTypeEnum.INT, SomeEntity::getAge);
+        return entityBuilder;
+    }
+
+    private <T> String writeCsvToString(CsvConfiguration<T> config, List<T> collection) throws IOException {
+        CsvWriter<T> writer = new CsvWriter<>(config);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        writer.writeAll(baos, collection);
+        return baos.toString(Charset.defaultCharset().name());
     }
 
 }
