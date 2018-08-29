@@ -33,7 +33,7 @@ import org.jfleet.util.MySqlTestConnectionProvider;
  * This example shows how to configure JFleet without javax.persistence annotations
  *
  */
-public class SampleEntityInfoBuilder {
+public class SampleEntityAnnotationLess {
 
     public static void main(String[] args) throws IOException, SQLException {
         Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
