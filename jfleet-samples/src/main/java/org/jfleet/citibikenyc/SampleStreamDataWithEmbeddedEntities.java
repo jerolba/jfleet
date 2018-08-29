@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
+import org.jfleet.citibikenyc.entities.StationEmbedded;
 import org.jfleet.citibikenyc.entities.TripEntity;
 import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.util.MySqlTestConnectionProvider;
@@ -47,5 +48,38 @@ public class SampleStreamDataWithEmbeddedEntities {
                 }
             });
         }
+    }
+
+    public static class TripEntityParser extends CSVParser<TripEntity> {
+
+        public TripEntityParser(String line) {
+            super(line, 15);
+        }
+
+        @Override
+        public TripEntity parse() {
+            TripEntity trip = new TripEntity();
+            trip.setTripduration(nextInteger());
+            trip.setStarttime(nextDate());
+            trip.setStoptime(nextDate());
+            StationEmbedded startStation = new StationEmbedded();
+            startStation.setStationId(nextInteger());
+            startStation.setStationName(nextString());
+            startStation.setStationLatitude(nextDouble());
+            startStation.setStationLongitude(nextDouble());
+            trip.setStartStation(startStation);
+            StationEmbedded endStation = new StationEmbedded();
+            endStation.setStationId(nextInteger());
+            endStation.setStationName(nextString());
+            endStation.setStationLatitude(nextDouble());
+            endStation.setStationLongitude(nextDouble());
+            trip.setEndStation(endStation);
+            trip.setBikeId(nextLong());
+            trip.setUserType(nextString());
+            trip.setBirthYear(nextInteger());
+            trip.setGender(nextChar());
+            return trip;
+        }
+
     }
 }

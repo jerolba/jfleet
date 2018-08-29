@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.citibikenyc;
+package org.jfleet.citibikenyc.csv;
 
-import org.jfleet.citibikenyc.entities.Trip;
-import org.jfleet.citibikenyc.entities.Trip.Station;
+import org.jfleet.citibikenyc.CSVParser;
 
-class TripParser extends CSVParser<Trip> {
+public class TripParser extends CSVParser<Trip> {
 
     public TripParser(String line) {
         super(line, 15);
@@ -27,21 +26,17 @@ class TripParser extends CSVParser<Trip> {
     @Override
     public Trip parse() {
         Trip trip = new Trip();
-        trip.setTripDuration(nextInteger());
-        trip.setStartTime(nextDate());
-        trip.setStopTime(nextDate());
-        Station start = new Station();
-        start.setId(nextInteger());
-        start.setName(nextString());
-        start.setLatitude(nextDouble());
-        start.setLongitude(nextDouble());
-        trip.setStartStation(start);
-        Station end = new Station();
-        end.setId(nextInteger());
-        end.setName(nextString());
-        end.setLatitude(nextDouble());
-        end.setLongitude(nextDouble());
-        trip.setEndStation(end);
+        trip.setTripduration(nextInteger());
+        trip.setStarttime(nextDate());
+        trip.setStoptime(nextDate());
+        trip.setStartStationId(nextInteger());
+        trip.setStartStationName(nextString());
+        trip.setStartStationLatitude(nextDouble());
+        trip.setStartStationLongitude(nextDouble());
+        trip.setEndStationId(nextInteger());
+        trip.setEndStationName(nextString());
+        trip.setEndStationLatitude(nextDouble());
+        trip.setEndStationLongitude(nextDouble());
         trip.setBikeId(nextLong());
         trip.setUserType(nextString());
         trip.setBirthYear(nextInteger());

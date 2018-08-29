@@ -34,6 +34,10 @@ public class EntityInfoBuilder<T> {
     private final List<ColumnInfo> columns = new ArrayList<>();
     private final EntityFieldAccesorFactory accesorFactory = new EntityFieldAccesorFactory();
 
+    public EntityInfoBuilder(Class<T> entityClass) {
+        this(entityClass, null);
+    }
+
     public EntityInfoBuilder(Class<T> entityClass, String tableName) {
         this.entityInspector = new JFleetEntityInspector(entityClass);
         this.entityClass = entityClass;
@@ -42,10 +46,16 @@ public class EntityInfoBuilder<T> {
 
     // Information by fieldPath is automatically inspected by reflection finding the
     // field accessed
-
     public EntityInfoBuilder<T> addField(String fieldPath) {
         String columnName = fieldPath.toLowerCase().replaceAll("\\.", "_");
         return addField(fieldPath, columnName, false);
+    }
+
+    public EntityInfoBuilder<T> addFields(String ...fieldPaths) {
+        for (String fieldPath : fieldPaths) {
+            addField(fieldPath);
+        }
+        return this;
     }
 
     public EntityInfoBuilder<T> addField(String fieldPath, String columnName) {
@@ -84,7 +94,6 @@ public class EntityInfoBuilder<T> {
 
     // Information by accessor is not linked to a field and can not extract return
     // type by reflection because of type erasure
-
     public EntityInfoBuilder<T> addColumn(String columnName, FieldTypeEnum fieldTypeEnum,
             Function<T, Object> accessor) {
         return addColumn(columnName, fieldTypeEnum, false, accessor);
@@ -119,7 +128,7 @@ public class EntityInfoBuilder<T> {
     }
 
     public EntityInfo build() {
-        return  new EntityInfo(entityClass, tableName, columns);
+        return new EntityInfo(entityClass, tableName, columns);
     }
 
 }
