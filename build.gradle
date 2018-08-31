@@ -8,7 +8,6 @@ allprojects {
     header rootProject.file("config/HEADER")
     exclude "**/*.properties"
     exclude "**/*.txt"
-    exclude "**/PersistenceUnitInfoImpl.java"
     exclude "**/ReaderInputStream.java"
   }
   
