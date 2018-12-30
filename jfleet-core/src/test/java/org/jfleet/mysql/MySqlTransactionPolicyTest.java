@@ -15,6 +15,7 @@
  */
 package org.jfleet.mysql;
 
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithForeignKeyError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithMultipleConstraintsErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
