@@ -52,6 +52,7 @@ import javax.persistence.Transient;
 
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,11 +117,7 @@ public class JpaFieldsInspector {
                 return entityToOneInspector.getFields();
             }
 
-            FieldInfo fieldInfo = new FieldInfo();
-            fieldInfo.setColumnName(getColumnName());
-            fieldInfo.setFieldName(field.getName());
-            fieldInfo.setFieldType(getFieldType());
-            return asList(fieldInfo);
+            return asList(new FieldInfo(field.getName(), getColumnName(), getFieldType()));
         }
 
         private String getColumnName() {

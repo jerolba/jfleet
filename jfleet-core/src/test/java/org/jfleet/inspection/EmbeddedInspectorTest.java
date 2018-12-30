@@ -17,6 +17,7 @@ package org.jfleet.inspection;
 
 import static org.junit.Assert.assertEquals;
 
+import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;

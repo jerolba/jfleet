@@ -22,7 +22,6 @@ import java.util.function.Function;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.inspection.EntityFieldAccesorFactory;
-import org.jfleet.inspection.FieldInfo;
 import org.jfleet.inspection.JFleetEntityInspector;
 
 public class EntityInfoBuilder<T> {
@@ -51,7 +50,7 @@ public class EntityInfoBuilder<T> {
         return addField(fieldPath, columnName, false);
     }
 
-    public EntityInfoBuilder<T> addFields(String ...fieldPaths) {
+    public EntityInfoBuilder<T> addFields(String... fieldPaths) {
         for (String fieldPath : fieldPaths) {
             addField(fieldPath);
         }
@@ -79,16 +78,13 @@ public class EntityInfoBuilder<T> {
 
     public EntityInfoBuilder<T> addField(String fieldPath, String columnName, EntityFieldType fieldType,
             boolean identityId) {
-        FieldInfo field = new FieldInfo();
-        field.setFieldName(fieldPath);
-        field.setColumnName(columnName);
-        field.setFieldType(new EntityFieldType(fieldType.getFieldType(), fieldType.isPrimitive(), identityId));
-        return addField(field);
+        EntityFieldType type = new EntityFieldType(fieldType.getFieldType(), fieldType.isPrimitive(), identityId);
+        return addField(new FieldInfo(fieldPath, columnName, type));
     }
 
     public EntityInfoBuilder<T> addField(FieldInfo fieldInfo) {
         validate(fieldInfo.getColumnName());
-        Function<Object, Object> accessor = accesorFactory.getAccessor(entityClass, fieldInfo);
+        Function<Object, Object> accessor = accesorFactory.getAccessor(entityClass, fieldInfo.getFieldName());
         return addColumn(new ColumnInfo(fieldInfo.getColumnName(), fieldInfo.getFieldType(), accessor));
     }
 

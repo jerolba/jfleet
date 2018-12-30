@@ -31,6 +31,7 @@ import javax.persistence.Table;
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
+import org.jfleet.FieldInfo;
 import org.junit.Test;
 
 public class EntityInspectorTest {

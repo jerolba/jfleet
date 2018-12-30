@@ -43,24 +43,18 @@ public class EmbeddedEntityFieldAccesorTest {
 
     @Test
     public void mainFieldAccessTest() {
-        Function<Object, Object> accessorId = factory.getAccessor(Person.class, fieldFor("id"));
+        Function<Object, Object> accessorId = factory.getAccessor(Person.class, "id");
         assertEquals(1L, accessorId.apply(person));
-        Function<Object, Object> accessorName = factory.getAccessor(Person.class, fieldFor("name"));
+        Function<Object, Object> accessorName = factory.getAccessor(Person.class, "name");
         assertEquals("Sherlock Holmes", accessorName.apply(person));
     }
 
     @Test
     public void embeddedFieldAccessTest() {
-        Function<Object, Object> accessorStreet = factory.getAccessor(Person.class, fieldFor("address.street"));
+        Function<Object, Object> accessorStreet = factory.getAccessor(Person.class, "address.street");
         assertEquals("221b Baker St", accessorStreet.apply(person));
-        Function<Object, Object> accessorCity = factory.getAccessor(Person.class, fieldFor("address.city"));
+        Function<Object, Object> accessorCity = factory.getAccessor(Person.class, "address.city");
         assertEquals("London", accessorCity.apply(person));
-    }
-
-    private FieldInfo fieldFor(String name) {
-        FieldInfo fi = new FieldInfo();
-        fi.setFieldName(name);
-        return fi;
     }
 
 }

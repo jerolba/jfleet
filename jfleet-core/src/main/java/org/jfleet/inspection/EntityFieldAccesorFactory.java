@@ -34,12 +34,11 @@ public class EntityFieldAccesorFactory {
 
     private static Logger logger = LoggerFactory.getLogger(EntityFieldAccesorFactory.class);
 
-    public Function<Object, Object> getAccessor(Class<?> entityClass, FieldInfo fieldInfo) {
-        String fieldName = fieldInfo.getFieldName();
-        if (!fieldName.contains(".")) {
-            return getAccessor(entityClass, fieldName);
+    public Function<Object, Object> getAccessor(Class<?> entityClass, String fieldPath) {
+        if (!fieldPath.contains(".")) {
+            return getFieldAccessor(entityClass, fieldPath);
         }
-        return getComposedAccessor(entityClass, fieldName);
+        return getComposedAccessor(entityClass, fieldPath);
     }
 
     private Function<Object, Object> getComposedAccessor(Class<?> entityClass, String fieldNameSeq) {
@@ -48,7 +47,7 @@ public class EntityFieldAccesorFactory {
         ComposedEntityFieldAccessor composed = head;
         for (int i = 0; i < fieldSeq.length; i++) {
             String fieldName = fieldSeq[i];
-            Function<Object, Object> accessor = getAccessor(entityClass, fieldName);
+            Function<Object, Object> accessor = getFieldAccessor(entityClass, fieldName);
             if (i < fieldSeq.length - 1) {
                 composed = composed.andThenApply(accessor);
                 entityClass = getAccessorTarget(entityClass, fieldName);
@@ -62,7 +61,7 @@ public class EntityFieldAccesorFactory {
         return head;
     }
 
-    private Function<Object, Object> getAccessor(Class<?> entityClass, String fieldName) {
+    private Function<Object, Object> getFieldAccessor(Class<?> entityClass, String fieldName) {
         return getAccessorByPublicField(entityClass, fieldName)
                 .orElseGet(() -> getAccessorByPropertyDescriptor(entityClass, fieldName)
                         .orElseGet(() -> getAccessorByPrivateField(entityClass, fieldName).orElse(null)));
