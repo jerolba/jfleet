@@ -18,9 +18,10 @@ package org.jfleet.mysql;
 import java.nio.charset.Charset;
 
 import org.jfleet.EntityInfo;
+import org.jfleet.common.JFleetBatchConfig;
 import org.jfleet.inspection.JpaEntityInspector;
 
-public class LoadDataConfiguration {
+public class LoadDataConfiguration implements JFleetBatchConfig {
 
     private EntityInfo entityInfo;
     private Charset encoding;
@@ -29,6 +30,7 @@ public class LoadDataConfiguration {
     private boolean concurrent;
     private boolean errorOnMissingRow;
 
+    @Override
     public EntityInfo getEntityInfo() {
         return entityInfo;
     }
@@ -37,14 +39,17 @@ public class LoadDataConfiguration {
         return encoding;
     }
 
+    @Override
     public int getBatchSize() {
         return batchSize;
     }
 
+    @Override
     public boolean isAutocommit() {
         return autocommit;
     }
 
+    @Override
     public boolean isConcurrent() {
         return concurrent;
     }

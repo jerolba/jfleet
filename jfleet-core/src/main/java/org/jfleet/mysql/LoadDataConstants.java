@@ -15,7 +15,7 @@
  */
 package org.jfleet.mysql;
 
-public class LoadDataConstants {
+class LoadDataConstants {
 
     public static final char ESCAPED_BY_CHAR = '\\';
     public static final char LINE_TERMINATED_CHAR = '\n';

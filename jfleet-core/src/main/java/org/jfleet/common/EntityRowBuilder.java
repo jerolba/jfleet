@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.common;
 
-import org.jfleet.common.BaseTypeSerializer;
+public interface EntityRowBuilder {
 
-class MySqlTypeSerializer extends BaseTypeSerializer {
-
+    <T> void add(StringContent stringContent, T entity);
 }

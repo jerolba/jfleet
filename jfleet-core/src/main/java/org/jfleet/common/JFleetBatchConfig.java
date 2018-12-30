@@ -13,10 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.common;
 
-import org.jfleet.common.BaseTypeSerializer;
+import org.jfleet.EntityInfo;
 
-class MySqlTypeSerializer extends BaseTypeSerializer {
+public interface JFleetBatchConfig {
 
+    EntityInfo getEntityInfo();
+
+    int getBatchSize();
+
+    boolean isAutocommit();
+
+    boolean isConcurrent();
 }

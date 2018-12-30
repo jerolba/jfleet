@@ -15,7 +15,7 @@
  */
 package org.jfleet.postgres;
 
-public class PgCopyEscaper {
+class PgCopyEscaper {
 
     public String escapeForStdIn(String text) {
         if (text == null) {

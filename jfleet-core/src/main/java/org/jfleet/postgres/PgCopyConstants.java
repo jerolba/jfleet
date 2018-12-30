@@ -15,7 +15,7 @@
  */
 package org.jfleet.postgres;
 
-public class PgCopyConstants {
+class PgCopyConstants {
 
     public static final char ESCAPE_CHAR = '\\';
     public static final char NEWLINE_CHAR = '\n';

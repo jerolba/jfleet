@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.mysql.jdbc.ResultsetInspector;
 import com.mysql.jdbc.Statement;
 
-public class LoadDataContentWriter implements ContentWriter {
+class LoadDataContentWriter implements ContentWriter {
 
     private static Logger logger = LoggerFactory.getLogger(LoadDataContentWriter.class);
 
@@ -38,8 +38,7 @@ public class LoadDataContentWriter implements ContentWriter {
     private final String mainSql;
     private final Charset charset;
 
-    public LoadDataContentWriter(Statement statement, MySqlTransactionPolicy txPolicy, String mainSql,
-            Charset charset) {
+    LoadDataContentWriter(Statement statement, MySqlTransactionPolicy txPolicy, String mainSql, Charset charset) {
         this.statement = statement;
         this.txPolicy = txPolicy;
         this.mainSql = mainSql;

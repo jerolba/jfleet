@@ -22,20 +22,21 @@ import java.util.List;
 
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.common.DoubleBufferStringContentBuilder;
+import org.jfleet.common.EntityRowBuilder;
+import org.jfleet.common.StringContent;
 
-public class StdInContentBuilder extends DoubleBufferStringContentBuilder {
+class PgCopyRowBuilder implements EntityRowBuilder {
 
     private final PgCopyEscaper escaper = new PgCopyEscaper();
     private final PostgresTypeSerializer typeSerializer = new PostgresTypeSerializer();
     private final List<ColumnInfo> columns;
 
-    public StdInContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
-        super(batchSize, concurrent);
+    PgCopyRowBuilder(EntityInfo entityInfo) {
         this.columns = entityInfo.getNotIdentityColumns();
     }
 
-    public <T> void add(T entity) {
+    @Override
+    public <T> void add(StringContent stringContent, T entity) {
         for (int i = 0; i < columns.size(); i++) {
             ColumnInfo info = columns.get(i);
             Object value = info.getAccessor().apply(entity);
@@ -51,7 +52,6 @@ public class StdInContentBuilder extends DoubleBufferStringContentBuilder {
             }
         }
         stringContent.append(NEWLINE_CHAR);
-        stringContent.inc();
     }
 
 }

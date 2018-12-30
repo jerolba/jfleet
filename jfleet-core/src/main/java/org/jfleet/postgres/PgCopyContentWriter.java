@@ -28,7 +28,7 @@ import org.postgresql.copy.CopyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PgCopyContentWriter implements ContentWriter {
+class PgCopyContentWriter implements ContentWriter {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyContentWriter.class);
 
@@ -36,7 +36,7 @@ public class PgCopyContentWriter implements ContentWriter {
     private final CopyManager copyManager;
     private final String mainSql;
 
-    public PgCopyContentWriter(TransactionPolicy txPolicy, CopyManager copyManager, String mainSql) {
+    PgCopyContentWriter(TransactionPolicy txPolicy, CopyManager copyManager, String mainSql) {
         this.txPolicy = txPolicy;
         this.copyManager = copyManager;
         this.mainSql = mainSql;
