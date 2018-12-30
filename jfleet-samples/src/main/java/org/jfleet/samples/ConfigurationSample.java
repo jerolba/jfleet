@@ -15,6 +15,8 @@
  */
 package org.jfleet.samples;
 
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -30,7 +32,7 @@ import java.util.stream.Stream;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.mysql.LoadDataBulkInsert;
-import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
+import org.jfleet.mysql.LoadDataConfiguration;
 import org.jfleet.samples.entities.EmissionTrade;
 import org.jfleet.util.CsvSplit;
 import org.jfleet.util.MySqlTestConnectionProvider;
@@ -54,9 +56,10 @@ public class ConfigurationSample {
                 emissions.add(Files.lines(path).skip(1).map(ConfigurationSample::parse));
             }
 
-            LoadDataBulkInsert.Configuration<EmissionTrade> config = new Configuration<>(EmissionTrade.class)
+            LoadDataConfiguration config = from(EmissionTrade.class)
                     .batchSize(1024*1024)
-                    .autocommit(false);
+                    .autocommit(false)
+                    .build();
 
             BulkInsert<EmissionTrade> bulkInsert = new LoadDataBulkInsert<>(config);
             bulkInsert.insertAll(connection, emissions.stream().flatMap(i -> i));

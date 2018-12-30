@@ -15,12 +15,7 @@
  */
 package org.jfleet.samples;
 
-import static org.jfleet.EntityFieldType.FieldTypeEnum.CHAR;
-import static org.jfleet.EntityFieldType.FieldTypeEnum.DOUBLE;
-import static org.jfleet.EntityFieldType.FieldTypeEnum.INT;
-import static org.jfleet.EntityFieldType.FieldTypeEnum.LONG;
-import static org.jfleet.EntityFieldType.FieldTypeEnum.STRING;
-import static org.jfleet.EntityFieldType.FieldTypeEnum.TIMESTAMP;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -68,9 +63,7 @@ public class FromArray {
                     .addColumn("gender", CHAR, map -> map.get(14))
                     .build();
 
-            LoadDataBulkInsert.Configuration<List<Object>> config = new LoadDataBulkInsert.Configuration<>(entityInfo);
-
-            BulkInsert<List<Object>> bulkInsert = new LoadDataBulkInsert<>(config);
+            BulkInsert<List<Object>> bulkInsert = new LoadDataBulkInsert<>(entityInfo);
             reader.forEachCsvInZip(trips -> {
                 try {
                     bulkInsert.insertAll(connection, trips);

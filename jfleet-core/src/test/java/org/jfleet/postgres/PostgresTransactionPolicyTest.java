@@ -15,6 +15,7 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder.from;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstraintError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
@@ -30,7 +31,6 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.jfleet.postgres.PgCopyBulkInsert.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -57,9 +57,10 @@ public class PostgresTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            PgCopyConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
-                    .autocommit(false);
+                    .autocommit(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
@@ -77,9 +78,10 @@ public class PostgresTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            PgCopyConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
-                    .autocommit(false);
+                    .autocommit(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             try {
@@ -99,9 +101,10 @@ public class PostgresTransactionPolicyTest {
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
             throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            PgCopyConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
-                    .autocommit(true);
+                    .autocommit(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = new PgCopyBulkInsert<>(config);
 
             try {
