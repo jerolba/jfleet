@@ -15,6 +15,7 @@
  */
 package org.jfleet.mysql;
 
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithForeignKeyError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithMultipleConstraintsErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
@@ -32,7 +33,6 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.jfleet.mysql.LoadDataBulkInsert.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,10 +58,11 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
-                    .errorOnMissingRow(true);
+                    .errorOnMissingRow(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
@@ -79,10 +80,11 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
-                    .errorOnMissingRow(true);
+                    .errorOnMissingRow(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
@@ -100,10 +102,11 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
-                    .errorOnMissingRow(false);
+                    .errorOnMissingRow(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithForeignKeyError());
@@ -118,10 +121,11 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
-                    .errorOnMissingRow(true);
+                    .errorOnMissingRow(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
@@ -139,10 +143,11 @@ public class MySqlTransactionPolicyTest {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(false)
-                    .errorOnMissingRow(false);
+                    .errorOnMissingRow(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithUniqueError());
@@ -155,10 +160,11 @@ public class MySqlTransactionPolicyTest {
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws SQLException {
         try (Connection connection = provider.get()) {
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)
-                    .errorOnMissingRow(true);
+                    .errorOnMissingRow(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             try {
@@ -175,10 +181,11 @@ public class MySqlTransactionPolicyTest {
     @Test
     public void multipleBatchOperationsCanMissRows() throws SQLException, JFleetException {
         try (Connection connection = provider.get()) {
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)
-                    .errorOnMissingRow(false);
+                    .errorOnMissingRow(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
 
             bulkInsert.insertAll(connection, employeesWithMultipleConstraintsErrors());

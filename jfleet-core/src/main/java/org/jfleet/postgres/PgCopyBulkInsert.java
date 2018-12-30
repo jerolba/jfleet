@@ -27,7 +27,7 @@ import org.jfleet.WrappedException;
 import org.jfleet.common.ContentWriter;
 import org.jfleet.common.ParallelContentWriter;
 import org.jfleet.common.TransactionPolicy;
-import org.jfleet.inspection.JpaEntityInspector;
+import org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
@@ -36,42 +36,35 @@ import org.slf4j.LoggerFactory;
 public class PgCopyBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(PgCopyBulkInsert.class);
-    private static final int DEFAULT_BATCH_SIZE = 10 * 1_024 * 1_024;
 
-    private final EntityInfo entityInfo;
+    private final PgCopyConfiguration cfg;
     private final String mainSql;
-    private final int batchSize;
-    private final boolean autocommit;
-    private final boolean concurrent;
 
     public PgCopyBulkInsert(Class<T> clazz) {
-        this(new Configuration<>(clazz));
+        this(PgCopyConfigurationBuilder.from(clazz).build());
     }
 
-    public PgCopyBulkInsert(Configuration<T> config) {
-        EntityInfo entityInfo = config.entityInfo;
-        if (entityInfo == null) {
-            JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
-            entityInfo = inspector.inspect();
-        }
-        this.entityInfo = entityInfo;
-        this.batchSize = config.batchSize;
-        this.autocommit = config.autocommit;
-        this.concurrent = config.concurrent;
-        this.mainSql = new SqlBuilder(entityInfo).build();
-        logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
-        logger.debug("Batch size: {} bytes", batchSize);
+    public PgCopyBulkInsert(EntityInfo entityInfo) {
+        this(PgCopyConfigurationBuilder.from(entityInfo).build());
+    }
+
+    public PgCopyBulkInsert(PgCopyConfiguration config) {
+        this.cfg = config;
+        this.mainSql = new SqlBuilder(config.getEntityInfo()).build();
+        logger.debug("SQL Insert for {}: {}", config.getEntityInfo().getEntityClass().getName(), mainSql);
+        logger.debug("Batch size: {} bytes", config.getBatchSize());
     }
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        StdInContentBuilder contentBuilder = new StdInContentBuilder(entityInfo, batchSize, concurrent);
+        StdInContentBuilder contentBuilder = new StdInContentBuilder(cfg.getEntityInfo(), cfg.getBatchSize(),
+                cfg.isConcurrent());
         CopyManager copyMng = getCopyManager(conn);
         try {
-            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
+            TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, cfg.isAutocommit());
             try {
                 ContentWriter contentWriter = new PgCopyContentWriter(txPolicy, copyMng, mainSql);
-                if (concurrent) {
+                if (cfg.isConcurrent()) {
                     contentWriter = new ParallelContentWriter(contentWriter);
                 }
                 Iterator<T> iterator = stream.iterator();
@@ -98,39 +91,6 @@ public class PgCopyBulkInsert<T> implements BulkInsert<T> {
     private CopyManager getCopyManager(Connection conn) throws SQLException {
         PgConnection unwrapped = conn.unwrap(PgConnection.class);
         return unwrapped.getCopyAPI();
-    }
-
-    public static class Configuration<T> {
-
-        private Class<T> clazz;
-        private EntityInfo entityInfo;
-        private int batchSize = DEFAULT_BATCH_SIZE;
-        private boolean autocommit = true;
-        private boolean concurrent = true;
-
-        public Configuration(Class<T> clazz) {
-            this.clazz = clazz;
-        }
-
-        public Configuration(EntityInfo entityInfo) {
-            this.entityInfo = entityInfo;
-        }
-
-        public Configuration<T> batchSize(int batchSize) {
-            this.batchSize = batchSize;
-            return this;
-        }
-
-        public Configuration<T> autocommit(boolean autocommit) {
-            this.autocommit = autocommit;
-            return this;
-        }
-
-        public Configuration<T> concurrent(boolean concurrent) {
-            this.concurrent = concurrent;
-            return this;
-        }
-
     }
 
 }

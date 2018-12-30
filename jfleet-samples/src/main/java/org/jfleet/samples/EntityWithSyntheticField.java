@@ -54,9 +54,7 @@ public class EntityWithSyntheticField {
                                     trip.getEndStation().getLongitude()))
                     .build();
 
-            LoadDataBulkInsert.Configuration<Trip> config = new LoadDataBulkInsert.Configuration<>(entityInfo);
-
-            BulkInsert<Trip> bulkInsert = new LoadDataBulkInsert<>(config);
+            BulkInsert<Trip> bulkInsert = new LoadDataBulkInsert<>(entityInfo);
             reader.forEachCsvInZip(trips -> {
                 try {
                     bulkInsert.insertAll(connection, trips);

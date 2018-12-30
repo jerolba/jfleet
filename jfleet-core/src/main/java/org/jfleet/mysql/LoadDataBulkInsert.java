@@ -17,7 +17,6 @@ package org.jfleet.mysql;
 
 import static org.jfleet.mysql.MySqlTransactionPolicy.getTransactionPolicy;
 
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -28,7 +27,7 @@ import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.common.ContentWriter;
 import org.jfleet.common.ParallelContentWriter;
-import org.jfleet.inspection.JpaEntityInspector;
+import org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,45 +36,34 @@ import com.mysql.jdbc.Statement;
 public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     private static Logger logger = LoggerFactory.getLogger(LoadDataBulkInsert.class);
-    private final static int DEFAULT_BATCH_SIZE = 10 * 1_024 * 1_024;
 
-    private final EntityInfo entityInfo;
+    private final LoadDataConfiguration cfg;
     private final String mainSql;
-    private final int batchSize;
-    private final boolean autocommit;
-    private final boolean concurrent;
-    private final boolean errorOnMissingRow;
-    private final Charset encoding;
 
-    public LoadDataBulkInsert(Class<T> clazz) {
-        this(new Configuration<>(clazz));
+    public LoadDataBulkInsert(Class<?> clazz) {
+        this(LoadDataConfigurationBuilder.from(clazz).build());
     }
 
-    public LoadDataBulkInsert(Configuration<T> config) {
-        EntityInfo entityInfo = config.entityInfo;
-        if (entityInfo == null) {
-            JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
-            entityInfo = inspector.inspect();
-        }
-        this.entityInfo = entityInfo;
-        this.encoding = config.encoding;
-        this.batchSize = config.batchSize;
-        this.autocommit = config.autocommit;
-        this.concurrent = config.concurrent;
-        this.errorOnMissingRow = config.errorOnMissingRow;
-        SqlBuilder sqlBuiler = new SqlBuilder(entityInfo);
+    public LoadDataBulkInsert(EntityInfo entityInfo) {
+        this(LoadDataConfigurationBuilder.from(entityInfo).build());
+    }
+
+    public LoadDataBulkInsert(LoadDataConfiguration loadDataConfiguration) {
+        this.cfg = loadDataConfiguration;
+        SqlBuilder sqlBuiler = new SqlBuilder(cfg.getEntityInfo());
         mainSql = sqlBuiler.build();
-        logger.debug("SQL Insert for {}: {}", entityInfo.getEntityClass().getName(), mainSql);
-        logger.debug("Batch size: {} bytes", batchSize);
+        logger.debug("SQL Insert for {}: {}", cfg.getEntityInfo().getEntityClass().getName(), mainSql);
+        logger.debug("Batch size: {} bytes", cfg.getBatchSize());
     }
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        FileContentBuilder contentBuilder = new FileContentBuilder(entityInfo, batchSize, true);
-        MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, autocommit, errorOnMissingRow);
+        FileContentBuilder contentBuilder = new FileContentBuilder(cfg.getEntityInfo(), cfg.getBatchSize(),
+                cfg.isConcurrent());
+        MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, cfg.isAutocommit(), cfg.isErrorOnMissingRow());
         try (Statement stmt = getStatementForLoadLocal(conn)) {
-            ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, encoding);
-            if (concurrent) {
+            ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, cfg.getEncoding());
+            if (cfg.isConcurrent()) {
                 contentWriter = new ParallelContentWriter(contentWriter);
             }
             Iterator<T> iterator = stream.iterator();
@@ -105,51 +93,6 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
             throw new RuntimeException("Incorrect Connection type. Expected com.mysql.jdbc.Connection");
         }
         return (Statement) unwrapped.createStatement();
-    }
-
-    public static class Configuration<T> {
-
-        private Class<T> clazz;
-        private EntityInfo entityInfo;
-        private Charset encoding = Charset.forName("UTF-8");
-        private int batchSize = DEFAULT_BATCH_SIZE;
-        private boolean autocommit = true;
-        private boolean concurrent = true;
-        private boolean errorOnMissingRow = false;
-
-        public Configuration(Class<T> clazz) {
-            this.clazz = clazz;
-        }
-
-        public Configuration(EntityInfo entityInfo) {
-            this.entityInfo = entityInfo;
-        }
-
-        public Configuration<T> encoding(Charset encoding) {
-            this.encoding = encoding;
-            return this;
-        }
-
-        public Configuration<T> batchSize(int batchSize) {
-            this.batchSize = batchSize;
-            return this;
-        }
-
-        public Configuration<T> autocommit(boolean autocommit) {
-            this.autocommit = autocommit;
-            return this;
-        }
-
-        public Configuration<T> concurrent(boolean concurrent) {
-            this.concurrent = concurrent;
-            return this;
-        }
-
-        public Configuration<T> errorOnMissingRow(boolean errorOnMissingRow) {
-            this.errorOnMissingRow = errorOnMissingRow;
-            return this;
-        }
-
     }
 
 }
