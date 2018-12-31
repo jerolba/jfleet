@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 

@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.inspection;
-
-import org.jfleet.EntityFieldType;
+package org.jfleet;
 
 public class FieldInfo {
 
     private String fieldName;
     private String columnName;
     private EntityFieldType fieldType;
+
+    public FieldInfo(String fieldName, String columnName, EntityFieldType fieldType) {
+        this.fieldName = fieldName;
+        this.columnName = columnName;
+        this.fieldType = fieldType;
+    }
 
     public String getFieldName() {
         return fieldName;
@@ -48,11 +52,7 @@ public class FieldInfo {
     }
 
     public FieldInfo prependName(String name) {
-        FieldInfo newOne = new FieldInfo();
-        newOne.fieldType = fieldType;
-        newOne.columnName = columnName;
-        newOne.fieldName = name + "." + fieldName;
-        return newOne;
+        return new FieldInfo(name + "." + fieldName, columnName, fieldType);
     }
 
     @Override
@@ -61,10 +61,6 @@ public class FieldInfo {
     }
 
     public FieldInfo withColumnName(String newColumnName) {
-        FieldInfo newOne = new FieldInfo();
-        newOne.setFieldName(this.fieldName);
-        newOne.setColumnName(newColumnName);
-        newOne.setFieldType(this.fieldType);
-        return newOne;
+        return new FieldInfo(fieldName, newColumnName, fieldType);
     }
 }

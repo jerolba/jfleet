@@ -32,6 +32,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.jfleet.EntityFieldType;
+import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.junit.Test;
 

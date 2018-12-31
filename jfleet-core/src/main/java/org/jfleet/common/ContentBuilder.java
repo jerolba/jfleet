@@ -15,12 +15,14 @@
  */
 package org.jfleet.common;
 
-public class DoubleBufferStringContentBuilder {
+public class ContentBuilder {
 
-    private DoubleBufferStringContent doubleBuffer;
+    private final EntityRowBuilder entityRowBuilder;
+    private final DoubleBufferStringContent doubleBuffer;
     protected StringContent stringContent;
 
-    public DoubleBufferStringContentBuilder(int batchSize, boolean concurrent) {
+    public ContentBuilder(EntityRowBuilder entityRowBuilder, int batchSize, boolean concurrent) {
+        this.entityRowBuilder = entityRowBuilder;
         this.doubleBuffer = new DoubleBufferStringContent(batchSize, concurrent);
         this.stringContent = doubleBuffer.next();
     }
@@ -43,6 +45,11 @@ public class DoubleBufferStringContentBuilder {
 
     public StringContent getContent() {
         return stringContent;
+    }
+
+    public <T> void add(T entity) {
+        entityRowBuilder.add(stringContent, entity);
+        stringContent.inc();
     }
 
 }

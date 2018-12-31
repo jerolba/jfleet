@@ -24,6 +24,7 @@ import javax.persistence.Table;
 
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
+import org.jfleet.FieldInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class JpaEntityInspector {
 
         EntityFieldAccesorFactory factory = new EntityFieldAccesorFactory();
         List<ColumnInfo> columns = fieldsFromClass.stream().map(field -> {
-            Function<Object, Object> accessor = factory.getAccessor(entityClass, field);
+            Function<Object, Object> accessor = factory.getAccessor(entityClass, field.getFieldName());
             return new ColumnInfo(field.getColumnName(), field.getFieldType(), accessor);
         }).collect(Collectors.toList());
         return new EntityInfo(entityClass, getTableName(), columns);

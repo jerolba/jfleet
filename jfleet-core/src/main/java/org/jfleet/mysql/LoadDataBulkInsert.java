@@ -19,14 +19,13 @@ import static org.jfleet.mysql.MySqlTransactionPolicy.getTransactionPolicy;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.common.ContentWriter;
-import org.jfleet.common.ParallelContentWriter;
+import org.jfleet.common.LoopAndWrite;
 import org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,27 +57,12 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        FileContentBuilder contentBuilder = new FileContentBuilder(cfg.getEntityInfo(), cfg.getBatchSize(),
-                cfg.isConcurrent());
+        LoadDataRowBuilder rowBuilder = new LoadDataRowBuilder(cfg.getEntityInfo());
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, cfg.isAutocommit(), cfg.isErrorOnMissingRow());
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, cfg.getEncoding());
-            if (cfg.isConcurrent()) {
-                contentWriter = new ParallelContentWriter(contentWriter);
-            }
-            Iterator<T> iterator = stream.iterator();
-            while (iterator.hasNext()) {
-                contentBuilder.add(iterator.next());
-                if (contentBuilder.isFilled()) {
-                    logger.debug("Writing content");
-                    contentWriter.writeContent(contentBuilder.getContent());
-                    contentBuilder.reset();
-                }
-            }
-            logger.debug("Flushing content");
-            contentWriter.writeContent(contentBuilder.getContent());
-            contentWriter.waitForWrite();
-            contentBuilder.reset();
+            LoopAndWrite loopAndWrite = new LoopAndWrite(cfg, contentWriter, rowBuilder);
+            loopAndWrite.go(stream);
         } finally {
             txPolicy.close();
         }

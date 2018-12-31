@@ -22,20 +22,21 @@ import java.util.List;
 
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
-import org.jfleet.common.DoubleBufferStringContentBuilder;
+import org.jfleet.common.EntityRowBuilder;
+import org.jfleet.common.StringContent;
 
-public class FileContentBuilder extends DoubleBufferStringContentBuilder {
+class LoadDataRowBuilder implements EntityRowBuilder {
 
     private final LoadDataEscaper escaper = new LoadDataEscaper();
     private final MySqlTypeSerializer typeSerializer = new MySqlTypeSerializer();
     private final List<ColumnInfo> columns;
 
-    public FileContentBuilder(EntityInfo entityInfo, int batchSize, boolean concurrent) {
-        super(batchSize, concurrent);
+    LoadDataRowBuilder(EntityInfo entityInfo) {
         this.columns = entityInfo.getColumns();
     }
 
-    public <T> void add(T entity) {
+    @Override
+    public <T> void add(StringContent stringContent, T entity) {
         for (int i = 0; i < columns.size(); i++) {
             ColumnInfo info = columns.get(i);
             Object value = info.getAccessor().apply(entity);
@@ -49,7 +50,6 @@ public class FileContentBuilder extends DoubleBufferStringContentBuilder {
             stringContent.append(FIELD_TERMINATED_CHAR);
         }
         stringContent.append(LINE_TERMINATED_CHAR);
-        stringContent.inc();
     }
 
 }

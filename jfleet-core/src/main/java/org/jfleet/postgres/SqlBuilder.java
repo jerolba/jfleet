@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
 
-public class SqlBuilder {
+class SqlBuilder {
 
     private final EntityInfo entityInfo;
     private final StringBuilder sb = new StringBuilder();
 
-    public SqlBuilder(EntityInfo entityInfo) {
+    SqlBuilder(EntityInfo entityInfo) {
         this.entityInfo = entityInfo;
     }
 

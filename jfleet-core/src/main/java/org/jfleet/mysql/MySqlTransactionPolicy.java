@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.jfleet.JFleetException;
 
-public interface MySqlTransactionPolicy {
+interface MySqlTransactionPolicy {
 
     static MySqlTransactionPolicy getTransactionPolicy(Connection connection, boolean autocommit,
             boolean errorOnMissingRow) throws SQLException {
@@ -39,7 +39,7 @@ public interface MySqlTransactionPolicy {
 
         private boolean errorOnMissingRow;
 
-        public LongTransaction(boolean errorOnMissingRow) {
+        LongTransaction(boolean errorOnMissingRow) {
             this.errorOnMissingRow = errorOnMissingRow;
         }
 
@@ -48,7 +48,7 @@ public interface MySqlTransactionPolicy {
             if (errorOnMissingRow && updatedInDB.isPresent()) {
                 if (processed != updatedInDB.get()) {
                     throw new JFleetException(
-                            "Missed row, processed: " + processed + ", expected: " + updatedInDB.get());
+                            "Missed rows, processed: " + processed + ", expected: " + updatedInDB.get());
                 }
             }
         }
@@ -66,7 +66,7 @@ public interface MySqlTransactionPolicy {
         private final boolean autocommit;
         private boolean errorOnMissingRow;
 
-        public BatchTransaction(Connection connection, boolean errorOnMissingRow) throws SQLException {
+        BatchTransaction(Connection connection, boolean errorOnMissingRow) throws SQLException {
             this.connection = connection;
             this.errorOnMissingRow = errorOnMissingRow;
             this.autocommit = connection.getAutoCommit();

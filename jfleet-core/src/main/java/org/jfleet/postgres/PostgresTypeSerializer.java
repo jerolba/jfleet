@@ -28,14 +28,14 @@ import java.time.format.DateTimeFormatter;
 
 import org.jfleet.common.BaseTypeSerializer;
 
-public class PostgresTypeSerializer extends BaseTypeSerializer {
+class PostgresTypeSerializer extends BaseTypeSerializer {
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private final SimpleDateFormat sdfTime = new SimpleDateFormat("HH:mm:ss.SSS");
     private final DateTimeFormatter dtfLocalTime = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
     private final DateTimeFormatter dtfLocalDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public PostgresTypeSerializer() {
+    PostgresTypeSerializer() {
         super();
         add(BOOLEAN, FROM_BOOLEAN);
         add(TIMESTAMP, FROM_TIMESTAMP);

@@ -15,14 +15,14 @@
  */
 package org.jfleet.common;
 
-public class DoubleBufferStringContent {
+class DoubleBufferStringContent {
 
+    private final StringContent[] buffer;
     private final int batchSize;
     private final int size;
     private int current = 0;
-    private StringContent[] buffer;
 
-    public DoubleBufferStringContent(int batchSize, boolean concurrent) {
+    DoubleBufferStringContent(int batchSize, boolean concurrent) {
         this.batchSize = batchSize;
         this.size = concurrent ? 2 : 1;
         this.buffer = new StringContent[size];

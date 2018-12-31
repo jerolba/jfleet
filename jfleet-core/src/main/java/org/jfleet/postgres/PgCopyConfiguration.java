@@ -16,27 +16,32 @@
 package org.jfleet.postgres;
 
 import org.jfleet.EntityInfo;
+import org.jfleet.common.JFleetBatchConfig;
 import org.jfleet.inspection.JpaEntityInspector;
 
-public class PgCopyConfiguration {
+public class PgCopyConfiguration implements JFleetBatchConfig {
 
     private EntityInfo entityInfo;
     private int batchSize;
     private boolean autocommit;
     private boolean concurrent;
 
+    @Override
     public EntityInfo getEntityInfo() {
         return entityInfo;
     }
 
+    @Override
     public int getBatchSize() {
         return batchSize;
     }
 
+    @Override
     public boolean isAutocommit() {
         return autocommit;
     }
 
+    @Override
     public boolean isConcurrent() {
         return concurrent;
     }
