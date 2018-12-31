@@ -28,6 +28,8 @@ import org.junit.Test;
 
 public class CsvSerializerTest {
 
+    private static String ls = System.lineSeparator();
+
     @Test
     public void canCreateSyntheticColumns() throws IOException {
         EntityInfoBuilder<SomeEntity> entityBuilder = new EntityInfoBuilder<>(SomeEntity.class);
@@ -35,7 +37,7 @@ public class CsvSerializerTest {
         entityBuilder.addColumn("adult", FieldTypeEnum.BOOLEAN, e -> e.getAge() >= 18);
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(entityBuilder.build());
         String result = writeCsvToString(config, new SomeEntity("John", 10), new SomeEntity("Amanda", 34));
-        assertEquals("name,age,adult\nJohn,10,false\nAmanda,34,true\n", result);
+        assertEquals("name,age,adult" + ls + "John,10,false" + ls + "Amanda,34,true" + ls, result);
     }
 
     @Test
@@ -50,7 +52,7 @@ public class CsvSerializerTest {
         Builder<SomeEntity> config = new Builder<>(entityBuilder.build());
         config.typeSerializer(serializer);
         String result = writeCsvToString(config.build(), new SomeEntity("John", 10), new SomeEntity("Amanda", 34));
-        assertEquals("name,age,adult\nJohn,10,0\nAmanda,34,1\n", result);
+        assertEquals("name,age,adult" + ls + "John,10,0" + ls + "Amanda,34,1" + ls, result);
     }
 
     @Test
@@ -62,7 +64,7 @@ public class CsvSerializerTest {
 
         Builder<SomeEntity> config = new Builder<>(entityBuilder.build());
         String result = writeCsvToString(config.build(), new SomeEntity("John", 10), new SomeEntity("Amanda", 34));
-        assertEquals("name,age,adult\nJohn,10 years,No\nAmanda,34 years,Si\n", result);
+        assertEquals("name,age,adult" + ls + "John,10 years,No" + ls + "Amanda,34 years,Si" + ls, result);
     }
 
 }

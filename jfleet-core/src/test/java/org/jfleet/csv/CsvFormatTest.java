@@ -26,34 +26,35 @@ import org.junit.Test;
 
 public class CsvFormatTest {
 
+    private static String ls = System.lineSeparator();
     private Builder<SomeEntity> config = new Builder<>(createBuilderForSomeEntity().build());
 
     @Test
     public void fieldSeparatorTest() throws IOException {
         config.fieldSeparator(';');
         String result = writeCsvToString(config.build(), new SomeEntity("John", 10));
-        assertEquals("name;age\nJohn;10\n", result);
+        assertEquals("name;age" + ls + "John;10" + ls, result);
     }
 
     @Test
     public void escapeFieldSeparatorTest() throws IOException {
         config.fieldSeparator(';').textDelimiter('\'');
         String result = writeCsvToString(config.build(), new SomeEntity("John;Smith", 10));
-        assertEquals("name;age\n'John;Smith';10\n", result);
+        assertEquals("name;age" + ls + "'John;Smith';10" + ls, result);
     }
 
     @Test
     public void optionalTextDelimiterNotUsedTest() throws IOException {
         config.textDelimiter('$');
         String result = writeCsvToString(config.build(), new SomeEntity("John", 10));
-        assertEquals("name,age\nJohn,10\n", result);
+        assertEquals("name,age" + ls + "John,10" + ls, result);
     }
 
     @Test
     public void optionalTextDelimiterUsedTest() throws IOException {
         config.textDelimiter('"');
         String result = writeCsvToString(config.build(), new SomeEntity("John \"Smith\"", 10));
-        assertEquals("name,age\n\"John \"\"Smith\"\"\",10\n", result);
+        assertEquals("name,age" + ls + "\"John \"\"Smith\"\"\",10" + ls, result);
     }
 
     @Test
@@ -62,14 +63,14 @@ public class CsvFormatTest {
         String result = writeCsvToString(config.build(),
                 new SomeEntity("John 'Smith'", 10),
                 new SomeEntity("Amanda", 20));
-        assertEquals("'name','age'\n'John ''Smith''','10'\n'Amanda','20'\n", result);
+        assertEquals("'name','age'" + ls + "'John ''Smith''','10'" + ls + "'Amanda','20'" + ls, result);
     }
 
     @Test
     public void escapeLineDelimiterTest() throws IOException {
         config.textDelimiter('\'');
         String result = writeCsvToString(config.build(), new SomeEntity("John \nSmith", 10));
-        assertEquals("name,age\n'John \nSmith',10\n", result);
+        assertEquals("name,age" + ls + "'John \nSmith',10" + ls, result);
     }
 
 }

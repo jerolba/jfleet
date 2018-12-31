@@ -34,6 +34,8 @@ import org.junit.Test;
 
 public class HeaderTest {
 
+    private static String ls = System.lineSeparator();
+
     @Entity
     public class AnnotatedEntity {
 
@@ -97,7 +99,7 @@ public class HeaderTest {
     public void emptyCollectionOnlyGeneratesHeader() throws IOException {
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(createBuilderForSomeEntity().build());
         String result = writeCsvToString(config, Collections.emptyList());
-        assertEquals("name,age\n", result);
+        assertEquals("name,age" + ls, result);
     }
 
     @Test
@@ -112,7 +114,7 @@ public class HeaderTest {
     public void elementIsAfterHeader() throws IOException {
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(createBuilderForSomeEntity().build());
         String result = writeCsvToString(config, new SomeEntity("John", 10));
-        assertEquals("name,age\nJohn,10\n", result);
+        assertEquals("name,age" + ls + "John,10" + ls, result);
     }
 
     @Test
@@ -120,7 +122,7 @@ public class HeaderTest {
         Builder<SomeEntity> config = new Builder<>(createBuilderForSomeEntity().build());
         config.header(false);
         String result = writeCsvToString(config.build(), new SomeEntity("John", 10));
-        assertEquals("John,10\n", result);
+        assertEquals("John,10" + ls, result);
     }
 
     @Test
@@ -130,7 +132,7 @@ public class HeaderTest {
         entityBuilder.addColumn("name", FieldTypeEnum.STRING, SomeEntity::getName);
         CsvConfiguration<SomeEntity> config = new CsvConfiguration<>(entityBuilder.build());
         String result = writeCsvToString(config, new SomeEntity("John", 10));
-        assertEquals("age,name\n10,John\n", result);
+        assertEquals("age,name" + ls + "10,John" + ls, result);
     }
 
     @Test
@@ -138,7 +140,7 @@ public class HeaderTest {
         CsvConfiguration<AnnotatedEntity> config = new CsvConfiguration<>(AnnotatedEntity.class);
         Address address = new Address("221B Baker Street", "London");
         String result = writeCsvToString(config, new AnnotatedEntity("Sherlock", 63, address));
-        assertEquals("title,duration,street,city\nSherlock,63,221B Baker Street,London\n", result);
+        assertEquals("title,duration,street,city" + ls + "Sherlock,63,221B Baker Street,London" + ls, result);
     }
 
 }
