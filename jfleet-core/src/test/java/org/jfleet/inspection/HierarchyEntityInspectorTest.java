@@ -15,7 +15,7 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
 import org.jfleet.FieldInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HierarchyEntityInspectorTest {
 

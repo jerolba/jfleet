@@ -15,10 +15,12 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 
@@ -31,8 +33,8 @@ import org.jfleet.metadata.JFleetEnumType;
 import org.jfleet.metadata.JFleetEnumerated;
 import org.jfleet.metadata.JFleetTemporal;
 import org.jfleet.metadata.JFleetTemporalType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EntityInfoBuilderTest {
 
@@ -142,7 +144,7 @@ public class EntityInfoBuilderTest {
     private SimpleEntity simple;
     private SimpleEntityEx simpleEx;
 
-    @Before
+    @BeforeEach
     public void setup() {
         city = new City();
         city.setId(1);
@@ -163,16 +165,20 @@ public class EntityInfoBuilderTest {
         simpleEx.setOrder(Numbers.one);
     }
 
-    @Test(expected = NoSuchFieldException.class)
+    @Test
     public void testNonExistentField() {
         EntityInfoBuilder<SimpleEntity> builder = new EntityInfoBuilder<>(SimpleEntity.class, "simple_entity");
-        builder.addField("noField", "someName");
+        assertThrows(NoSuchFieldException.class, () -> {
+            builder.addField("noField", "someName");
+        });
     }
 
-    @Test(expected = NoSuchFieldException.class)
+    @Test
     public void testNonExistentFieldInHierarchy() {
         EntityInfoBuilder<SimpleEntityEx> builder = new EntityInfoBuilder<>(SimpleEntityEx.class, "simple_entity");
-        builder.addField("noField", "someName");
+        assertThrows(NoSuchFieldException.class, () -> {
+            builder.addField("noField", "someName");
+        });
     }
 
     @Test
@@ -380,11 +386,13 @@ public class EntityInfoBuilderTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void childColumnNamesCanCollision() {
         EntityInfoBuilder<Collision> builder = new EntityInfoBuilder<>(Collision.class, "collision_entity");
         builder.addField("city_name");
-        builder.addField("city.name");
+        assertThrows(RuntimeException.class, () -> {
+            builder.addField("city.name");
+        });
     }
 
     public void childColumnNamesCollisionMustBeDisambiguated() {

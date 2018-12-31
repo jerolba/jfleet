@@ -15,20 +15,20 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.function.Function;
 
 import org.jfleet.entities.Address;
 import org.jfleet.entities.Person;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class EmbeddedEntityFieldAccesorTest {
 
     private Person person;
 
-    @Before
+    @BeforeEach
     public void setup() {
         person = new Person();
         person.setId(1L);

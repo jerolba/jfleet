@@ -15,7 +15,7 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,7 +24,7 @@ import javax.persistence.OneToOne;
 
 import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OneToOneEntityInspectorTest {
 
