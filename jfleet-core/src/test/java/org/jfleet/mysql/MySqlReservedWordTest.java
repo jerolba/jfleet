@@ -15,8 +15,8 @@
  */
 package org.jfleet.mysql;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -33,7 +33,7 @@ import javax.persistence.Table;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MySqlReservedWordTest {
 
