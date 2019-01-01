@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.mysql;
+package org.jfleet.util;
 
-import java.io.IOException;
+public class JdbcPostgresDatabase extends JdbcDatabase {
 
-import org.jfleet.util.DatabaseTestConnectionProvider;
+    public JdbcPostgresDatabase(String properties) {
+        super(properties);
+    }
 
-public class MySqlTestConnectionProvider extends DatabaseTestConnectionProvider {
-
-    public MySqlTestConnectionProvider() throws IOException {
-        super("mysql-test.properties");
+    public JdbcPostgresDatabase() {
+        super("postgres-test.properties");
     }
 
 }

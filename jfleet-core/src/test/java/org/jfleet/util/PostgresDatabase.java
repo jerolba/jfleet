@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
-
-import java.io.IOException;
-import java.sql.Connection;
+package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.util.DatabaseTestConnectionProvider;
+import org.jfleet.postgres.PgCopyBulkInsert;
 
-public abstract class Database {
+public class PostgresDatabase extends Database {
 
-    private String properties;
-
-    public Database(String properties) {
-        this.properties = properties;
+    public PostgresDatabase(String properties) {
+        super(properties);
     }
 
-    public String getProperties() {
-        return properties;
+    public PostgresDatabase() {
+        super("postgres-test.properties");
     }
 
-    public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
-
-    public Connection getConnection() throws IOException {
-        return new DatabaseTestConnectionProvider(getProperties()).get();
+    @Override
+    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
+        return new PgCopyBulkInsert<>(clazz);
     }
 
 }

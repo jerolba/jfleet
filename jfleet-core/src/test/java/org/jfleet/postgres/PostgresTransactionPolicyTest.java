@@ -26,10 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
+import org.jfleet.util.Database;
+import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -40,19 +41,18 @@ public class PostgresTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(PostgresTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private Supplier<Connection> provider;
+    private Database database = new PostgresDatabase();
 
     @BeforeEach
     public void setup() throws IOException, SQLException {
-        this.provider = new PostgresTestConnectionProvider();
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
         }
     }
 
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws Exception {
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             PgCopyConfiguration config = from(Employee.class)
@@ -73,7 +73,7 @@ public class PostgresTransactionPolicyTest {
 
     @Test
     public void longTransactionWithConstraintExceptionIsRollbacked() throws Exception {
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             PgCopyConfiguration config = from(Employee.class)
@@ -97,7 +97,7 @@ public class PostgresTransactionPolicyTest {
 
     @Test
     public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws Exception {
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             PgCopyConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)

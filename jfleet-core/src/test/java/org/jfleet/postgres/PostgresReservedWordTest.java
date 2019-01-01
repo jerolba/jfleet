@@ -29,9 +29,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.Database;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.parameterized.WithDB;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.params.provider.ValueSource;
 

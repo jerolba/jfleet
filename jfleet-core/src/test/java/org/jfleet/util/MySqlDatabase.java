@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
 
-public class JdbcMysqlDatabase extends JdbcDatabase {
+import org.jfleet.BulkInsert;
+import org.jfleet.mysql.LoadDataBulkInsert;
 
-    public JdbcMysqlDatabase(String properties) {
+public class MySqlDatabase extends Database {
+
+    public MySqlDatabase(String properties) {
         super(properties);
     }
 
-    public JdbcMysqlDatabase() {
+    public MySqlDatabase() {
         super("mysql-test.properties");
+    }
+
+    @Override
+    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
+        return new LoadDataBulkInsert<>(clazz);
     }
 
 }

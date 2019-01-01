@@ -25,7 +25,8 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jfleet.mysql.MySqlTestConnectionProvider;
+import org.jfleet.util.Database;
+import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.Test;
 
 import com.mysql.jdbc.Connection;
@@ -33,10 +34,11 @@ import com.mysql.jdbc.Statement;
 
 public class ConnectionTest {
 
+    private Database database = new MySqlDatabase();
+
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {
-        MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-        try (java.sql.Connection conn = connectionProvider.get()) {
+        try (java.sql.Connection conn = database.getConnection()) {
             assertNotNull(conn);
         }
     }
@@ -46,8 +48,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = (Connection) connectionProvider.get()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");
@@ -74,8 +75,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = (Connection) connectionProvider.get()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");

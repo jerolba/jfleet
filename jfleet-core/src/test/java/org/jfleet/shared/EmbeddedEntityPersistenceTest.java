@@ -29,9 +29,9 @@ import org.jfleet.BulkInsert;
 import org.jfleet.entities.Address;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
-import org.jfleet.parameterized.Database;
 import org.jfleet.parameterized.TestAllDBs;
 import org.jfleet.parameterized.WithDB;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
 public class EmbeddedEntityPersistenceTest {

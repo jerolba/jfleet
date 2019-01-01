@@ -28,7 +28,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jfleet.common.StringBuilderReader;
-import org.jfleet.postgres.PostgresTestConnectionProvider;
+import org.jfleet.util.Database;
+import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.Test;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
@@ -36,10 +37,11 @@ import org.postgresql.util.PSQLException;
 
 public class ConnectionTest {
 
+    private Database database = new PostgresDatabase();
+
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {
-        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (java.sql.Connection conn = connectionProvider.get()) {
+        try (java.sql.Connection conn = database.getConnection()) {
             assertNotNull(conn);
         }
     }
@@ -49,8 +51,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
+        try (Connection conn = database.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 PgConnection unwrapped = conn.unwrap(PgConnection.class);
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
@@ -80,8 +81,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
+        try (Connection conn = database.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 PgConnection unwrapped = conn.unwrap(PgConnection.class);
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
@@ -114,8 +114,7 @@ public class ConnectionTest {
 
     @Test
     public void canNotInsertIntoSerialColumn() throws SQLException, IOException {
-        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
+        try (Connection conn = database.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 PgConnection unwrapped = conn.unwrap(PgConnection.class);
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
@@ -136,8 +135,7 @@ public class ConnectionTest {
 
     @Test
     public void canInsertIntoSerialColumn() throws SQLException, IOException {
-        PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
-        try (Connection conn = connectionProvider.get()) {
+        try (Connection conn = database.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 PgConnection unwrapped = conn.unwrap(PgConnection.class);
                 stmt.execute("DROP TABLE IF EXISTS simple_table");

@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
 
-public class JdbcPostgresDatabase extends JdbcDatabase {
+import org.jfleet.BulkInsert;
+import org.jfleet.jdbc.JdbcBulkInsert;
+import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
 
-    public JdbcPostgresDatabase(String properties) {
+public abstract class JdbcDatabase extends Database {
+
+    public JdbcDatabase(String properties) {
         super(properties);
     }
 
-    public JdbcPostgresDatabase() {
-        super("postgres-test.properties");
+    @Override
+    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
+        return new JdbcBulkInsert<>(clazz);
+    }
+
+    public <T> BulkInsert<T> getBulkInsert(Configuration<T> config) {
+        return new JdbcBulkInsert<>(config);
     }
 
 }

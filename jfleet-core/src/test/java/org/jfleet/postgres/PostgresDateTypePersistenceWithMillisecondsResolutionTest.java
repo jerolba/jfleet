@@ -28,14 +28,14 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.Database;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.Database;
+import org.jfleet.util.PostgresDatabase;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -55,8 +55,7 @@ public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
 
         BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
-        try (Connection conn = provider.get()) {
+        try (Connection conn = new PostgresDatabase().getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
             insert.insertAll(conn, Stream.of(entity));
 

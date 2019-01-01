@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.postgres.PgCopyBulkInsert;
+public class JdbcMysqlDatabase extends JdbcDatabase {
 
-public class PostgresDatabase extends Database {
-
-    public PostgresDatabase(String properties) {
+    public JdbcMysqlDatabase(String properties) {
         super(properties);
     }
 
-    public PostgresDatabase() {
-        super("postgres-test.properties");
-    }
-
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new PgCopyBulkInsert<>(clazz);
+    public JdbcMysqlDatabase() {
+        super("mysql-test.properties");
     }
 
 }

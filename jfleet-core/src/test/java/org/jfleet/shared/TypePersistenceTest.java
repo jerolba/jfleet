@@ -26,11 +26,11 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.Database;
 import org.jfleet.parameterized.TestAllDBs;
 import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.shared.entities.EnumForTest;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
 public class TypePersistenceTest {

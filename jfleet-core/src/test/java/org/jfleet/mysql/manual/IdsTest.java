@@ -24,7 +24,8 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jfleet.mysql.MySqlTestConnectionProvider;
+import org.jfleet.util.Database;
+import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.Test;
 
 import com.mysql.jdbc.Connection;
@@ -32,10 +33,11 @@ import com.mysql.jdbc.Statement;
 
 public class IdsTest {
 
+    private Database database = new MySqlDatabase();
+
     @Test
     public void canExecuteLoadDataWithAutoIncrement() throws SQLException, IOException {
-        MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = (Connection) connectionProvider.get()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "
@@ -65,8 +67,7 @@ public class IdsTest {
 
     @Test
     public void canExecuteLoadDataWithAutoIncrementIdSetted() throws SQLException, IOException {
-        MySqlTestConnectionProvider connectionProvider = new MySqlTestConnectionProvider();
-        try (Connection conn = (Connection) connectionProvider.get()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "

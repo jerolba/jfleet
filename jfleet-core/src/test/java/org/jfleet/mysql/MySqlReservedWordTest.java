@@ -29,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.util.MySqlDatabase;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +65,7 @@ public class MySqlReservedWordTest {
         Stream<ReservedWordEntity> stream = IntStream.range(0, times)
                 .mapToObj(i -> new ReservedWordEntity(i, "current_user_" + i));
 
-        try (Connection conn = new MySqlTestConnectionProvider().get()) {
+        try (Connection conn = new MySqlDatabase().getConnection()) {
             SqlUtil.createTableForEntity(conn, ReservedWordEntity.class);
             insert.insertAll(conn, stream);
 
