@@ -30,17 +30,20 @@ import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
 import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
-import org.junit.Test;
+import org.jfleet.parameterized.JdbcDatabase;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JdbcTransactionPolicyTest extends JdbcDatabasesBaseTest {
+public class JdbcTransactionPolicyTest {
 
     private static Logger logger = LoggerFactory.getLogger(JdbcTransactionPolicyTest.class);
     private static final long TWO_ROW_BATCH_SIZE = 2;
 
-    @Test
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
+    @ParameterizedTest(name = "Database {0}")
+    @ArgumentsSource(JdbcArgumentsProvider.class)
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly(String name, JdbcDatabase database)
             throws IOException, SQLException, JFleetException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
@@ -61,8 +64,10 @@ public class JdbcTransactionPolicyTest extends JdbcDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void longTransactionWithConstraintExceptionIsRollbacked() throws IOException, SQLException, JFleetException {
+    @ParameterizedTest(name = "Database {0}")
+    @ArgumentsSource(JdbcArgumentsProvider.class)
+    public void longTransactionWithConstraintExceptionIsRollbacked(String name, JdbcDatabase database) 
+            throws IOException, SQLException, JFleetException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
@@ -85,9 +90,10 @@ public class JdbcTransactionPolicyTest extends JdbcDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
-            throws IOException, SQLException, JFleetException {
+    @ParameterizedTest(name = "Database {0}")
+    @ArgumentsSource(JdbcArgumentsProvider.class)
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction(String name, 
+            JdbcDatabase database) throws IOException, SQLException, JFleetException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
 

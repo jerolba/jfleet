@@ -15,32 +15,22 @@
  */
 package org.jfleet.jdbc;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
-import org.jfleet.parameterized.JdbcDatabase;
 import org.jfleet.parameterized.JdbcMysqlDatabase;
 import org.jfleet.parameterized.JdbcPostgresDatabase;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 
-@RunWith(Parameterized.class)
-public abstract class JdbcDatabasesBaseTest {
+public class JdbcArgumentsProvider implements ArgumentsProvider {
 
-    @Parameters(name = "Database {0}")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-            {"JdbcPosgres", new JdbcPostgresDatabase()},
-            {"JdbcMySql", new JdbcMysqlDatabase()}
-        });
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        return Stream.of(
+                Arguments.of("JdbcPosgres", new JdbcPostgresDatabase()),
+                Arguments.of("JdbcMySql", new JdbcMysqlDatabase()));
+
     }
-
-    @Parameter(0)
-    public String databaseName;
-
-    @Parameter(1)
-    public JdbcDatabase database;
 
 }
