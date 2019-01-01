@@ -15,8 +15,8 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +33,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class EncodingTest extends AllDatabasesBaseTest {
+public class EncodingTest {
 
     @Entity
     @Table(name = "table_utf8_encoding")
@@ -62,8 +62,8 @@ public class EncodingTest extends AllDatabasesBaseTest {
 
     }
 
-    @Test
-    public void persistAllTypes() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void persistAllTypes(@WithDB Database database) throws Exception {
         List<EncodingUtf8Entity> values = fetchTestValues();
         BulkInsert<EncodingUtf8Entity> insert = database.getBulkInsert(EncodingUtf8Entity.class);
 

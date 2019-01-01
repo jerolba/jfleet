@@ -15,7 +15,8 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import javax.persistence.ManyToOne;
 
 import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FailedManyToOneEntityInspectorTest {
 
@@ -124,13 +125,11 @@ public class FailedManyToOneEntityInspectorTest {
         assertEquals("uuid", id.getColumnName());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void joinColumnsIsNotMapped() {
-        List<FieldInfo> fields = fieldsInspector.getFieldsFromClass(FooBar.class);
-        assertEquals(1, fields.size());
-        FieldInfo id = fields.get(0);
-        assertEquals(FieldTypeEnum.INT, id.getFieldType().getFieldType());
-        assertEquals("serialId", id.getColumnName());
+        assertThrows(UnsupportedOperationException.class, () -> {
+            fieldsInspector.getFieldsFromClass(FooBar.class);
+        });
     }
 
 }

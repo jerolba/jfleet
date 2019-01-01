@@ -15,22 +15,16 @@
  */
 package org.jfleet.parameterized;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.postgres.PgCopyBulkInsert;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class PostgresDatabase extends Database {
+import org.junit.jupiter.params.ParameterizedTest;
 
-    public PostgresDatabase(String properties) {
-        super(properties);
-    }
-
-    public PostgresDatabase() {
-        super("postgres-test.properties");
-    }
-
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new PgCopyBulkInsert<>(clazz);
-    }
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@ParameterizedTest(name = "Database {0}")
+public @interface TestDBs {
 
 }

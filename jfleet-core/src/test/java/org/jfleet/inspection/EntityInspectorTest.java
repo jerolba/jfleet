@@ -15,9 +15,10 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.FieldInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EntityInspectorTest {
 
@@ -42,10 +43,11 @@ public class EntityInspectorTest {
 
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void entityMustBeAnnotated() {
-        JpaEntityInspector inspector = new JpaEntityInspector(SimpleClass.class);
-        inspector.inspect();
+        assertThrows(RuntimeException.class, () -> {
+            new JpaEntityInspector(SimpleClass.class);
+        });
     }
 
     @Entity

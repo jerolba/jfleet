@@ -15,13 +15,13 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EmbeddedInspectorTest {
 

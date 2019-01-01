@@ -15,29 +15,28 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.shared.entities.EnumForTest;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class TypePersistenceTest extends AllDatabasesBaseTest {
+public class TypePersistenceTest {
 
-    @Test
-    public void persistAllTypes() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void persistAllTypes(@WithDB Database database) throws Exception {
         EntityWithBasicTypes entity = new EntityWithBasicTypes();
         entity.setBooleanObject(true);
         entity.setByteObject((byte) 42);
@@ -81,8 +80,8 @@ public class TypePersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void persistNullValues() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void persistNullValues(@WithDB Database database) throws Exception {
         EntityWithBasicTypes entity = new EntityWithBasicTypes();
         entity.setBooleanObject(null);
         entity.setByteObject(null);

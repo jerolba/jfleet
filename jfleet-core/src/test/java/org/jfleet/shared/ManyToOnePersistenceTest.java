@@ -15,15 +15,13 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -33,11 +31,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
+public class ManyToOnePersistenceTest {
 
     @Entity
     public class Product {
@@ -122,15 +121,15 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
 
     }
 
-    @Test
-    public void canPersistAnEntityWithManyToOne() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithManyToOne(@WithDB Database database) throws Exception {
         Product p1 = new Product(1L, "Tesla X");
         Foo f1 = new Foo(1L, "85H", p1);
         Foo f2 = new Foo(2L, "100H", p1);
         Product p2 = new Product(2L, "Tesla S");
         Foo f3 = new Foo(3L, "120H", p2);
 
-        List<Foo> foos = Arrays.asList(f1, f2, f3);
+        List<Foo> foos = asList(f1, f2, f3);
 
         BulkInsert<Foo> insert = database.getBulkInsert(Foo.class);
         try (Connection conn = database.getConnection()) {
@@ -150,15 +149,15 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void canPersistAnEntityWithJoinColumn() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithJoinColumn(@WithDB Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Bar f2 = new Bar(2L, 14.95, p1);
         Product p2 = new Product(2L, "Amichi");
         Bar f3 = new Bar(3L, 4.95, p2);
 
-        List<Bar> bars = Arrays.asList(f1, f2, f3);
+        List<Bar> bars = asList(f1, f2, f3);
 
         BulkInsert<Bar> insert = database.getBulkInsert(Bar.class);
         try (Connection conn = database.getConnection()) {
@@ -183,19 +182,17 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
      * the Id. The main entity then is persisted without the id of the referenced entity.
      * JFleet user must persist or load any entity referenced, or assign manually an id.
      */
-    @Test
-    public void canPersistAnEntityWithManyToOneNullId() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithManyToOneNullId(@WithDB Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Product p2 = new Product(null, "Amichi");
         Bar f2 = new Bar(2L, 14.95, p2);
 
-        List<Bar> bars = Arrays.asList(f1, f2);
-
         BulkInsert<Bar> insert = database.getBulkInsert(Bar.class);
         try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, Bar.class);
-            insert.insertAll(conn, bars);
+            insert.insertAll(conn, asList(f1, f2));
 
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT id, price, alternate_id FROM textil ORDER BY id ASC")) {
@@ -214,18 +211,16 @@ public class ManyToOnePersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void canPersistAnEntityWithManyToOneNullReference() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithManyToOneNullReference(@WithDB Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Bar f2 = new Bar(2L, 14.95, null);
 
-        List<Bar> bars = Arrays.asList(f1, f2);
-
         BulkInsert<Bar> insert = database.getBulkInsert(Bar.class);
         try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, Bar.class);
-            insert.insertAll(conn, bars);
+            insert.insertAll(conn, asList(f1, f2));
 
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT id, price, alternate_id FROM textil ORDER BY id ASC")) {

@@ -15,13 +15,11 @@
  */
 package org.jfleet.postgres;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -30,19 +28,22 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.Database;
+import org.jfleet.util.PostgresDatabase;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
+import org.junit.jupiter.params.provider.ValueSource;
 
-public class PostgresDateTypePersistenceWithMillisecondsResolutionTest extends PostgresBaseTest {
+public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
 
-    @Test
-    public void persistWithMillisecondResolution() throws JFleetException, SQLException, IOException {
+    @TestDBs
+    @ValueSource(strings = {"Postgres", "JdbcPosgres"})
+    public void persistWithMillisecondResolution(@WithDB Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48.132"));
         entity.setTime(getDate("24/01/2012 23:12:48.132"));
@@ -54,8 +55,7 @@ public class PostgresDateTypePersistenceWithMillisecondsResolutionTest extends P
 
         BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-        Supplier<Connection> provider = new PostgresTestConnectionProvider();
-        try (Connection conn = provider.get()) {
+        try (Connection conn = new PostgresDatabase().getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
             insert.insertAll(conn, Stream.of(entity));
 

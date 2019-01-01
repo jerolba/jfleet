@@ -15,22 +15,16 @@
  */
 package org.jfleet.parameterized;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.mysql.LoadDataBulkInsert;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class MySqlDatabase extends Database {
+import org.junit.jupiter.params.converter.ConvertWith;
 
-    public MySqlDatabase(String properties) {
-        super(properties);
-    }
-
-    public MySqlDatabase() {
-        super("mysql-test.properties");
-    }
-
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new LoadDataBulkInsert<>(clazz);
-    }
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.PARAMETER })
+@Retention(RetentionPolicy.RUNTIME)
+@ConvertWith(DatabaseArgumentConverter.class)
+public @interface WithDB {
 
 }

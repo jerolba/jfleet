@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
+
+import java.io.IOException;
+import java.sql.Connection;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
 
-public abstract class JdbcDatabase extends Database {
+public abstract class Database {
 
-    public JdbcDatabase(String properties) {
-        super(properties);
+    private String properties;
+
+    public Database(String properties) {
+        this.properties = properties;
     }
 
-    @Override
-    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new JdbcBulkInsert<>(clazz);
+    public String getProperties() {
+        return properties;
     }
 
-    public <T> BulkInsert<T> getBulkInsert(Configuration<T> config) {
-        return new JdbcBulkInsert<>(config);
+    public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
+
+    public Connection getConnection() throws IOException {
+        return new DatabaseTestConnectionProvider(getProperties()).get();
     }
 
 }

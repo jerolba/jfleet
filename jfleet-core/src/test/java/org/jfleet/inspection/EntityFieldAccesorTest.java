@@ -15,8 +15,8 @@
  */
 package org.jfleet.inspection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.function.Function;
 
@@ -26,7 +26,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EntityFieldAccesorTest {
 

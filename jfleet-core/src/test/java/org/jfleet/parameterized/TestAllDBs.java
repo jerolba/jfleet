@@ -15,28 +15,17 @@
  */
 package org.jfleet.parameterized;
 
-import java.io.IOException;
-import java.sql.Connection;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.util.DatabaseTestConnectionProvider;
+import org.junit.jupiter.params.provider.EnumSource;
 
-public abstract class Database {
-
-    private String properties;
-
-    public Database(String properties) {
-        this.properties = properties;
-    }
-
-    public String getProperties() {
-        return properties;
-    }
-
-    public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
-
-    public Connection getConnection() throws IOException {
-        return new DatabaseTestConnectionProvider(getProperties()).get();
-    }
+@Target({ ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@TestDBs
+@EnumSource(Databases.class)
+public @interface TestAllDBs {
 
 }

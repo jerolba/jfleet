@@ -22,19 +22,20 @@ import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithUniqueError;
 import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
 import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.junit.Before;
-import org.junit.Test;
+import org.jfleet.util.Database;
+import org.jfleet.util.MySqlDatabase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,19 +44,18 @@ public class MySqlTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private Supplier<Connection> provider;
+    private Database database = new MySqlDatabase();
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, SQLException {
-        this.provider = new MySqlTestConnectionProvider();
-        try (Connection connection = provider.get()) {
+        try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
         }
     }
 
     @Test
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws SQLException, JFleetException {
-        try (Connection connection = provider.get()) {
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws Exception {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             LoadDataConfiguration config = from(Employee.class)
@@ -76,8 +76,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithMissedForeignKeyCanBeRollbacked() throws SQLException {
-        try (Connection connection = provider.get()) {
+    public void inLongTransactionWithMissedForeignKeyCanBeRollbacked() throws Exception {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             LoadDataConfiguration config = from(Employee.class)
@@ -98,8 +98,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithMissedForeignKeyCanBeSkipped() throws SQLException, JFleetException {
-        try (Connection connection = provider.get()) {
+    public void inLongTransactionWithMissedForeignKeyCanBeSkipped() throws Exception {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             LoadDataConfiguration config = from(Employee.class)
@@ -117,8 +117,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws SQLException {
-        try (Connection connection = provider.get()) {
+    public void inLongTransactionWithDuplicatedIdCanBeRollbacked() throws Exception {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             LoadDataConfiguration config = from(Employee.class)
@@ -139,8 +139,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void inLongTransactionWithDuplicatedIdCanBeSkipped() throws SQLException, JFleetException {
-        try (Connection connection = provider.get()) {
+    public void inLongTransactionWithDuplicatedIdCanBeSkipped() throws Exception {
+        try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 
             LoadDataConfiguration config = from(Employee.class)
@@ -158,8 +158,8 @@ public class MySqlTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws SQLException {
-        try (Connection connection = provider.get()) {
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws Exception {
+        try (Connection connection = database.getConnection()) {
             LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)
@@ -174,13 +174,13 @@ public class MySqlTransactionPolicyTest {
                 assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
                 return;
             }
-            assertTrue("Expected JFleetException exception", false);
+            assertTrue(false, "Expected JFleetException exception");
         }
     }
 
     @Test
-    public void multipleBatchOperationsCanMissRows() throws SQLException, JFleetException {
-        try (Connection connection = provider.get()) {
+    public void multipleBatchOperationsCanMissRows() throws Exception {
+        try (Connection connection = database.getConnection()) {
             LoadDataConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)
                     .autocommit(true)

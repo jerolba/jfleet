@@ -15,13 +15,11 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
@@ -29,11 +27,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class SpecialCharsPersistenceTest extends AllDatabasesBaseTest {
+public class SpecialCharsPersistenceTest {
 
     @Entity
     @Table(name = "table_with_strings")
@@ -60,7 +59,7 @@ public class SpecialCharsPersistenceTest extends AllDatabasesBaseTest {
 
     }
 
-    public void testWithString(String text) throws JFleetException, SQLException, IOException {
+    public void testWithString(Database database, String text) throws Exception {
         EnityWithStrings entity = new EnityWithStrings();
         entity.setFoo("Some text");
         entity.setBar(text);
@@ -81,24 +80,24 @@ public class SpecialCharsPersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void persistTab() throws JFleetException, SQLException, IOException {
-        testWithString("A text with a tab \t char inside \t");
+    @TestAllDBs
+    public void persistTab(@WithDB Database database) throws Exception {
+        testWithString(database, "A text with a tab \t char inside \t");
     }
 
-    @Test
-    public void persistReturn() throws JFleetException, SQLException, IOException {
-        testWithString("A text with a return \n char \n");
-        testWithString("A text with a return \n char \n\r");
+    @TestAllDBs
+    public void persistReturn(@WithDB Database database) throws Exception {
+        testWithString(database, "A text with a return \n char \n");
+        testWithString(database, "A text with a return \n char \n\r");
     }
 
-    @Test
-    public void persistWithEscapeChar() throws JFleetException, SQLException, IOException {
-        testWithString("A text with \\ a escape \\");
+    @TestAllDBs
+    public void persistWithEscapeChar(@WithDB Database database) throws Exception {
+        testWithString(database, "A text with \\ a escape \\");
     }
 
-    @Test
-    public void persistMixChars() throws JFleetException, SQLException, IOException {
-        testWithString("A text all \\ types \t of \n escape chars\n\r");
+    @TestAllDBs
+    public void persistMixChars(@WithDB Database database) throws Exception {
+        testWithString(database, "A text all \\ types \t of \n escape chars\n\r");
     }
 }
