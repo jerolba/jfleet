@@ -19,8 +19,8 @@ import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstrain
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
 import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -84,7 +84,7 @@ public class JdbcTransactionPolicyTest {
                 assertEquals(0, numberOfRowsInEmployeeTable(connection));
                 return;
             }
-            assertTrue("Expected SQLException exception", false);
+            assertTrue(false, "Expected SQLException exception");
         }
     }
 
@@ -107,7 +107,7 @@ public class JdbcTransactionPolicyTest {
                 assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
                 return;
             }
-            assertTrue("Expected SQLException exception", false);
+            assertTrue(false, "Expected SQLException exception");
         }
     }
 
