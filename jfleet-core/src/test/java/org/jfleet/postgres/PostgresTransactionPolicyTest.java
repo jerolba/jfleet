@@ -29,7 +29,6 @@ import java.sql.SQLException;
 import java.util.function.Supplier;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,8 +51,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly()
-            throws SQLException, JFleetException {
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws Exception {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -74,7 +72,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void longTransactionWithConstraintExceptionIsRollbacked() throws SQLException, JFleetException {
+    public void longTransactionWithConstraintExceptionIsRollbacked() throws Exception {
         try (Connection connection = provider.get()) {
             connection.setAutoCommit(false);
 
@@ -98,8 +96,7 @@ public class PostgresTransactionPolicyTest {
     }
 
     @Test
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction()
-            throws SQLException, JFleetException {
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction() throws Exception {
         try (Connection connection = provider.get()) {
             PgCopyConfiguration config = from(Employee.class)
                     .batchSize(VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA)

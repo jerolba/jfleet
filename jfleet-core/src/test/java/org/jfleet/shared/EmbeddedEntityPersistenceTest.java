@@ -18,27 +18,26 @@ package org.jfleet.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
 import org.jfleet.entities.Address;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
+import org.jfleet.parameterized.Database;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class EmbeddedEntityPersistenceTest extends AllDatabasesBaseTest {
+public class EmbeddedEntityPersistenceTest {
 
-    @Test
-    public void canPersistAnEntityWithEmbeddedValues() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithEmbeddedValues(@WithDB Database database) throws Exception {
         Person p1 = new Person();
         p1.setId(1L);
         p1.setName("Sherlock Holmes");
@@ -75,8 +74,8 @@ public class EmbeddedEntityPersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void canPersistAnEntityWithMultipleEmbeddedValues() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithMultipleEmbeddedValues(@WithDB Database database) throws Exception {
         Company c1 = new Company();
         c1.setId(1L);
         c1.setName("Apple Inc");
@@ -126,8 +125,8 @@ public class EmbeddedEntityPersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void canPersistAnEntityWithEmbeddedNullValue() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithEmbeddedNullValue(@WithDB Database database) throws Exception {
         Person p = new Person();
         p.setId(1L);
         p.setName("Sherlock Holmes");
@@ -154,9 +153,8 @@ public class EmbeddedEntityPersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-
-    @Test
-    public void canPersistAnEntityWithOneEmbeddedNull() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistAnEntityWithOneEmbeddedNull(@WithDB Database database) throws Exception {
         Company c = new Company();
         c.setId(1L);
         c.setName("Apple Inc");

@@ -18,10 +18,8 @@ package org.jfleet.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -30,11 +28,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.Database;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class SimpleEntityPersistenceTest extends AllDatabasesBaseTest {
+public class SimpleEntityPersistenceTest {
 
     @Entity
     @Table(name = "simple_table")
@@ -64,8 +63,8 @@ public class SimpleEntityPersistenceTest extends AllDatabasesBaseTest {
 
     }
 
-    @Test
-    public void canPersistCollectionOfEntities() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void canPersistCollectionOfEntities(@WithDB Database database) throws Exception {
         int times = 1000;
         BulkInsert<SimpleEntity> insert = database.getBulkInsert(SimpleEntity.class);
         Stream<SimpleEntity> stream = IntStream.range(0, times)

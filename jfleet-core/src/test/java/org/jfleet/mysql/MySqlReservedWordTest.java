@@ -15,13 +15,11 @@
  */
 package org.jfleet.mysql;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -31,7 +29,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
@@ -61,7 +58,7 @@ public class MySqlReservedWordTest {
     }
 
     @Test
-    public void canPersistWithReservedWords() throws JFleetException, SQLException, IOException {
+    public void canPersistWithReservedWords() throws Exception {
         int times = 1000;
         BulkInsert<ReservedWordEntity> insert = new LoadDataBulkInsert<>(ReservedWordEntity.class);
         Stream<ReservedWordEntity> stream = IntStream.range(0, times)

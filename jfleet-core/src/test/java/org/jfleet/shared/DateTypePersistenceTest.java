@@ -18,10 +18,8 @@ package org.jfleet.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,15 +30,16 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
+import org.jfleet.parameterized.Database;
+import org.jfleet.parameterized.TestAllDBs;
+import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.SqlUtil;
-import org.junit.Test;
 
-public class DateTypePersistenceTest extends AllDatabasesBaseTest {
+public class DateTypePersistenceTest {
 
-    @Test
-    public void persistAllDateTypes() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void persistAllDateTypes(@WithDB Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));
         entity.setDate(getDate("24/01/2012 23:12:48"));
@@ -79,8 +78,8 @@ public class DateTypePersistenceTest extends AllDatabasesBaseTest {
         }
     }
 
-    @Test
-    public void persistNullDateTypes() throws JFleetException, SQLException, IOException {
+    @TestAllDBs
+    public void persistNullDateTypes(@WithDB Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(null);
         entity.setDate(null);

@@ -22,17 +22,16 @@ import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
 import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
 import org.jfleet.parameterized.JdbcDatabase;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.parameterized.WithDB;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +40,10 @@ public class JdbcTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(JdbcTransactionPolicyTest.class);
     private static final long TWO_ROW_BATCH_SIZE = 2;
 
-    @ParameterizedTest(name = "Database {0}")
-    @ArgumentsSource(JdbcArgumentsProvider.class)
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly(String name, JdbcDatabase database)
-            throws IOException, SQLException, JFleetException {
+    @TestDBs
+    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly(@WithDB JdbcDatabase database)
+            throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
@@ -64,10 +63,9 @@ public class JdbcTransactionPolicyTest {
         }
     }
 
-    @ParameterizedTest(name = "Database {0}")
-    @ArgumentsSource(JdbcArgumentsProvider.class)
-    public void longTransactionWithConstraintExceptionIsRollbacked(String name, JdbcDatabase database) 
-            throws IOException, SQLException, JFleetException {
+    @TestDBs
+    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
+    public void longTransactionWithConstraintExceptionIsRollbacked(@WithDB JdbcDatabase database) throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
@@ -90,10 +88,10 @@ public class JdbcTransactionPolicyTest {
         }
     }
 
-    @ParameterizedTest(name = "Database {0}")
-    @ArgumentsSource(JdbcArgumentsProvider.class)
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction(String name, 
-            JdbcDatabase database) throws IOException, SQLException, JFleetException {
+    @TestDBs
+    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction(
+            @WithDB JdbcDatabase database) throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
 
