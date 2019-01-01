@@ -15,7 +15,7 @@
  */
 package org.jfleet.postgres;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 
@@ -23,7 +23,7 @@ import org.jfleet.ColumnInfo;
 import org.jfleet.EntityFieldType;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SqlBuilderTest {
 

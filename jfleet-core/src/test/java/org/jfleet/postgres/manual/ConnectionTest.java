@@ -15,9 +15,10 @@
  */
 package org.jfleet.postgres.manual;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -28,7 +29,7 @@ import java.sql.Statement;
 
 import org.jfleet.common.StringBuilderReader;
 import org.jfleet.postgres.PostgresTestConnectionProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
 import org.postgresql.util.PSQLException;
@@ -111,7 +112,7 @@ public class ConnectionTest {
         }
     }
 
-    @Test(expected = PSQLException.class)
+    @Test
     public void canNotInsertIntoSerialColumn() throws SQLException, IOException {
         PostgresTestConnectionProvider connectionProvider = new PostgresTestConnectionProvider();
         try (Connection conn = connectionProvider.get()) {
@@ -128,7 +129,7 @@ public class ConnectionTest {
                 String row1 = "\\N\tJohn\n";
                 String row2 = "\\N\tSmith\n";
                 Reader reader = new StringBuilderReader(new StringBuilder(row1).append(row2));
-                copyManager.copyIn(sql, reader);
+                assertThrows(PSQLException.class, () -> copyManager.copyIn(sql, reader));
             }
         }
     }

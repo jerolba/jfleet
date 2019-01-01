@@ -20,8 +20,8 @@ import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstrain
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
 import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -31,8 +31,8 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class PostgresTransactionPolicyTest {
 
     private Supplier<Connection> provider;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, SQLException {
         this.provider = new PostgresTestConnectionProvider();
         try (Connection connection = provider.get()) {
@@ -93,7 +93,7 @@ public class PostgresTransactionPolicyTest {
                 assertEquals(0, numberOfRowsInEmployeeTable(connection));
                 return;
             }
-            assertTrue("Expected JFleetException exception", false);
+            assertTrue(false, "Expected JFleetException exception");
         }
     }
 
@@ -114,7 +114,7 @@ public class PostgresTransactionPolicyTest {
                 assertTrue(numberOfRowsInEmployeeTable(connection) > 0);
                 return;
             }
-            assertTrue("Expected JFleetException exception", false);
+            assertTrue(false, "Expected JFleetException exception");
         }
     }
 
