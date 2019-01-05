@@ -17,7 +17,7 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.jdbc.JdbcBulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
+import org.jfleet.jdbc.JdbcConfiguration;
 
 public abstract class JdbcDatabase extends Database {
 
@@ -30,7 +30,7 @@ public abstract class JdbcDatabase extends Database {
         return new JdbcBulkInsert<>(clazz);
     }
 
-    public <T> BulkInsert<T> getBulkInsert(Configuration<T> config) {
+    public <T> BulkInsert<T> getBulkInsert(JdbcConfiguration config) {
         return new JdbcBulkInsert<>(config);
     }
 

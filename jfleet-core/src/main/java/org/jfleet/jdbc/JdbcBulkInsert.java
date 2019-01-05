@@ -37,35 +37,30 @@ import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
 import org.jfleet.common.TransactionPolicy;
-import org.jfleet.inspection.JpaEntityInspector;
+import org.jfleet.jdbc.JdbcConfiguration.JdbcConfigurationBuilder;
 
 public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
-    private static final int DEFAULT_BATCH_SIZE = 10_000;
+    private final JdbcConfiguration cfg;
     private final String insertSql;
-
-    private final long batchSize;
-    private final boolean autocommit;
 
     private final List<Function<Object, Object>> accessors = new ArrayList<>();
     private final List<Function<Object, Object>> preConvert = new ArrayList<>();
 
     private final List<ColumnInfo> columns;
 
-    public JdbcBulkInsert(Class<T> clazz) {
-        this(new Configuration<>(clazz));
+    public JdbcBulkInsert(Class<?> clazz) {
+        this(JdbcConfigurationBuilder.from(clazz).build());
     }
 
-    public JdbcBulkInsert(Configuration<T> config) {
-        EntityInfo entityInfo = config.entityInfo;
-        if (entityInfo == null) {
-            JpaEntityInspector inspector = new JpaEntityInspector(config.clazz);
-            entityInfo = inspector.inspect();
-        }
-        this.batchSize = config.batchSize;
-        this.autocommit = config.autocommit;
-        this.columns = entityInfo.getNotIdentityColumns();
-        this.insertSql = createInsertQuery(entityInfo.getTableName(), columns);
+    public JdbcBulkInsert(EntityInfo entityInfo) {
+        this(JdbcConfigurationBuilder.from(entityInfo).build());
+    }
+
+    public JdbcBulkInsert(JdbcConfiguration config) {
+        this.cfg = config;
+        this.columns = cfg.getEntityInfo().getNotIdentityColumns();
+        this.insertSql = createInsertQuery(cfg.getEntityInfo().getTableName(), columns);
         for (ColumnInfo column : columns) {
             accessors.add(column.getAccessor());
         }
@@ -87,7 +82,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, autocommit);
+        TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, cfg.isAutocommit());
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
             BatchInsert batchInsert = new BatchInsert(txPolicy, pstmt);
             Iterator<T> iterator = stream.iterator();
@@ -115,7 +110,7 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             setObjectValues(pstmt, entity);
             pstmt.addBatch();
             count++;
-            if (count == batchSize) {
+            if (count == cfg.getBatchSize()) {
                 flush();
                 count = 0;
             }
@@ -195,30 +190,4 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    public static class Configuration<T> {
-
-        private Class<T> clazz;
-        private EntityInfo entityInfo;
-        private long batchSize = DEFAULT_BATCH_SIZE;
-        private boolean autocommit = true;
-
-        public Configuration(Class<T> clazz) {
-            this.clazz = clazz;
-        }
-
-        public Configuration(EntityInfo entityInfo) {
-            this.entityInfo = entityInfo;
-        }
-
-        public Configuration<T> batchSize(long batchSize) {
-            this.batchSize = batchSize;
-            return this;
-        }
-
-        public Configuration<T> autocommit(boolean autocommit) {
-            this.autocommit = autocommit;
-            return this;
-        }
-
-    }
 }

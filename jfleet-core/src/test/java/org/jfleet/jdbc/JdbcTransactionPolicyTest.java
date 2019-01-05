@@ -27,7 +27,7 @@ import java.sql.SQLException;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
-import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
+import org.jfleet.jdbc.JdbcConfiguration.JdbcConfigurationBuilder;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.parameterized.WithDB;
 import org.jfleet.util.JdbcDatabase;
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class JdbcTransactionPolicyTest {
 
     private static Logger logger = LoggerFactory.getLogger(JdbcTransactionPolicyTest.class);
-    private static final long TWO_ROW_BATCH_SIZE = 2;
+    private static final int TWO_ROW_BATCH_SIZE = 2;
 
     @TestDBs
     @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
@@ -48,9 +48,10 @@ public class JdbcTransactionPolicyTest {
             setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            JdbcConfiguration config = JdbcConfigurationBuilder.from(Employee.class)
                     .batchSize(TWO_ROW_BATCH_SIZE)
-                    .autocommit(false);
+                    .autocommit(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             bulkInsert.insertAll(connection, employeesWithOutErrors());
@@ -70,9 +71,10 @@ public class JdbcTransactionPolicyTest {
             setupDatabase(connection);
             connection.setAutoCommit(false);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            JdbcConfiguration config = JdbcConfigurationBuilder.from(Employee.class)
                     .batchSize(TWO_ROW_BATCH_SIZE)
-                    .autocommit(false);
+                    .autocommit(false)
+                    .build();
             BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             try {
@@ -95,9 +97,10 @@ public class JdbcTransactionPolicyTest {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
 
-            Configuration<Employee> config = new Configuration<>(Employee.class)
+            JdbcConfiguration config = JdbcConfigurationBuilder.from(Employee.class)
                     .batchSize(TWO_ROW_BATCH_SIZE)
-                    .autocommit(true);
+                    .autocommit(true)
+                    .build();
             BulkInsert<Employee> bulkInsert = database.getBulkInsert(config);
 
             try {

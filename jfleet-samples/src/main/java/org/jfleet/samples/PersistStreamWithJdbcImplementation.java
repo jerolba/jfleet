@@ -23,7 +23,8 @@ import java.util.function.Supplier;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.jdbc.JdbcBulkInsert;
-import org.jfleet.jdbc.JdbcBulkInsert.Configuration;
+import org.jfleet.jdbc.JdbcConfiguration;
+import org.jfleet.jdbc.JdbcConfiguration.JdbcConfigurationBuilder;
 import org.jfleet.samples.entities.TripFlatEntity;
 import org.jfleet.samples.shared.CitiBikeReader;
 import org.jfleet.samples.shared.FlatTripParser;
@@ -41,8 +42,8 @@ public class PersistStreamWithJdbcImplementation {
         try (Connection connection = connectionSuplier.get()){
             TableHelper.createTable(connection);
             CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
-            Configuration<TripFlatEntity> config = new Configuration<>(TripFlatEntity.class)
-                    .batchSize(100);
+            JdbcConfiguration config = JdbcConfigurationBuilder.from(TripFlatEntity.class)
+                    .batchSize(100).build();
             BulkInsert<TripFlatEntity> bulkInsert = new JdbcBulkInsert<>(config);
             reader.forEachCsvInZip(trips -> {
                 try {
