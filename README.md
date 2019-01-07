@@ -203,9 +203,7 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 ### Supported database versions
 
-JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and the latest stable release of **PostgreSQL 9.6**.
-
-PostgreSQL 10.1 release has been manually tested without any problem.
+JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and the latest stable release of **PostgreSQL 10.6**.
 
 MySQL 8 is not yet supported by JFleet because requires the latest JDBC driver which it is completely rewritten, and all internal classes used by JFleet change from 5.x versions.
 
