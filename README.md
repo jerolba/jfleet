@@ -62,7 +62,7 @@ public class Customer {
 
     private Long id;
 
-    private String contactName;
+    private String telephone;
     
     @Column(name="customer_name")
     private String name;
@@ -119,18 +119,18 @@ More information about supported annotations and limitations can be found in the
 
 ### Maping manually each column
  
-If you have any problem using JPA annotations in your domain objects or directly you don't want to add `javax.persistence` dependency to your project, you can configure it manually mapping each column to a field path, separating each field name in the path with `.`. 
+If you have any problem using JPA annotations in your domain objects or directly you don't want to add `javax.persistence` dependency to your project, you can configure it manually mapping each column to a field path. If a field has a reference to other object, separate each field name in the path with `.`. 
 
-This mechanism is much more powerfull than JPA, and allows you also to map values that are not present in the object, transform or systhetice it.    
+This mechanism is much more powerfull than JPA, and allows you also to map values that are not present in the object or transform it.    
 
-Given a similar domain object, we need to persist the customer age, and the object only have the country name, but not the code:
+Given a similar domain object, we need to persist the customer age. The object only have the country name, but not a needed country code:
 
 ```java
 
 public class Customer {
 
     private Long id;
-    private String contactName;
+    private String telephone;
     private String name;
     private City city;
     private String countryName;
@@ -149,15 +149,15 @@ Date today = new Date();
 
 EntityInfo customerMap = new EntityInfoBuilder(Customer.class, "customer_contact")
 	.addField("id", "id")
-	.addField("contactName", "contactname")
+	.addField("telephone")
 	.addField("name", "customer_name")
 	.addField("city_id", "city.id")
-	.addColumn("country_id", STRING, customer -> mapCountryName2CountryId.get(customer.getCountryName()))
+	.addColumn("country_id", INT, customer -> mapCountryName2CountryId.get(customer.getCountryName()))
 	.addColumn("age", INT, custormer -> calculateDifferenceYears(customer.getBirthDate(), today));
 	.build();
 ```
 
-And instead of instantiate the BulkInsert with the annotated class, we use the created EntityInfo:
+And instead of instantiate the BulkInsert with the annotated class, use the created EntityInfo:
 
 ```java
     try (Connection connection = dataSource.getConnection()){
@@ -170,7 +170,7 @@ And instead of instantiate the BulkInsert with the annotated class, we use the c
 You can find more examples on how to map objects in the [example project](https://github.com/jerolba/jfleet/tree/master/jfleet-samples/src/main/java/org/jfleet/samples).
 
 
-In all cases transactionality, batch size or error management can be configured. You can find more information in the project [wiki page](https://github.com/jerolba/jfleet/wiki/BulkInsert-configuration).
+In both cases, transactionality, batch size or error management in MySQL can be configured in the same way. You can find more information in the project [wiki page](https://github.com/jerolba/jfleet/wiki/BulkInsert-configuration).
 
 ## Dependency
 
@@ -197,11 +197,12 @@ By default JFleet uses basic `javax.persistence` annotations. If you use it, and
     <version>1.0.2</version>
 </dependency>
 ```
+
 Apart from `persistence-api` and [SLF4J](https://www.slf4j.org/) for logging, JFleet does not have any dependency.
 JFleet has not been tested against all JDBC driver versions, but it is expected that any modern version will work properly.
 
 
-### Supported database versions
+## Supported database versions
 
 JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and the latest stable release of **PostgreSQL 10.6**.
 
