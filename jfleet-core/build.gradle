@@ -1,5 +1,5 @@
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 apply plugin: 'maven-publish'
@@ -108,8 +108,8 @@ if (project.hasProperty('bintrayUser')){
             vcsUrl = 'https://github.com/jerolba/jfleet.git'
             labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
             version {
-                name = '0.5.12'
-                desc = 'Add concurrent execution'
+                name = '0.6.1'
+                desc = 'Improve configuration'
                 released  = new Date()
             }
         }
