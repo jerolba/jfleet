@@ -11,7 +11,7 @@ JFleet is a Java library which persist in database large collections of Java POJ
 
 Its goal is to store a large amount of information in a **single table** using available batch persistence techniques.
 
-Despite using basic JPA annotations to map Java objects to tables and columns, **JFleet is not an ORM**.
+despite being able to use JPA annotations to map Java objects to tables and columns, **JFleet is not an ORM**.
 
 ## Table of Contents
 
@@ -46,7 +46,7 @@ You can find all the benchmarks numbers and results [here](https://github.com/je
 JFleet needs to know how to map your Java objects or entities to a table. JFleet provides two mechanisms to map your objects to a table:
 
 - Using standard [JPA annotations](https://docs.oracle.com/javaee/6/api/javax/persistence/package-summary.html) like [@Entity](https://docs.oracle.com/javaee/6/api/javax/persistence/Entity.html), [@Column](https://docs.oracle.com/javaee/6/api/javax/persistence/Column.html) or [@ManyToOne](https://docs.oracle.com/javaee/6/api/javax/persistence/ManyToOne.html). 
-- Mapping manually each column to one field attribute or with a `Function`   
+- Mapping manually each column to one object field or with a `Function`   
 
 ### Using standard JPA annotations 
 
@@ -123,7 +123,7 @@ If you have any problem using JPA annotations in your domain objects or directly
 
 This mechanism is much more powerfull than JPA, and allows you also to map values that are not present in the object, transform or systhetice it.    
 
-Given a similar domain object, we need to persist the customer age, and the object only have the cityName, but not the code:
+Given a similar domain object, we need to persist the customer age, and the object only have the country name, but not the code:
 
 ```java
 
@@ -132,7 +132,8 @@ public class Customer {
     private Long id;
     private String contactName;
     private String name;
-    private String cityName;
+    private City city;
+    private String countryName;
     private Date birthDate;
     
     //Getters and setters
@@ -150,7 +151,8 @@ EntityInfo customerMap = new EntityInfoBuilder(Customer.class, "customer_contact
 	.addField("id", "id")
 	.addField("contactName", "contactname")
 	.addField("name", "customer_name")
-	.addColumn("city_id", STRING, customer -> mapCityName2CityId.get(customer.getCityName()))
+	.addField("city_id", "city.id")
+	.addColumn("country_id", STRING, customer -> mapCountryName2CountryId.get(customer.getCountryName()))
 	.addColumn("age", INT, custormer -> calculateDifferenceYears(customer.getBirthDate(), today));
 	.build();
 ```
@@ -186,7 +188,7 @@ or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 
-By default JFleet uses basic `javax.persistence` annotations. If you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
+By default JFleet uses basic `javax.persistence` annotations. If you use it, and you don't have any JPA implementation as a dependency in your project, you must add the Javax Persistence API dependency:
 
 ```xml
 <dependency>
