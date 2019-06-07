@@ -120,12 +120,12 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
         /**
          * Experimental feature: allows to wrap the ContentWriter object, which
          * is the object in charge of writing the information into the database.
-         * 
+         *
          * Any error in the operation can be managed by the warepper and
          * implement some error management.
-         * 
+         *
          * See {@code LockTimeoutErrorManager} for an example.
-         * 
+         *
          * @param writerWrapper
          *            with the ContentWriter wrapper
          * @return the builder

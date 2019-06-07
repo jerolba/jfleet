@@ -1,3 +1,18 @@
+/**
+ * Copyright 2017 Jerónimo López Bezanilla
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jfleet.mysql.error;
 
 import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
@@ -28,9 +43,9 @@ import org.slf4j.LoggerFactory;
 public class LockRetryTest {
 
     private static Logger logger = LoggerFactory.getLogger(LockRetryTest.class);
-            
+
     private Database database = new MySqlDatabase();
-    
+
     private static City city1 = new City(1, "Madrid");
     private static City city2 = new City(2, "Barcelona");
 
@@ -49,9 +64,8 @@ public class LockRetryTest {
                 connection.setAutoCommit(false);
                 connection.createStatement().execute("SET innodb_lock_wait_timeout = 2");
                 LoadDataConfiguration config = from(Employee.class)
-                        .writerWrapper(writer -> new LockTimeoutErrorManager(writer, 3))
-                        .build();
-                
+                        .writerWrapper(writer -> new LockTimeoutErrorManager(writer, 3)).build();
+
                 BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
                 long init = System.nanoTime();
                 bulkInsert.insertAll(connection, moreEmployees());
@@ -62,7 +76,7 @@ public class LockRetryTest {
             }
         }
     }
-    
+
     @Test
     public void lockTableRetryFinishInIteratoins() throws Exception {
         int lockMilisecond = 5000;
@@ -72,9 +86,8 @@ public class LockRetryTest {
                 connection.setAutoCommit(false);
                 connection.createStatement().execute("SET innodb_lock_wait_timeout = 1");
                 LoadDataConfiguration config = from(Employee.class)
-                        .writerWrapper(writer -> new LockTimeoutErrorManager(writer, 2))
-                        .build();
-                
+                        .writerWrapper(writer -> new LockTimeoutErrorManager(writer, 2)).build();
+
                 BulkInsert<Employee> bulkInsert = new LoadDataBulkInsert<>(config);
                 long init = System.nanoTime();
                 bulkInsert.insertAll(connection, moreEmployees());
@@ -86,9 +99,8 @@ public class LockRetryTest {
         }
     }
 
-    
-    private void lockTableForInsert(Connection connection, int lockMilisecond) throws SQLException, JFleetException {
-        new Thread(() ->{
+    private void lockTableForInsert(Connection connection, int lockMilisecond) {
+        new Thread(() -> {
             try {
                 connection.setAutoCommit(false);
                 LoadDataConfiguration config = from(Employee.class).build();
@@ -100,11 +112,11 @@ public class LockRetryTest {
                 Thread.sleep(lockMilisecond);
                 connection.commit();
                 logger.debug("Table unlocked");
-            } catch(SQLException | JFleetException | InterruptedException e) {
+            } catch (SQLException | JFleetException | InterruptedException e) {
                 throw new RuntimeException(e);
-            } 
+            }
         }).start();
-        //Avoid that main thread start before this
+        // Avoid that main thread start before this
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
@@ -122,8 +134,7 @@ public class LockRetryTest {
                 new Employee(6, "Alex", city1),
                 new Employee(7, "David", city1));
     }
-    
-    
+
     private static Stream<Employee> moreEmployees() {
         return Stream.of(
                 new Employee(8, "Albert", city1),
