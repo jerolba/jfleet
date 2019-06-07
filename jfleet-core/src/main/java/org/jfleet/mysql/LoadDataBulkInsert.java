@@ -61,7 +61,8 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, cfg.isAutocommit(), cfg.isErrorOnMissingRow());
         try (Statement stmt = getStatementForLoadLocal(conn)) {
             ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, cfg.getEncoding());
-            LoopAndWrite loopAndWrite = new LoopAndWrite(cfg, contentWriter, rowBuilder);
+            ContentWriter wrappedContentWriter = cfg.getWriterWrapper().apply(contentWriter);
+            LoopAndWrite loopAndWrite = new LoopAndWrite(cfg, wrappedContentWriter, rowBuilder);
             loopAndWrite.go(stream);
         } finally {
             txPolicy.close();

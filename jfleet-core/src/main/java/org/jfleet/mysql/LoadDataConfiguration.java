@@ -16,8 +16,10 @@
 package org.jfleet.mysql;
 
 import java.nio.charset.Charset;
+import java.util.function.Function;
 
 import org.jfleet.EntityInfo;
+import org.jfleet.common.ContentWriter;
 import org.jfleet.common.JFleetBatchConfig;
 import org.jfleet.inspection.JpaEntityInspector;
 
@@ -29,6 +31,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
     private boolean autocommit;
     private boolean concurrent;
     private boolean errorOnMissingRow;
+    private Function<ContentWriter, ContentWriter> writerWrapper;
 
     @Override
     public EntityInfo getEntityInfo() {
@@ -58,6 +61,10 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
         return errorOnMissingRow;
     }
 
+    public Function<ContentWriter, ContentWriter> getWriterWrapper() {
+        return writerWrapper;
+    }
+
     public static class LoadDataConfigurationBuilder {
 
         private Class<?> clazz;
@@ -67,6 +74,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
         private boolean autocommit = true;
         private boolean concurrent = true;
         private boolean errorOnMissingRow = false;
+        private Function<ContentWriter, ContentWriter> writerWrapper = id -> id;
 
         public static LoadDataConfigurationBuilder from(Class<?> clazz) {
             return new LoadDataConfigurationBuilder(clazz);
@@ -109,6 +117,24 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
             return this;
         }
 
+        /**
+         * Experimental feature: allows to wrap the ContentWriter object, which
+         * is the object in charge of writing the information into the database.
+         * 
+         * Any error in the operation can be managed by the warepper and
+         * implement some error management.
+         * 
+         * See {@code LockTimeoutErrorManager} for an example.
+         * 
+         * @param writerWrapper
+         *            with the ContentWriter wrapper
+         * @return the builder
+         */
+        public LoadDataConfigurationBuilder writerWrapper(Function<ContentWriter, ContentWriter> writerWrapper) {
+            this.writerWrapper = writerWrapper;
+            return this;
+        }
+
         public LoadDataConfiguration build() {
             if (entityInfo == null) {
                 JpaEntityInspector inspector = new JpaEntityInspector(clazz);
@@ -121,6 +147,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
             conf.encoding = this.encoding;
             conf.entityInfo = this.entityInfo;
             conf.errorOnMissingRow = this.errorOnMissingRow;
+            conf.writerWrapper = this.writerWrapper;
             return conf;
         }
     }

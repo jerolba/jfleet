@@ -46,6 +46,6 @@ public class StringBuilderReader extends Reader {
 
     @Override
     public void close() throws IOException {
-        sb.setLength(0);
+
     }
 }
