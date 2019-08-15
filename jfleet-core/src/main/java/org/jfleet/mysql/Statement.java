@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.jfleet.JFleetException;
+
 interface Statement extends AutoCloseable {
 
-    static Statement createStatement(Connection conn) {
+    static Statement createStatement(Connection conn) throws JFleetException{
         Connection unwrapped = null;
         try {
             Class<?> mysql5Class = Class.forName("com.mysql.jdbc.Connection");
