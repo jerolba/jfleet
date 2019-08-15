@@ -27,8 +27,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
@@ -80,24 +79,24 @@ public class SpecialCharsPersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void persistTab(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistTab(Database database) throws Exception {
         testWithString(database, "A text with a tab \t char inside \t");
     }
 
-    @TestAllDBs
-    public void persistReturn(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistReturn(Database database) throws Exception {
         testWithString(database, "A text with a return \n char \n");
         testWithString(database, "A text with a return \n char \n\r");
     }
 
-    @TestAllDBs
-    public void persistWithEscapeChar(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistWithEscapeChar(Database database) throws Exception {
         testWithString(database, "A text with \\ a escape \\");
     }
 
-    @TestAllDBs
-    public void persistMixChars(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistMixChars(Database database) throws Exception {
         testWithString(database, "A text all \\ types \t of \n escape chars\n\r");
     }
 }

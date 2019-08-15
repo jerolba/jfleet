@@ -15,6 +15,8 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.Postgres;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,11 +31,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
 import org.jfleet.parameterized.TestDBs;
-import org.jfleet.parameterized.WithDB;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
-import org.junit.jupiter.params.provider.ValueSource;
 
 public class PostgresReservedWordTest {
 
@@ -61,8 +62,8 @@ public class PostgresReservedWordTest {
     }
 
     @TestDBs
-    @ValueSource(strings = {"Postgres", "JdbcPosgres"})
-    public void canPersistWithReservedWords(@WithDB Database database) throws Exception {
+    @DBs({ Postgres, JdbcPosgres })
+    public void canPersistWithReservedWords(Database database) throws Exception {
         int times = 1000;
         BulkInsert<ReservedWordEntity> insert = database.getBulkInsert(ReservedWordEntity.class);
         Stream<ReservedWordEntity> stream = IntStream.range(0, times)

@@ -15,6 +15,8 @@
  */
 package org.jfleet.jdbc;
 
+import static org.jfleet.parameterized.Databases.JdbcMySql;
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstraintError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
@@ -28,10 +30,9 @@ import java.sql.SQLException;
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
 import org.jfleet.jdbc.JdbcConfiguration.JdbcConfigurationBuilder;
+import org.jfleet.parameterized.DBs;
 import org.jfleet.parameterized.TestDBs;
-import org.jfleet.parameterized.WithDB;
 import org.jfleet.util.JdbcDatabase;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +42,8 @@ public class JdbcTransactionPolicyTest {
     private static final int TWO_ROW_BATCH_SIZE = 2;
 
     @TestDBs
-    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
-    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly(@WithDB JdbcDatabase database)
-            throws Exception {
+    @DBs({ JdbcMySql, JdbcPosgres })
+    public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly(JdbcDatabase database) throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
@@ -65,8 +65,8 @@ public class JdbcTransactionPolicyTest {
     }
 
     @TestDBs
-    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
-    public void longTransactionWithConstraintExceptionIsRollbacked(@WithDB JdbcDatabase database) throws Exception {
+    @DBs({ JdbcMySql, JdbcPosgres })
+    public void longTransactionWithConstraintExceptionIsRollbacked(JdbcDatabase database) throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
             connection.setAutoCommit(false);
@@ -91,9 +91,9 @@ public class JdbcTransactionPolicyTest {
     }
 
     @TestDBs
-    @ValueSource(strings = { "JdbcMySql", "JdbcPosgres" })
-    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction(
-            @WithDB JdbcDatabase database) throws Exception {
+    @DBs({ JdbcMySql, JdbcPosgres })
+    public void multipleBatchOperationsExecuteMultipleLoadDataOperationsWithHisOwnTransaction(JdbcDatabase database)
+            throws Exception {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
 

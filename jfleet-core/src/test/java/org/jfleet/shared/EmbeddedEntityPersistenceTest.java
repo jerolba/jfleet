@@ -29,15 +29,14 @@ import org.jfleet.BulkInsert;
 import org.jfleet.entities.Address;
 import org.jfleet.entities.Company;
 import org.jfleet.entities.Person;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
 public class EmbeddedEntityPersistenceTest {
 
-    @TestAllDBs
-    public void canPersistAnEntityWithEmbeddedValues(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithEmbeddedValues(Database database) throws Exception {
         Person p1 = new Person();
         p1.setId(1L);
         p1.setName("Sherlock Holmes");
@@ -74,8 +73,8 @@ public class EmbeddedEntityPersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithMultipleEmbeddedValues(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithMultipleEmbeddedValues(Database database) throws Exception {
         Company c1 = new Company();
         c1.setId(1L);
         c1.setName("Apple Inc");
@@ -125,8 +124,8 @@ public class EmbeddedEntityPersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithEmbeddedNullValue(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithEmbeddedNullValue(Database database) throws Exception {
         Person p = new Person();
         p.setId(1L);
         p.setName("Sherlock Holmes");
@@ -153,8 +152,8 @@ public class EmbeddedEntityPersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithOneEmbeddedNull(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithOneEmbeddedNull(Database database) throws Exception {
         Company c = new Company();
         c.setId(1L);
         c.setName("Apple Inc");

@@ -20,12 +20,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.junit.jupiter.params.provider.EnumSource;
-
-@Target({ ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@TestDBs
-@EnumSource(Databases.class)
-public @interface TestAllDBs {
+@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+public @interface DBs {
+
+    Databases[] value();
 
 }

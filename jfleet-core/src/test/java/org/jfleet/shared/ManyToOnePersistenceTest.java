@@ -31,8 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
@@ -121,8 +120,8 @@ public class ManyToOnePersistenceTest {
 
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithManyToOne(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithManyToOne(Database database) throws Exception {
         Product p1 = new Product(1L, "Tesla X");
         Foo f1 = new Foo(1L, "85H", p1);
         Foo f2 = new Foo(2L, "100H", p1);
@@ -149,8 +148,8 @@ public class ManyToOnePersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithJoinColumn(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithJoinColumn(Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Bar f2 = new Bar(2L, 14.95, p1);
@@ -182,8 +181,8 @@ public class ManyToOnePersistenceTest {
      * the Id. The main entity then is persisted without the id of the referenced entity.
      * JFleet user must persist or load any entity referenced, or assign manually an id.
      */
-    @TestAllDBs
-    public void canPersistAnEntityWithManyToOneNullId(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithManyToOneNullId(Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Product p2 = new Product(null, "Amichi");
@@ -211,8 +210,8 @@ public class ManyToOnePersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void canPersistAnEntityWithManyToOneNullReference(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistAnEntityWithManyToOneNullReference(Database database) throws Exception {
         Product p1 = new Product(1L, "Gocco");
         Bar f1 = new Bar(1L, 10.95, p1);
         Bar f2 = new Bar(2L, 14.95, null);
