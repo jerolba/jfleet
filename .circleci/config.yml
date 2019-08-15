@@ -38,7 +38,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
         
-      - run: gradle test
+      - run: ./gradlew test
       
       # Jacoco and codecov
       - run: gradle jacocoTestReport
