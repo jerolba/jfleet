@@ -43,7 +43,7 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     private Stream<? extends Arguments> getDatabases(Databases[] dbs) {
-        return Stream.of(dbs).filter(this::mustFilterMysql).map(this::createDatabase).map(Arguments::of);
+        return Stream.of(dbs).map(this::createDatabase).map(Arguments::of);
     }
 
     private Database createDatabase(Databases enumValue) {
@@ -58,24 +58,6 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
             return new PostgresDatabase();
         }
         return null;
-    }
-
-    private boolean mustFilterMysql(Databases db) {
-        if (db.name().contains("MySql") && !db.name().contains("MySql8")) {
-            if (!isMySql5Present()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean isMySql5Present() {
-        try {
-            Class.forName("com.mysql.jdbc.PreparedStatement");
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
     }
 
 }
