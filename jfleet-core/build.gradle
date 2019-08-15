@@ -46,6 +46,7 @@ test {
     	showExceptions true
     	showStackTraces true
     	showCauses true
+    	exceptionFormat TestExceptionFormat.FULL
         events "passed", "skipped", "failed"
     }
 }
