@@ -30,16 +30,15 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
 public class DateTypePersistenceTest {
 
-    @TestAllDBs
-    public void persistAllDateTypes(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistAllDateTypes(Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));
         entity.setDate(getDate("24/01/2012 23:12:48"));
@@ -78,8 +77,8 @@ public class DateTypePersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void persistNullDateTypes(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistNullDateTypes(Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(null);
         entity.setDate(null);

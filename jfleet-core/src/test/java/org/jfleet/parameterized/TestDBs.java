@@ -21,10 +21,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
-@Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@ParameterizedTest(name = "Database {0}")
+@ParameterizedTest
+@ArgumentsSource(DatabaseArgumentProvider.class)
 public @interface TestDBs {
 
 }

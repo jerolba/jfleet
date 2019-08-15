@@ -28,8 +28,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
@@ -63,8 +62,8 @@ public class SimpleEntityPersistenceTest {
 
     }
 
-    @TestAllDBs
-    public void canPersistCollectionOfEntities(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistCollectionOfEntities(Database database) throws Exception {
         int times = 1000;
         BulkInsert<SimpleEntity> insert = database.getBulkInsert(SimpleEntity.class);
         Stream<SimpleEntity> stream = IntStream.range(0, times)

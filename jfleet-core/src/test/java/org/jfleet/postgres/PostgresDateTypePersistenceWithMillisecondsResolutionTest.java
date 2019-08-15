@@ -15,6 +15,8 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.Postgres;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,19 +33,18 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
 import org.jfleet.parameterized.TestDBs;
-import org.jfleet.parameterized.WithDB;
 import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.Database;
 import org.jfleet.util.PostgresDatabase;
 import org.jfleet.util.SqlUtil;
-import org.junit.jupiter.params.provider.ValueSource;
 
 public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
 
     @TestDBs
-    @ValueSource(strings = {"Postgres", "JdbcPosgres"})
-    public void persistWithMillisecondResolution(@WithDB Database database) throws Exception {
+    @DBs({Postgres, JdbcPosgres})
+    public void persistWithMillisecondResolution(Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48.132"));
         entity.setTime(getDate("24/01/2012 23:12:48.132"));

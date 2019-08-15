@@ -26,8 +26,7 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.shared.entities.EnumForTest;
 import org.jfleet.util.Database;
@@ -35,8 +34,8 @@ import org.jfleet.util.SqlUtil;
 
 public class TypePersistenceTest {
 
-    @TestAllDBs
-    public void persistAllTypes(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistAllTypes(Database database) throws Exception {
         EntityWithBasicTypes entity = new EntityWithBasicTypes();
         entity.setBooleanObject(true);
         entity.setByteObject((byte) 42);
@@ -80,8 +79,8 @@ public class TypePersistenceTest {
         }
     }
 
-    @TestAllDBs
-    public void persistNullValues(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void persistNullValues(Database database) throws Exception {
         EntityWithBasicTypes entity = new EntityWithBasicTypes();
         entity.setBooleanObject(null);
         entity.setByteObject(null);

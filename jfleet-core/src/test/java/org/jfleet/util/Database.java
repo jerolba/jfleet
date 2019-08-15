@@ -38,4 +38,9 @@ public abstract class Database {
         return new DatabaseTestConnectionProvider(getProperties()).get();
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName().replace("Database", "");
+    }
+
 }

@@ -15,24 +15,38 @@
  */
 package org.jfleet.parameterized;
 
+import java.lang.reflect.Method;
+import java.util.stream.Stream;
+
+import org.jfleet.util.Database;
 import org.jfleet.util.JdbcMysqlDatabase;
 import org.jfleet.util.JdbcPostgresDatabase;
 import org.jfleet.util.MySqlDatabase;
 import org.jfleet.util.PostgresDatabase;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.params.converter.ArgumentConversionException;
-import org.junit.jupiter.params.converter.ArgumentConverter;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 
-public class DatabaseArgumentConverter implements ArgumentConverter {
+public class DatabaseArgumentProvider implements ArgumentsProvider {
 
     @Override
-    public Object convert(Object source, ParameterContext context) throws ArgumentConversionException {
-        Databases enumValue = null;
-        if (source instanceof Databases) {
-            enumValue = (Databases) source;
-        } else {
-            enumValue = Databases.valueOf((String) source);
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+        Method testMethod = context.getTestMethod().get();
+        DBs dbs = testMethod.getAnnotation(DBs.class);
+        if (dbs != null) {
+            Databases[] value = dbs.value();
+            if (value != null && value.length > 0) {
+                return getDatabases(value);
+            }
         }
+        return getDatabases(Databases.values());
+    }
+
+    private Stream<? extends Arguments> getDatabases(Databases[] dbs) {
+        return Stream.of(dbs).map(this::createDatabase).map(Arguments::of);
+    }
+
+    private Database createDatabase(Databases enumValue) {
         switch (enumValue) {
         case JdbcMySql:
             return new JdbcMysqlDatabase();

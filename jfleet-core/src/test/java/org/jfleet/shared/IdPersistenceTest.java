@@ -32,8 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestAllDBs;
-import org.jfleet.parameterized.WithDB;
+import org.jfleet.parameterized.TestDBs;
 import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 
@@ -62,8 +61,8 @@ public class IdPersistenceTest {
 
     }
 
-    @TestAllDBs
-    public void canPersistWithAssignedId(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistWithAssignedId(Database database) throws Exception {
         int times = 1000;
         BulkInsert<EntityWithAssignedId> insert = database.getBulkInsert(EntityWithAssignedId.class);
         Stream<EntityWithAssignedId> stream = LongStream.range(0, times)
@@ -110,8 +109,8 @@ public class IdPersistenceTest {
 
     }
 
-    @TestAllDBs
-    public void canPersistWithIdentityId(@WithDB Database database) throws Exception {
+    @TestDBs
+    public void canPersistWithIdentityId(Database database) throws Exception {
         int times = 1000;
         BulkInsert<EntityWithIdentityId> insert = database.getBulkInsert(EntityWithIdentityId.class);
         Stream<EntityWithIdentityId> stream = LongStream.range(0, times)
