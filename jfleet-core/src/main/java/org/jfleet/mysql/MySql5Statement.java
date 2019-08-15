@@ -1,8 +1,8 @@
 package org.jfleet.mysql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import com.mysql.jdbc.ResultsetInspector;
 
@@ -22,8 +22,8 @@ class MySql5Statement implements org.jfleet.mysql.Statement {
     }
 
     @Override
-    public void setLocalInfileInputStream(ReaderInputStream ris) {
-        statement.setLocalInfileInputStream(ris);
+    public void setLocalInfileInputStream(InputStream is) {
+        statement.setLocalInfileInputStream(is);
     }
 
     @Override
@@ -32,7 +32,7 @@ class MySql5Statement implements org.jfleet.mysql.Statement {
     }
 
     @Override
-    public Optional<Long> getUpdatedRows() {
+    public long getUpdatedRows() {
         return ResultsetInspector.getUpdatedRows(statement);
     }
 

@@ -1,8 +1,8 @@
 package org.jfleet.mysql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.jfleet.JFleetException;
 
@@ -26,13 +26,13 @@ interface Statement extends AutoCloseable {
         }
     }
 
-    void setLocalInfileInputStream(ReaderInputStream ris);
+    void setLocalInfileInputStream(InputStream is);
 
     @Override
     void close() throws SQLException;
 
     void execute(String mainSql) throws SQLException;
 
-    Optional<Long> getUpdatedRows();
+    long getUpdatedRows();
 
 }
