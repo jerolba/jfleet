@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
+import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.util.Database;
 import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@IsMySql5Present
 public class MySqlTransactionPolicyTest {
 
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);

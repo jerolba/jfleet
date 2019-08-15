@@ -33,6 +33,7 @@ import org.jfleet.entities.City;
 import org.jfleet.entities.Employee;
 import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.mysql.LoadDataConfiguration;
+import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.util.Database;
 import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@IsMySql5Present
 public class LockRetryTest {
 
     private static Logger logger = LoggerFactory.getLogger(LockRetryTest.class);

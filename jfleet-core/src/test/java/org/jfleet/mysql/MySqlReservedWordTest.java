@@ -29,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.util.MySqlDatabase;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,7 @@ public class MySqlReservedWordTest {
     }
 
     @Test
+    @IsMySql5Present
     public void canPersistWithReservedWords() throws Exception {
         int times = 1000;
         BulkInsert<ReservedWordEntity> insert = new LoadDataBulkInsert<>(ReservedWordEntity.class);
