@@ -6,7 +6,7 @@ import java.util.Optional;
 
 interface Statement extends AutoCloseable {
 
-    static Statement createStatement(Connection conn) throws SQLException {
+    static Statement createStatement(Connection conn) {
         Connection unwrapped = null;
         try {
             Class<?> mysql5Class = Class.forName("com.mysql.jdbc.Connection");
@@ -16,12 +16,12 @@ interface Statement extends AutoCloseable {
             try {
                 Class<?> mysql8Class = Class.forName("com.mysql.cj.jdbc.JdbcConnection");
                 unwrapped = (Connection) conn.unwrap(mysql8Class);
+                return new MySql8Statement(unwrapped);
             } catch (ClassNotFoundException | SQLException e2) {
                 throw new RuntimeException("Incorrect Connection type. Expected com.mysql.jdbc.Connection"
                         + " or com.mysql.cj.jdbc.JdbcConnection");
             }
         }
-        return (Statement) unwrapped.createStatement();
     }
 
     void setLocalInfileInputStream(ReaderInputStream ris);
