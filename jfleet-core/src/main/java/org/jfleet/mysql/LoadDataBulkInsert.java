@@ -16,6 +16,7 @@
 package org.jfleet.mysql;
 
 import static org.jfleet.mysql.MySqlTransactionPolicy.getTransactionPolicy;
+import static org.jfleet.mysql.Statement.createStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,8 +30,6 @@ import org.jfleet.common.LoopAndWrite;
 import org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.mysql.jdbc.Statement;
 
 public class LoadDataBulkInsert<T> implements BulkInsert<T> {
 
@@ -59,7 +58,7 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
         LoadDataRowBuilder rowBuilder = new LoadDataRowBuilder(cfg.getEntityInfo());
         MySqlTransactionPolicy txPolicy = getTransactionPolicy(conn, cfg.isAutocommit(), cfg.isErrorOnMissingRow());
-        try (Statement stmt = getStatementForLoadLocal(conn)) {
+        try (Statement stmt = createStatement(conn)) {
             ContentWriter contentWriter = new LoadDataContentWriter(stmt, txPolicy, mainSql, cfg.getEncoding());
             ContentWriter wrappedContentWriter = cfg.getWriterWrapper().apply(contentWriter);
             LoopAndWrite loopAndWrite = new LoopAndWrite(cfg, wrappedContentWriter, rowBuilder);
@@ -67,17 +66,6 @@ public class LoadDataBulkInsert<T> implements BulkInsert<T> {
         } finally {
             txPolicy.close();
         }
-    }
-
-    private Statement getStatementForLoadLocal(Connection conn) throws SQLException {
-        com.mysql.jdbc.Connection unwrapped = null;
-        try {
-            unwrapped = conn.unwrap(com.mysql.jdbc.Connection.class);
-            unwrapped.setAllowLoadLocalInfile(true);
-        } catch (SQLException e) {
-            throw new RuntimeException("Incorrect Connection type. Expected com.mysql.jdbc.Connection");
-        }
-        return (Statement) unwrapped.createStatement();
     }
 
 }
