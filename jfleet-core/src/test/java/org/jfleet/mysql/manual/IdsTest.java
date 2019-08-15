@@ -25,7 +25,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.jfleet.parameterized.IsMySql5Present;
-import org.jfleet.util.Database;
 import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.Test;
 
@@ -35,11 +34,9 @@ import com.mysql.jdbc.Statement;
 @IsMySql5Present
 public class IdsTest {
 
-    private Database database = new MySqlDatabase();
-
     @Test
     public void canExecuteLoadDataWithAutoIncrement() throws SQLException, IOException {
-        try (Connection conn = (Connection) database.getConnection()) {
+        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "
@@ -69,7 +66,7 @@ public class IdsTest {
 
     @Test
     public void canExecuteLoadDataWithAutoIncrementIdSetted() throws SQLException, IOException {
-        try (Connection conn = (Connection) database.getConnection()) {
+        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "

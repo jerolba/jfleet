@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.Database;
@@ -38,6 +39,7 @@ import org.jfleet.util.SqlUtil;
 public class DateTypePersistenceTest {
 
     @TestDBs
+    @IsMySql5Present("Pending review configuration of timezones with MySql8 driver")
     public void persistAllDateTypes(Database database) throws Exception {
         EntityWithDateTypes entity = new EntityWithDateTypes();
         entity.setNonAnnotatedDate(getDate("24/01/2012 23:12:48"));

@@ -28,7 +28,7 @@ class MySql8Statement implements org.jfleet.mysql.Statement {
 
     private final com.mysql.cj.jdbc.StatementImpl statement;
 
-    public MySql8Statement(Connection unwrapped) throws SQLException, JFleetException {
+    MySql8Statement(Connection unwrapped) throws SQLException, JFleetException {
         com.mysql.cj.jdbc.JdbcConnection connection = (com.mysql.cj.jdbc.JdbcConnection) unwrapped;
         Properties properties = connection.getProperties();
         String allow = properties.getProperty("allowLoadLocalInfile");
