@@ -22,7 +22,7 @@ dependencies {
 	testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
 	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.2'
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.3.2'
     testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.2'
 }
