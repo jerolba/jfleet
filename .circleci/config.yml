@@ -52,6 +52,7 @@ jobs:
             - MYSQL_USER=test
             - MYSQL_PASSWORD=test
             - MYSQL_DATABASE=testdb
+        #In MySql 8 local-infile is not active by default
         command: mysqld --local-infile=1
       - image: circleci/postgres:11.5
         environment:
