@@ -15,7 +15,7 @@ compileJava   {
 dependencies {
 	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-	compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+	compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
     compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
 
 	testCompile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
