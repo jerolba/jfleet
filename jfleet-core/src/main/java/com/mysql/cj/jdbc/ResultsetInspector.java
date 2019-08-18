@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysql.jdbc;
+package com.mysql.cj.jdbc;
+
+import com.mysql.cj.jdbc.result.ResultSetInternalMethods;
 
 public class ResultsetInspector {
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
+    public static long getUpdatedRows(StatementImpl statement) {
+        ResultSetInternalMethods resultSetInternal = statement.getResultSetInternal();
         return resultSetInternal.getUpdateCount();
     }
 

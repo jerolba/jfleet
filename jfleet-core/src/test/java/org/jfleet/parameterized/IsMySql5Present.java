@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysql.jdbc;
+package org.jfleet.parameterized;
 
-public class ResultsetInspector {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
-        return resultSetInternal.getUpdateCount();
-    }
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(IsMySql5Condition.class)
+public @interface IsMySql5Present {
+
+    String value() default "";
 }

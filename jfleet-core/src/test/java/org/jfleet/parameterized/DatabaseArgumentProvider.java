@@ -60,4 +60,13 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
         return null;
     }
 
+    public static boolean isMySql5Present() {
+        try {
+            Class.forName("com.mysql.jdbc.PreparedStatement");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -1,4 +1,6 @@
 include 'jfleet-core'
 include 'jfleet-samples'
+include 'jfleet-mock-mysql5'
+include 'jfleet-mock-mysql8'
 
 rootProject.name = 'jfleet'

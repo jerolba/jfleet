@@ -15,12 +15,33 @@
  */
 package com.mysql.jdbc;
 
-public class ResultsetInspector {
+import java.io.InputStream;
+import java.sql.ResultSet;
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
-        return resultSetInternal.getUpdateCount();
+public class StatementImpl implements Statement {
+
+    public ResultSetInternalMethods getResultSetInternal() {
+        return null;
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    @Override
+    public void execute(String sql) {
+
+    }
+
+    @Override
+    public void setLocalInfileInputStream(InputStream inputStream) {
+
+    }
+
+    @Override
+    public ResultSet executeQuery(String sql) {
+        return null;
     }
 
 }

@@ -13,14 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysql.jdbc;
+package com.mysql.cj.jdbc;
 
-public class ResultsetInspector {
+import java.sql.SQLException;
+import java.util.Properties;
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
-        return resultSetInternal.getUpdateCount();
+public class JdbcConnection implements AutoCloseable {
+
+    public java.sql.Statement createStatement() throws SQLException {
+        throw new SQLException();
+    }
+
+    @Override
+    public void close() {
+
+    }
+
+    public Properties getProperties() {
+        return null;
     }
 
 }

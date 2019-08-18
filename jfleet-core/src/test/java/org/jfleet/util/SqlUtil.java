@@ -26,6 +26,8 @@ import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.cj.jdbc.JdbcConnection;
+
 public class SqlUtil {
 
     private static Logger logger = LoggerFactory.getLogger(SqlUtil.class);
@@ -52,11 +54,16 @@ public class SqlUtil {
             return Dialect.Mysql;
         } catch (SQLException e) {
             try {
-                conn.unwrap(PgConnection.class);
-                return Dialect.Postgres;
+                conn.unwrap(JdbcConnection.class);
+                return Dialect.Mysql;
             } catch (SQLException e1) {
-                logger.error("No dialect found for connection");
-                return null;
+                try {
+                    conn.unwrap(PgConnection.class);
+                    return Dialect.Postgres;
+                } catch (SQLException e2) {
+                    logger.error("No dialect found for connection");
+                    return null;
+                }
             }
         }
     }

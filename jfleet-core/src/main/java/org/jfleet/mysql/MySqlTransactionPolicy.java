@@ -17,7 +17,6 @@ package org.jfleet.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.jfleet.JFleetException;
 
@@ -31,7 +30,7 @@ interface MySqlTransactionPolicy {
         return new LongTransaction(errorOnMissingRow);
     }
 
-    void commit(int processed, Optional<Long> updatedInDB) throws SQLException, JFleetException;
+    void commit(int processed, long updatedInDB) throws SQLException, JFleetException;
 
     void close() throws SQLException;
 
@@ -44,12 +43,10 @@ interface MySqlTransactionPolicy {
         }
 
         @Override
-        public void commit(int processed, Optional<Long> updatedInDB) throws SQLException, JFleetException {
-            if (errorOnMissingRow && updatedInDB.isPresent()) {
-                if (processed != updatedInDB.get()) {
-                    throw new JFleetException(
-                            "Missed rows, processed: " + processed + ", expected: " + updatedInDB.get());
-                }
+        public void commit(int processed, long updatedInDB) throws SQLException, JFleetException {
+            if (errorOnMissingRow && processed != updatedInDB) {
+                throw new JFleetException(
+                        "Missed rows, processed by JFleet: " + processed + ", loaded in DB: " + updatedInDB);
             }
         }
 
@@ -74,13 +71,11 @@ interface MySqlTransactionPolicy {
         }
 
         @Override
-        public void commit(int processed, Optional<Long> updatedInDB) throws SQLException, JFleetException {
-            if (errorOnMissingRow && updatedInDB.isPresent()) {
-                if (processed != updatedInDB.get()) {
-                    this.connection.rollback();
-                    throw new JFleetException(
-                            "Missed row, processed: " + processed + ", expected: " + updatedInDB.get());
-                }
+        public void commit(int processed, long updatedInDB) throws SQLException, JFleetException {
+            if (errorOnMissingRow && processed != updatedInDB) {
+                this.connection.rollback();
+                throw new JFleetException(
+                        "Missed rows, processed by JFleet: " + processed + ", loaded in DB: " + updatedInDB);
             }
             this.connection.commit();
         }

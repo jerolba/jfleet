@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mysql.jdbc;
+package com.mysql.cj.jdbc;
 
-public class ResultsetInspector {
+import java.io.InputStream;
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
-        return resultSetInternal.getUpdateCount();
-    }
+public interface JdbcStatement extends AutoCloseable {
+
+    @Override
+    public void close();
+
+    void execute(String string);
+
+    void setLocalInfileInputStream(InputStream inputStream);
 
 }

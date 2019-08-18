@@ -17,7 +17,6 @@ package org.jfleet.mysql;
 
 import java.nio.charset.Charset;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import org.jfleet.JFleetException;
 import org.jfleet.common.ContentWriter;
@@ -25,9 +24,6 @@ import org.jfleet.common.StringBuilderReader;
 import org.jfleet.common.StringContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.mysql.jdbc.ResultsetInspector;
-import com.mysql.jdbc.Statement;
 
 class LoadDataContentWriter implements ContentWriter {
 
@@ -56,7 +52,7 @@ class LoadDataContentWriter implements ContentWriter {
             statement.execute(mainSql);
             logger.debug("{} ms writing {} bytes for {} records", (System.nanoTime() - init) / 1_000_000,
                     contentSize, stringContent.getRecords());
-            Optional<Long> updatedInDB = ResultsetInspector.getUpdatedRows(statement);
+            long updatedInDB = statement.getUpdatedRows();
             int processed = stringContent.getRecords();
             txPolicy.commit(processed, updatedInDB);
         }

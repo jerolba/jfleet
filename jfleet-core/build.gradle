@@ -13,24 +13,41 @@ compileJava   {
 }
 
 dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
 	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-	compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+	if (project.hasProperty("mysql8")) {
+		compileOnly project(':jfleet-mock-mysql5')
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+	} else {
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+		compileOnly project(':jfleet-mock-mysql8')
+	}
     compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
 
 	testCompile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-	testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
-	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+	if (project.hasProperty("mysql8")) {
+		testCompile project(':jfleet-mock-mysql5')
+		testCompile group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+    } else {
+		testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+		testCompile project(':jfleet-mock-mysql8')
+    }
+	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.3.2'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.3.2'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.2'
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.1'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
 }
 
 test {
     useJUnitPlatform()
     testLogging {
-        events "passed", "skipped", "failed"
+    	showStandardStreams true
+    	showExceptions true
+    	showStackTraces true
+    	showCauses true
+		exceptionFormat "full"
+        events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }
 

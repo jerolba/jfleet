@@ -15,12 +15,10 @@
  */
 package com.mysql.jdbc;
 
-public class ResultsetInspector {
+public class ResultSetInternalMethods {
 
-    public static long getUpdatedRows(Statement statement) {
-        StatementImpl impl = (StatementImpl) statement;
-        ResultSetInternalMethods resultSetInternal = impl.getResultSetInternal();
-        return resultSetInternal.getUpdateCount();
+    public Long getUpdateCount() {
+        return 0L;
     }
 
 }
