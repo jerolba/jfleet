@@ -47,7 +47,7 @@ jobs:
   build-latest:
     docker:
       - image: circleci/openjdk:8-jdk
-      - image: circleci/mysql:8.0.17
+      - image: circleci/mysql:8.0
         environment:
             - MYSQL_USER=test
             - MYSQL_PASSWORD=test

@@ -204,11 +204,9 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 ## Supported database versions
 
-JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and the latest stable release of **PostgreSQL 10.6**.
+JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 10.9** and **PostgreSQL 11.5**.
 
-MySQL 8 is not yet supported by JFleet because requires the latest JDBC driver which it is completely rewritten, and all internal classes used by JFleet change from 5.x versions.
-
-**JFleet is currently running in production against AWS Aurora MySQL edition**, and has been tested for benchmarks with the Google Cloud managed versions of MySQL and Postgres.   
+**JFleet is currently running in production against AWS Aurora MySQL edition**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.   
 
 Any database engine with a standard JDBC driver should be used with the `JdbcBulkInsert` implementation.
 
@@ -222,6 +220,13 @@ To execute all test you must execute the command:
 
 ```bash
 $ .\gradlew test
+```
+
+Because gradle can not resolve both drivers version concurrently, by default tests are executed with the MySQL 5.X JDBC driver. 
+To execute it with MySQL 8.0 driver, you must add a modifier to gradle command:
+
+```bash
+$ .\gradlew test -Pmysql8
 ```
 
 You can also fork the project and test it in your [CircleCI](https://circleci.com/signup/) free account.
