@@ -41,7 +41,7 @@ jobs:
       - run: ./gradlew test
       
       # Jacoco and codecov
-      - run: gradle jacocoTestReport
+      - run: ./gradlew jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
 
   build-latest:
@@ -84,7 +84,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
         
-      - run: gradle test -Pmysql8
+      - run: ./gradlew test -Pmysql8
       
 workflows:
   version: 2.0
