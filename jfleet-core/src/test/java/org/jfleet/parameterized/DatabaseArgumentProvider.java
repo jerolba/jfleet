@@ -22,6 +22,7 @@ import org.jfleet.util.Database;
 import org.jfleet.util.JdbcMsSqlDatabase;
 import org.jfleet.util.JdbcMysqlDatabase;
 import org.jfleet.util.JdbcPostgresDatabase;
+import org.jfleet.util.MsSqlDatabase;
 import org.jfleet.util.MySqlDatabase;
 import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -59,6 +60,8 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
             return new MySqlDatabase();
         case Postgres:
             return new PostgresDatabase();
+        case MsSql:
+            return new MsSqlDatabase();
         }
         return null;
     }

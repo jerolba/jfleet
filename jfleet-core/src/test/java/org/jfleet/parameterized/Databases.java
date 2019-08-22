@@ -17,6 +17,6 @@ package org.jfleet.parameterized;
 
 public enum Databases {
 
-    MySql, Postgres, JdbcPosgres, JdbcMySql, JdbcMsSql
+    MySql, Postgres, MsSql, JdbcPosgres, JdbcMySql, JdbcMsSql
 
 }
