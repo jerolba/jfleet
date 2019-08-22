@@ -16,7 +16,7 @@
 package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.mssql.BulkCopyBulkInsert;
 
 public class MsSqlDatabase extends Database {
 
@@ -30,7 +30,7 @@ public class MsSqlDatabase extends Database {
 
     @Override
     public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
-        return new LoadDataBulkInsert<>(clazz);
+        return new BulkCopyBulkInsert<>(clazz);
     }
 
 }
