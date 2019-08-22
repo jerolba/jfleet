@@ -23,6 +23,7 @@ public class JdbcConfiguration {
     private EntityInfo entityInfo;
     private int batchSize;
     private boolean autocommit;
+    private ParameterSetter parameterSetter;
 
     private JdbcConfiguration() {
     }
@@ -38,6 +39,10 @@ public class JdbcConfiguration {
     public boolean isAutocommit() {
         return autocommit;
     }
+    
+    public ParameterSetter getParameterSetter() {
+        return parameterSetter;
+    }
 
     public static class JdbcConfigurationBuilder {
 
@@ -45,6 +50,7 @@ public class JdbcConfiguration {
         private EntityInfo entityInfo;
         private int batchSize = 10_000;
         private boolean autocommit = true;
+        private ParameterSetter parameterSetter;
 
         public static JdbcConfigurationBuilder from(Class<?> clazz) {
             return new JdbcConfigurationBuilder(clazz);
@@ -72,6 +78,11 @@ public class JdbcConfiguration {
             return this;
         }
 
+        public JdbcConfigurationBuilder parameterSetter(ParameterSetter parameterSetter) {
+            this.parameterSetter = parameterSetter;
+            return this;
+        }
+
         public JdbcConfiguration build() {
             if (entityInfo == null) {
                 JpaEntityInspector inspector = new JpaEntityInspector(clazz);
@@ -81,6 +92,7 @@ public class JdbcConfiguration {
             conf.autocommit = this.autocommit;
             conf.batchSize = this.batchSize;
             conf.entityInfo = this.entityInfo;
+            conf.parameterSetter = this.parameterSetter;
             return conf;
         }
     }

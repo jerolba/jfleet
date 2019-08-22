@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
 
-public enum Databases {
+public class JdbcMsSqlDatabase extends JdbcDatabase {
 
-    MySql, Postgres, JdbcPosgres, JdbcMySql, JdbcMsSql
+    public JdbcMsSqlDatabase(String properties) {
+        super(properties);
+    }
+
+    public JdbcMsSqlDatabase() {
+        super("mssql-test.properties");
+    }
 
 }

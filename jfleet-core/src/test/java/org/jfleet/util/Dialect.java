@@ -19,7 +19,7 @@ import org.jfleet.EntityInfo;
 
 public enum Dialect {
 
-    Mysql(new MysqlDDLHelper()), Postgres(new PostgresDDLHelper());
+    Mysql(new MysqlDDLHelper()), Postgres(new PostgresDDLHelper()), Mssql(new MsSqlDDLHelper());
 
     private DDLHelper ddlHelper;
 
