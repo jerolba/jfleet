@@ -31,6 +31,7 @@ import org.jfleet.BulkInsert;
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityInfo;
 import org.jfleet.JFleetException;
+import org.jfleet.common.DatabaseVersion.Database;
 import org.jfleet.common.TransactionPolicy;
 import org.jfleet.jdbc.JdbcConfiguration.JdbcConfigurationBuilder;
 
@@ -135,16 +136,18 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
         }
     }
 
-    protected ParameterSetter getParameterSetter(Connection connection) throws SQLException {
+    private ParameterSetter getParameterSetter(Connection connection) throws SQLException {
         if (cfg.getParameterSetter() != null) {
             return cfg.getParameterSetter();
         }
-        switch (getVersion(connection)) {
-        case MsSql:
+        return getVersion(connection).map(this::getSetter).orElseGet(() -> new DefaultParameterSetter());
+    }
+
+    private ParameterSetter getSetter(Database database) {
+        if (database == Database.MsSql) {
             return new MsSqlParameterSetter();
-        default:
-            return new DefaultParameterSetter();
         }
+        return new DefaultParameterSetter();
     }
 
 }
