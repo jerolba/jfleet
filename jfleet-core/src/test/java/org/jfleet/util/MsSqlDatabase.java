@@ -13,10 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jfleet.parameterized;
+package org.jfleet.util;
 
-public enum Databases {
+import org.jfleet.BulkInsert;
+import org.jfleet.mysql.LoadDataBulkInsert;
 
-    MySql, Postgres, JdbcPosgres, JdbcMySql, JdbcMsSql
+public class MsSqlDatabase extends Database {
+
+    public MsSqlDatabase(String properties) {
+        super(properties);
+    }
+
+    public MsSqlDatabase() {
+        super("mssql-test.properties");
+    }
+
+    @Override
+    public <T> BulkInsert<T> getBulkInsert(Class<T> clazz) {
+        return new LoadDataBulkInsert<>(clazz);
+    }
 
 }

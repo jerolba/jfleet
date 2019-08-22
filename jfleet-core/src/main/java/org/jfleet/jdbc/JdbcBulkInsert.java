@@ -15,16 +15,11 @@
  */
 package org.jfleet.jdbc;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import static org.jfleet.common.DatabaseVersion.getVersion;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -82,9 +77,10 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
+        ParameterSetter parameterSetter = getParameterSetter(conn);
         TransactionPolicy txPolicy = TransactionPolicy.getTransactionPolicy(conn, cfg.isAutocommit());
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
-            BatchInsert batchInsert = new BatchInsert(txPolicy, pstmt);
+            BatchInsert batchInsert = new BatchInsert(txPolicy, pstmt, parameterSetter);
             Iterator<T> iterator = stream.iterator();
             while (iterator.hasNext()) {
                 batchInsert.add(iterator.next());
@@ -99,11 +95,13 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
 
         private final TransactionPolicy txPolicy;
         private final PreparedStatement pstmt;
+        private final ParameterSetter parameterSetter;
         private int count = 0;
 
-        BatchInsert(TransactionPolicy txPolicy, PreparedStatement pstmt) {
+        BatchInsert(TransactionPolicy txPolicy, PreparedStatement pstmt, ParameterSetter parameterSetter) {
             this.txPolicy = txPolicy;
             this.pstmt = pstmt;
+            this.parameterSetter = parameterSetter;
         }
 
         public void add(T entity) throws SQLException {
@@ -127,66 +125,25 @@ public class JdbcBulkInsert<T> implements BulkInsert<T> {
             txPolicy.commit();
         }
 
-    }
-
-    public void setObjectValues(PreparedStatement pstmt, T entity) throws SQLException {
-        for (int i = 0; i < columns.size(); i++) {
-            Function<Object, Object> accessor = accessors.get(i);
-            Object value = accessor.apply(entity);
-            Function<Object, Object> f = preConvert.get(i);
-            setParameter(pstmt, i + 1, f.apply(value));
+        private void setObjectValues(PreparedStatement pstmt, T entity) throws SQLException {
+            for (int i = 0; i < columns.size(); i++) {
+                Function<Object, Object> accessor = accessors.get(i);
+                Object value = accessor.apply(entity);
+                Function<Object, Object> f = preConvert.get(i);
+                parameterSetter.setParameter(pstmt, i + 1, f.apply(value));
+            }
         }
     }
 
-    /*
-     * Each JDBC driver implements code like this in their setObject(idx, object)
-     * method. If following conversions are not supported by your driver (like
-     * LocalDate, LocalTime, and LocalDateTime), extend and overwrite it with the
-     * correct one.
-     */
-    public void setParameter(PreparedStatement pstmt, int parameterIndex, Object parameterObj) throws SQLException {
-        if (parameterObj == null) {
-            pstmt.setNull(parameterIndex, java.sql.Types.OTHER);
-        } else {
-            if (parameterObj instanceof Integer) {
-                pstmt.setInt(parameterIndex, ((Integer) parameterObj).intValue());
-            } else if (parameterObj instanceof String) {
-                pstmt.setString(parameterIndex, (String) parameterObj);
-            } else if (parameterObj instanceof Long) {
-                pstmt.setLong(parameterIndex, ((Long) parameterObj).longValue());
-            } else if (parameterObj instanceof Boolean) {
-                pstmt.setBoolean(parameterIndex, ((Boolean) parameterObj).booleanValue());
-            } else if (parameterObj instanceof java.util.Date) {
-                pstmt.setTimestamp(parameterIndex, new Timestamp(((java.util.Date) parameterObj).getTime()));
-            } else if (parameterObj instanceof BigDecimal) {
-                pstmt.setBigDecimal(parameterIndex, (BigDecimal) parameterObj);
-            } else if (parameterObj instanceof Byte) {
-                pstmt.setInt(parameterIndex, ((Byte) parameterObj).intValue());
-            } else if (parameterObj instanceof Character) {
-                pstmt.setString(parameterIndex, ((Character) parameterObj).toString());
-            } else if (parameterObj instanceof Short) {
-                pstmt.setShort(parameterIndex, ((Short) parameterObj).shortValue());
-            } else if (parameterObj instanceof Float) {
-                pstmt.setFloat(parameterIndex, ((Float) parameterObj).floatValue());
-            } else if (parameterObj instanceof Double) {
-                pstmt.setDouble(parameterIndex, ((Double) parameterObj).doubleValue());
-            } else if (parameterObj instanceof java.sql.Date) {
-                pstmt.setDate(parameterIndex, (java.sql.Date) parameterObj);
-            } else if (parameterObj instanceof Time) {
-                pstmt.setTime(parameterIndex, (Time) parameterObj);
-            } else if (parameterObj instanceof Timestamp) {
-                pstmt.setTimestamp(parameterIndex, (Timestamp) parameterObj);
-            } else if (parameterObj instanceof BigInteger) {
-                pstmt.setObject(parameterIndex, parameterObj);
-            } else if (parameterObj instanceof LocalDate) {
-                pstmt.setObject(parameterIndex, parameterObj);
-            } else if (parameterObj instanceof LocalTime) {
-                pstmt.setObject(parameterIndex, parameterObj);
-            } else if (parameterObj instanceof LocalDateTime) {
-                pstmt.setObject(parameterIndex, parameterObj);
-            } else {
-                throw new RuntimeException("No type mapper for " + parameterObj.getClass());
-            }
+    protected ParameterSetter getParameterSetter(Connection connection) throws SQLException {
+        if (cfg.getParameterSetter() != null) {
+            return cfg.getParameterSetter();
+        }
+        switch (getVersion(connection)) {
+        case MsSql:
+            return new MsSqlParameterSetter();
+        default:
+            return new DefaultParameterSetter();
         }
     }
 

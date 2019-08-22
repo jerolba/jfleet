@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 import org.jfleet.util.Database;
+import org.jfleet.util.JdbcMsSqlDatabase;
 import org.jfleet.util.JdbcMysqlDatabase;
 import org.jfleet.util.JdbcPostgresDatabase;
 import org.jfleet.util.MySqlDatabase;
@@ -52,6 +53,8 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
             return new JdbcMysqlDatabase();
         case JdbcPosgres:
             return new JdbcPostgresDatabase();
+        case JdbcMsSql:
+            return new JdbcMsSqlDatabase();
         case MySql:
             return new MySqlDatabase();
         case Postgres:
