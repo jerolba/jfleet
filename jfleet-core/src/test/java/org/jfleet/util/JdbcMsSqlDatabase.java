@@ -15,14 +15,16 @@
  */
 package org.jfleet.util;
 
+import org.jfleet.parameterized.Databases;
+
 public class JdbcMsSqlDatabase extends JdbcDatabase {
 
     public JdbcMsSqlDatabase(String properties) {
-        super(properties);
+        super(properties, Databases.JdbcMsSql);
     }
 
     public JdbcMsSqlDatabase() {
-        super("mssql-test.properties");
+        this("mssql-test.properties");
     }
 
 }

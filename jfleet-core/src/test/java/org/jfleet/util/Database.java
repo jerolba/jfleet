@@ -19,13 +19,16 @@ import java.io.IOException;
 import java.sql.Connection;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.Databases;
 
 public abstract class Database {
 
-    private String properties;
+    private final Databases type;
+    private final String properties;
 
-    public Database(String properties) {
+    public Database(String properties, Databases type) {
         this.properties = properties;
+        this.type = type;
     }
 
     public String getProperties() {
@@ -33,6 +36,10 @@ public abstract class Database {
     }
 
     public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
+
+    public Databases getType() {
+        return type;
+    }
 
     public Connection getConnection() throws IOException {
         return new DatabaseTestConnectionProvider(getProperties()).get();

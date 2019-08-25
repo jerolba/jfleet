@@ -39,7 +39,7 @@ public class JdbcConfiguration {
     public boolean isAutocommit() {
         return autocommit;
     }
-    
+
     public ParameterSetter getParameterSetter() {
         return parameterSetter;
     }

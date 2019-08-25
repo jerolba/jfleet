@@ -38,7 +38,7 @@ public class BulkInsertConfiguration {
     public boolean isAutocommit() {
         return autocommit;
     }
-    
+
     public static class BulkInsertConfigurationBuilder {
 
         private Class<?> clazz;

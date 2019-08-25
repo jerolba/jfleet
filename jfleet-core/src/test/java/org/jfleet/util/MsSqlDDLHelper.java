@@ -58,7 +58,7 @@ public class MsSqlDDLHelper implements DDLHelper {
                 sb.append(", ");
             }
         }
-        sb.append(") ");//DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        sb.append(") ");
         return sb.toString();
     }
 

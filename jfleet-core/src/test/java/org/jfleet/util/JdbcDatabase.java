@@ -18,11 +18,12 @@ package org.jfleet.util;
 import org.jfleet.BulkInsert;
 import org.jfleet.jdbc.JdbcBulkInsert;
 import org.jfleet.jdbc.JdbcConfiguration;
+import org.jfleet.parameterized.Databases;
 
 public abstract class JdbcDatabase extends Database {
 
-    public JdbcDatabase(String properties) {
-        super(properties);
+    public JdbcDatabase(String properties, Databases type) {
+        super(properties, type);
     }
 
     @Override

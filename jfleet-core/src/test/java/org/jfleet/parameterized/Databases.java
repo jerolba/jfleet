@@ -17,6 +17,17 @@ package org.jfleet.parameterized;
 
 public enum Databases {
 
-    MySql, Postgres, MsSql, JdbcPosgres, JdbcMySql, JdbcMsSql
+    MySql(Backend.MySql), Postgres(Backend.Postgres), MsSql(Backend.MsSql),
+    JdbcPosgres(Backend.Postgres), JdbcMySql(Backend.MySql), JdbcMsSql(Backend.MsSql);
+
+    private Backend backend;
+
+    Databases(Backend backend) {
+        this.backend = backend;
+    }
+
+    public Backend getBackend() {
+        return backend;
+    }
 
 }
