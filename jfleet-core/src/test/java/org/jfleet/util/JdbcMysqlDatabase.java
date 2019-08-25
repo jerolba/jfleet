@@ -15,14 +15,16 @@
  */
 package org.jfleet.util;
 
+import org.jfleet.parameterized.Databases;
+
 public class JdbcMysqlDatabase extends JdbcDatabase {
 
     public JdbcMysqlDatabase(String properties) {
-        super(properties);
+        super(properties, Databases.JdbcMySql);
     }
 
     public JdbcMysqlDatabase() {
-        super("mysql-test.properties");
+        this("mysql-test.properties");
     }
 
 }

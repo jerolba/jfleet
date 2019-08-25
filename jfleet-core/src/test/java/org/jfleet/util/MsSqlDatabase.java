@@ -17,15 +17,16 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.mssql.BulkCopyBulkInsert;
+import org.jfleet.parameterized.Databases;
 
 public class MsSqlDatabase extends Database {
 
     public MsSqlDatabase(String properties) {
-        super(properties);
+        super(properties, Databases.MsSql);
     }
 
     public MsSqlDatabase() {
-        super("mssql-test.properties");
+        this("mssql-test.properties");
     }
 
     @Override

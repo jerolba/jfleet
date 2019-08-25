@@ -16,6 +16,7 @@
 package org.jfleet.shared;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.Backend;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.shared.entities.EnumForTest;
@@ -50,9 +52,16 @@ public class TypePersistenceTest {
         entity.setString("some string");
         entity.setEnumOrdinal(EnumForTest.one);
         entity.setEnumString(EnumForTest.four);
+        entity.setBooleanPrimitive(false);
+        entity.setBytePrimitive((byte) 54);
+        entity.setCharPrimitive('a');
+        entity.setDoublePrimitive(1.229283);
+        entity.setFloatPrimitive(1234567.897654f);
+        entity.setIntPrimitive(4096);
+        entity.setLongPrimitive(123456789L);
+        entity.setShortPrimitive((short) 1234);
 
         BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
-
         try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithBasicTypes.class);
             insert.insertAll(conn, Stream.of(entity));
@@ -60,7 +69,9 @@ public class TypePersistenceTest {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
                         + " doubleObject, floatObject, intObject, longObject, shortObject, string,"
-                        + " bigDecimal, bigInteger, enumOrdinal, enumString FROM table_with_basic_types")) {
+                        + " bigDecimal, bigInteger, enumOrdinal, enumString, booleanPrimitive, bytePrimitive,"
+                        + " charPrimitive, doublePrimitive, floatPrimitive, intPrimitive, longPrimitive, shortPrimitive"
+                        + " FROM table_with_basic_types")) {
                     assertTrue(rs.next());
                     assertEquals(true, rs.getBoolean("booleanObject"));
                     assertEquals(42, rs.getByte("byteObject"));
@@ -74,6 +85,14 @@ public class TypePersistenceTest {
                     assertEquals(new BigInteger("1234567890").longValueExact(), rs.getInt("bigInteger"));
                     assertEquals(0, rs.getInt("enumOrdinal"));
                     assertEquals("four", rs.getString("enumString"));
+                    assertEquals(false, rs.getBoolean("booleanPrimitive"));
+                    assertEquals(54, rs.getByte("bytePrimitive"));
+                    assertEquals("a", rs.getString("charPrimitive"));
+                    assertEquals(1.229283, rs.getDouble("doublePrimitive"), 0.000001);
+                    assertEquals(1234567.897654f, rs.getFloat("floatPrimitive"), 0.000001);
+                    assertEquals(4096, rs.getInt("intPrimitive"));
+                    assertEquals(123456789L, rs.getLong("longPrimitive"));
+                    assertEquals(1234, rs.getShort("shortPrimitive"));
                 }
             }
         }
@@ -96,8 +115,21 @@ public class TypePersistenceTest {
         entity.setEnumOrdinal(null);
         entity.setEnumString(null);
 
-        BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
+        entity.setBooleanPrimitive(false);
+        entity.setBytePrimitive((byte) 0);
+        // Postgres doesn't allow null char \0
+        if (database.getType().getBackend() == Backend.Postgres) {
+            entity.setCharPrimitive((char) 1);
+        } else {
+            entity.setCharPrimitive((char) 0);
+        }
+        entity.setDoublePrimitive(0.0);
+        entity.setFloatPrimitive(0.0f);
+        entity.setIntPrimitive(0);
+        entity.setLongPrimitive(0L);
+        entity.setShortPrimitive((short) 0);
 
+        BulkInsert<EntityWithBasicTypes> insert = database.getBulkInsert(EntityWithBasicTypes.class);
         try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithBasicTypes.class);
             insert.insertAll(conn, Stream.of(entity));
@@ -105,7 +137,8 @@ public class TypePersistenceTest {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("SELECT booleanObject, byteObject, charObject,"
                         + " doubleObject, floatObject, intObject, longObject, shortObject, string,"
-                        + " bigDecimal, bigInteger, enumOrdinal, enumString "
+                        + " bigDecimal, bigInteger, enumOrdinal, enumString, booleanPrimitive, bytePrimitive,"
+                        + " charPrimitive, doublePrimitive, floatPrimitive, intPrimitive, longPrimitive, shortPrimitive"
                         + " FROM table_with_basic_types")) {
                     assertTrue(rs.next());
                     assertEquals(false, rs.getBoolean("booleanObject"));
@@ -132,6 +165,25 @@ public class TypePersistenceTest {
                     assertTrue(rs.wasNull());
                     assertEquals(null, rs.getString("enumString"));
                     assertTrue(rs.wasNull());
+
+                    assertEquals(false, rs.getBoolean("booleanPrimitive"));
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getByte("bytePrimitive"));
+                    assertFalse(rs.wasNull());
+                    if (database.getType().getBackend() != Backend.Postgres) {
+                        assertEquals(String.valueOf((char) 0), rs.getString("charPrimitive"));
+                    }
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getDouble("doublePrimitive"), 0.001);
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getFloat("floatPrimitive"), 0.001);
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getInt("intPrimitive"));
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getLong("longPrimitive"));
+                    assertFalse(rs.wasNull());
+                    assertEquals(0, rs.getShort("shortPrimitive"));
+                    assertFalse(rs.wasNull());
                 }
             }
         }

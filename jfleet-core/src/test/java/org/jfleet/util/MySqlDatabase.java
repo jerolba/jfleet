@@ -17,15 +17,16 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.parameterized.Databases;
 
 public class MySqlDatabase extends Database {
 
     public MySqlDatabase(String properties) {
-        super(properties);
+        super(properties, Databases.MySql);
     }
 
     public MySqlDatabase() {
-        super("mysql-test.properties");
+        this("mysql-test.properties");
     }
 
     @Override

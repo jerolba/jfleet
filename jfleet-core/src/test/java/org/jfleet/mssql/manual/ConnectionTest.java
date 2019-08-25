@@ -53,28 +53,29 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        try (Connection conn =  new MsSqlDatabase().getConnection()) {
+        try (Connection conn = new MsSqlDatabase().getConnection()) {
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
                 stmt.execute("CREATE TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");
 
                 String someData = someValue + "," + otherValue + ",\n";
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(someData.getBytes(StandardCharsets.UTF_8.name()));
-                
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(
+                        someData.getBytes(StandardCharsets.UTF_8.name()));
+
                 SQLServerBulkCSVFileRecord fileRecord = new SQLServerBulkCSVFileRecord(
                         inputStream, StandardCharsets.UTF_8.name(), ",", false);
-                
+
                 fileRecord.addColumnMetadata(1, "some_column", Types.INTEGER, 0, 0);
                 fileRecord.addColumnMetadata(2, "other_column", Types.VARCHAR, 0, 0);
-                
+
                 SQLServerBulkCopyOptions opt = new SQLServerBulkCopyOptions();
                 opt.setBatchSize(100);
-                try (SQLServerBulkCopy copy = new SQLServerBulkCopy(conn)){
+                try (SQLServerBulkCopy copy = new SQLServerBulkCopy(conn)) {
                     copy.setBulkCopyOptions(opt);
                     copy.setDestinationTableName("simple_table");
                     copy.writeToServer(fileRecord);
                 }
-                
+
                 try (ResultSet rs = stmt.executeQuery("SELECT some_column, other_column FROM simple_table")) {
                     assertTrue(rs.next());
                     assertEquals(rs.getInt(1), someValue);
@@ -84,35 +85,35 @@ public class ConnectionTest {
             }
         }
     }
-    
+
     @Test
     public void canExecuteLoadDataJFleet() throws SQLException, IOException {
-        
+
         int someValue = 12345;
         String otherValue = "foobar";
-        
-        EntityInfo entityInfo= new EntityInfoBuilder<>(MyEntity.class, "simple_table")
+
+        EntityInfo entityInfo = new EntityInfoBuilder<>(MyEntity.class, "simple_table")
                 .addField("someColumn", "some_column")
                 .addField("otherColumn", "other_column")
                 .build();
 
-        try (Connection conn =  new MsSqlDatabase().getConnection()) {
+        try (Connection conn = new MsSqlDatabase().getConnection()) {
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("DROP TABLE IF EXISTS simple_table");
                 stmt.execute("CREATE TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");
-                
+
                 Stream<MyEntity> stream = Stream.of(new MyEntity(someValue, otherValue));
 
                 JFleetSQLServerBulkRecord fileRecord = new JFleetSQLServerBulkRecord(entityInfo, stream);
-                
+
                 SQLServerBulkCopyOptions opt = new SQLServerBulkCopyOptions();
                 opt.setBatchSize(100);
-                try (SQLServerBulkCopy copy = new SQLServerBulkCopy(conn)){
+                try (SQLServerBulkCopy copy = new SQLServerBulkCopy(conn)) {
                     copy.setBulkCopyOptions(opt);
                     copy.setDestinationTableName("simple_table");
                     copy.writeToServer(fileRecord);
                 }
-                
+
                 try (ResultSet rs = stmt.executeQuery("SELECT some_column, other_column FROM simple_table")) {
                     assertTrue(rs.next());
                     assertEquals(rs.getInt(1), someValue);
@@ -121,12 +122,12 @@ public class ConnectionTest {
             }
         }
     }
-    
+
     public static class MyEntity {
-        
+
         private int someColumn;
         private String otherColumn;
-        
+
         public MyEntity(int someColumn, String otherColumn) {
             this.someColumn = someColumn;
             this.otherColumn = otherColumn;

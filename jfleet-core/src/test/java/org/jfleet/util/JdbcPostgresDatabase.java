@@ -15,14 +15,16 @@
  */
 package org.jfleet.util;
 
+import org.jfleet.parameterized.Databases;
+
 public class JdbcPostgresDatabase extends JdbcDatabase {
 
     public JdbcPostgresDatabase(String properties) {
-        super(properties);
+        super(properties, Databases.JdbcPosgres);
     }
 
     public JdbcPostgresDatabase() {
-        super("postgres-test.properties");
+        this("postgres-test.properties");
     }
 
 }
