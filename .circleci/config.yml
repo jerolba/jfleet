@@ -13,7 +13,11 @@ jobs:
             - POSTGRES_USER=test
             - POSTGRES_PASSWORD=test
             - POSTGRES_DB=testdb
-
+      - image: microsoft/mssql-server-linux:2017-GDR
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=jfleettestd1!
+            
     working_directory: ~/repo
 
     environment:
@@ -24,6 +28,14 @@ jobs:
     steps:
       - checkout
 
+      # Install MS cmd client
+      - run: sudo apt-get install -y apt-transport-https
+      - run: curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+      - run: curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+      - run: sudo apt update
+      - run: sudo ACCEPT_EULA=Y apt install -y mssql-tools unixodbc-dev locales-all
+      - run: /opt/mssql-tools/bin/sqlcmd -H localhost -U sa -P jfleettestd1! -Q "CREATE DATABASE testdb;" 
+      
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -59,7 +71,10 @@ jobs:
             - POSTGRES_USER=test
             - POSTGRES_PASSWORD=test
             - POSTGRES_DB=testdb
-
+      - image: microsoft/mssql-server-linux:2017-latest
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=jfleettestd1!
     working_directory: ~/repo
 
     environment:
@@ -69,6 +84,14 @@ jobs:
     
     steps:
       - checkout
+
+      # Install MS cmd client
+      - run: sudo apt-get install -y apt-transport-https
+      - run: curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+      - run: curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+      - run: sudo apt update
+      - run: sudo ACCEPT_EULA=Y apt install -y mssql-tools unixodbc-dev locales-all
+      - run: /opt/mssql-tools/bin/sqlcmd -H localhost -U sa -P jfleettestd1! -Q "CREATE DATABASE testdb;" 
 
       # Download and cache dependencies
       - restore_cache:
