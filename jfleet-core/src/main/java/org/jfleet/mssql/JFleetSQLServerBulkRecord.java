@@ -42,12 +42,8 @@ import com.microsoft.sqlserver.jdbc.SQLServerException;
 public class JFleetSQLServerBulkRecord implements ISQLServerBulkRecord {
 
     private static final long serialVersionUID = 7107797683112745162L;
-
+    
     private static final EnumMap<FieldTypeEnum, Integer> FIELD_TYPES = createTypes();
-
-    private final EntityInfo entityInfo;
-    private final List<ColumnInfo> columns;
-    private final Iterator<?> iterator;
 
     private final SimpleDateFormat dateAndTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -56,33 +52,11 @@ public class JFleetSQLServerBulkRecord implements ISQLServerBulkRecord {
     private final DateTimeFormatter localTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final DateTimeFormatter localDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private static EnumMap<FieldTypeEnum, Integer> createTypes() {
-        EnumMap<FieldTypeEnum, Integer> fieldTypes = new EnumMap<>(FieldTypeEnum.class);
-        fieldTypes.put(FieldTypeEnum.BOOLEAN, Types.BIT);
-        fieldTypes.put(FieldTypeEnum.BYTE, Types.TINYINT);
-        fieldTypes.put(FieldTypeEnum.SHORT, Types.SMALLINT);
-        fieldTypes.put(FieldTypeEnum.INT, Types.INTEGER);
-        fieldTypes.put(FieldTypeEnum.LONG, Types.BIGINT);
-        fieldTypes.put(FieldTypeEnum.CHAR, Types.CHAR);
-        fieldTypes.put(FieldTypeEnum.FLOAT, Types.FLOAT);
-        fieldTypes.put(FieldTypeEnum.DOUBLE, Types.DOUBLE);
-        fieldTypes.put(FieldTypeEnum.STRING, Types.NVARCHAR);
-        fieldTypes.put(FieldTypeEnum.DATE, Types.VARCHAR);
-        fieldTypes.put(FieldTypeEnum.TIME, Types.VARCHAR);
-        fieldTypes.put(FieldTypeEnum.TIMESTAMP, Types.VARCHAR);
-        fieldTypes.put(FieldTypeEnum.BIGDECIMAL, Types.DECIMAL);
-        fieldTypes.put(FieldTypeEnum.BIGINTEGER, Types.BIGINT);
-        fieldTypes.put(FieldTypeEnum.LOCALDATE, Types.VARCHAR); // ??
-        fieldTypes.put(FieldTypeEnum.LOCALTIME, Types.VARCHAR); // ??
-        fieldTypes.put(FieldTypeEnum.LOCALDATETIME, Types.VARCHAR); // ??
-        fieldTypes.put(FieldTypeEnum.ENUMSTRING, Types.VARCHAR);
-        fieldTypes.put(FieldTypeEnum.ENUMORDINAL, Types.TINYINT);
-        return fieldTypes;
-    }
+    private final List<ColumnInfo> columns;
+    private final Iterator<?> iterator;
 
     public JFleetSQLServerBulkRecord(EntityInfo entityInfo, Stream<?> stream) {
-        this.entityInfo = entityInfo;
-        this.columns = entityInfo.getColumns();
+        this.columns = entityInfo.getNotIdentityColumns();
         this.iterator = stream.iterator();
     }
 
@@ -119,7 +93,7 @@ public class JFleetSQLServerBulkRecord implements ISQLServerBulkRecord {
 
     @Override
     public boolean isAutoIncrement(int column) {
-        return false;
+        return columns.get(column - 1).getFieldType().isIdentityId();
     }
 
     @Override
@@ -201,4 +175,27 @@ public class JFleetSQLServerBulkRecord implements ISQLServerBulkRecord {
         throw new UnsupportedOperationException();
     }
 
+    private static EnumMap<FieldTypeEnum, Integer> createTypes() {
+        EnumMap<FieldTypeEnum, Integer> fieldTypes = new EnumMap<>(FieldTypeEnum.class);
+        fieldTypes.put(FieldTypeEnum.BOOLEAN, Types.BIT);
+        fieldTypes.put(FieldTypeEnum.BYTE, Types.TINYINT);
+        fieldTypes.put(FieldTypeEnum.SHORT, Types.SMALLINT);
+        fieldTypes.put(FieldTypeEnum.INT, Types.INTEGER);
+        fieldTypes.put(FieldTypeEnum.LONG, Types.BIGINT);
+        fieldTypes.put(FieldTypeEnum.CHAR, Types.CHAR);
+        fieldTypes.put(FieldTypeEnum.FLOAT, Types.FLOAT);
+        fieldTypes.put(FieldTypeEnum.DOUBLE, Types.DOUBLE);
+        fieldTypes.put(FieldTypeEnum.STRING, Types.NVARCHAR);
+        fieldTypes.put(FieldTypeEnum.DATE, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.TIME, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.TIMESTAMP, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.BIGDECIMAL, Types.DECIMAL);
+        fieldTypes.put(FieldTypeEnum.BIGINTEGER, Types.BIGINT);
+        fieldTypes.put(FieldTypeEnum.LOCALDATE, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.LOCALTIME, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.LOCALDATETIME, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.ENUMSTRING, Types.VARCHAR);
+        fieldTypes.put(FieldTypeEnum.ENUMORDINAL, Types.TINYINT);
+        return fieldTypes;
+    }
 }

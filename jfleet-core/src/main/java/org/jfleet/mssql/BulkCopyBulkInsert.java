@@ -50,14 +50,19 @@ public class BulkCopyBulkInsert<T> implements BulkInsert<T> {
 
     @Override
     public void insertAll(Connection conn, Stream<T> stream) throws JFleetException, SQLException {
-        JFleetSQLServerBulkRecord fileRecord = new JFleetSQLServerBulkRecord(cfg.getEntityInfo(), stream);
-
         SQLServerBulkCopyOptions opt = new SQLServerBulkCopyOptions();
         opt.setBatchSize(cfg.getBatchSize());
+        opt.setCheckConstraints(cfg.isCheckConstraints());
+        opt.setFireTriggers(cfg.isFireTriggers());
+        opt.setKeepIdentity(cfg.isKeepIdentity());
+        opt.setKeepNulls(cfg.isKeepNulls());
+        opt.setTableLock(cfg.isTableLock());
+
+        JFleetSQLServerBulkRecord jfleetRecord = new JFleetSQLServerBulkRecord(cfg.getEntityInfo(), stream);
         try (SQLServerBulkCopy copy = new SQLServerBulkCopy(conn)) {
             copy.setBulkCopyOptions(opt);
             copy.setDestinationTableName(cfg.getEntityInfo().getTableName());
-            copy.writeToServer(fileRecord);
+            copy.writeToServer(jfleetRecord);
         }
 
     }

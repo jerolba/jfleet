@@ -22,6 +22,11 @@ public class BulkInsertConfiguration {
 
     private EntityInfo entityInfo;
     private int batchSize;
+    private boolean checkConstraints;
+    private boolean fireTriggers;
+    private boolean keepIdentity;
+    private boolean keepNulls;
+    private boolean tableLock;
     private boolean autocommit;
 
     private BulkInsertConfiguration() {
@@ -35,6 +40,26 @@ public class BulkInsertConfiguration {
         return batchSize;
     }
 
+    public boolean isCheckConstraints() {
+        return checkConstraints;
+    }
+    
+    public boolean isFireTriggers() {
+        return fireTriggers;
+    }
+
+    public boolean isKeepIdentity() {
+        return keepIdentity;
+    }
+
+    public boolean isKeepNulls() {
+        return keepNulls;
+    }
+
+    public boolean isTableLock() {
+        return tableLock;
+    }
+
     public boolean isAutocommit() {
         return autocommit;
     }
@@ -44,6 +69,11 @@ public class BulkInsertConfiguration {
         private Class<?> clazz;
         private EntityInfo entityInfo;
         private int batchSize = 10_000;
+        private boolean checkConstraints = true;
+        private boolean fireTriggers = true;
+        private boolean keepIdentity = true;
+        private boolean keepNulls = false;
+        private boolean tableLock = false;
         private boolean autocommit = true;
 
         public static BulkInsertConfigurationBuilder from(Class<?> clazz) {
@@ -66,6 +96,31 @@ public class BulkInsertConfiguration {
             this.batchSize = batchSize;
             return this;
         }
+        
+        public BulkInsertConfigurationBuilder checkConstraints(boolean checkConstraints) {
+            this.checkConstraints = checkConstraints;
+            return this;
+        }
+
+        public BulkInsertConfigurationBuilder fireTriggers(boolean fireTriggers) {
+            this.fireTriggers = fireTriggers;
+            return this;
+        }
+
+        public BulkInsertConfigurationBuilder keepIdentity(boolean keepIdentity) {
+            this.keepIdentity = keepIdentity;
+            return this;
+        }
+
+        public BulkInsertConfigurationBuilder keepNulls(boolean keepNulls) {
+            this.keepNulls = keepNulls;
+            return this;
+        }
+
+        public BulkInsertConfigurationBuilder tableLock(boolean tableLock) {
+            this.tableLock = tableLock;
+            return this;
+        }
 
         public BulkInsertConfigurationBuilder autocommit(boolean autocommit) {
             this.autocommit = autocommit;
@@ -81,6 +136,11 @@ public class BulkInsertConfiguration {
             conf.autocommit = this.autocommit;
             conf.batchSize = this.batchSize;
             conf.entityInfo = this.entityInfo;
+            conf.checkConstraints = this.checkConstraints;
+            conf.fireTriggers = this.fireTriggers;
+            conf.keepIdentity = this.keepIdentity;
+            conf.keepNulls = this.keepNulls;
+            conf.tableLock = this.tableLock;
             return conf;
         }
     }
