@@ -17,10 +17,7 @@ package org.jfleet.samples.entities;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="bike_trip")
@@ -30,7 +27,7 @@ public class TripFlatEntity {
     /* Removed in JPA because disable batch inserts. He must get created IDs to update the entity
      * and main the identity of entity in memory. You can also use a logical composite key.
      */
-	//@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 
 	@Column(name="tripduration")

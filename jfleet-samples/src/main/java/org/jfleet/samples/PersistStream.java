@@ -23,12 +23,13 @@ import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
-import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.jdbc.JdbcBulkInsert;
+import org.jfleet.mssql.BulkCopyBulkInsert;
 import org.jfleet.samples.entities.TripFlatEntity;
 import org.jfleet.samples.shared.CitiBikeReader;
 import org.jfleet.samples.shared.FlatTripParser;
 import org.jfleet.samples.shared.TableHelper;
-import org.jfleet.util.MySqlTestConnectionProvider;
+import org.jfleet.util.DatabaseTestConnectionProvider;
 
 /*
  * This example inserts an stream of entities. This allows us to persist all information without keeping
@@ -38,12 +39,12 @@ import org.jfleet.util.MySqlTestConnectionProvider;
 public class PersistStream {
 
     public static void main(String[] args) throws IOException, SQLException {
-        Supplier<Connection> connectionSuplier = new MySqlTestConnectionProvider();
+        Supplier<Connection> connectionSuplier = new DatabaseTestConnectionProvider("mssql-test.properties");
         try (Connection connection = connectionSuplier.get()) {
             TableHelper.createTable(connection);
 
             CitiBikeReader<TripFlatEntity> reader = new CitiBikeReader<>("/tmp", str -> new FlatTripParser(str));
-            BulkInsert<TripFlatEntity> bulkInsert = new LoadDataBulkInsert<>(TripFlatEntity.class);
+            BulkInsert<TripFlatEntity> bulkInsert = new BulkCopyBulkInsert<>(TripFlatEntity.class);
             reader.forEachCsvInZip((Stream<TripFlatEntity> trips) -> {
                 try {
                     bulkInsert.insertAll(connection, trips);

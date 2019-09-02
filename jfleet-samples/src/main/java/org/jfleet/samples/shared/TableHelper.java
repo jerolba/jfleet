@@ -25,12 +25,12 @@ public class TableHelper {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute("DROP TABLE IF EXISTS bike_trip");
             stmt.execute(
-                    "CREATE TABLE bike_trip (id INT NOT NULL AUTO_INCREMENT, tripduration INT NOT NULL, "
+                    "CREATE TABLE bike_trip (id INT IDENTITY PRIMARY KEY, tripduration INT NOT NULL, "
                     + "starttime DATETIME, stoptime DATETIME, start_station_id INT NOT NULL, start_station_name VARCHAR(255), "
-                    + "start_station_latitude DOUBLE NOT NULL, start_station_longitude DOUBLE NOT NULL, "
-                    + "end_station_id INT NOT NULL, end_station_name VARCHAR(255), end_station_latitude DOUBLE NOT NULL, "
-                    + "end_station_longitude DOUBLE NOT NULL, bike_id BIGINT NOT NULL, user_type VARCHAR(255), "
-                    + "birth_year INT, gender CHAR, PRIMARY KEY (id))");
+                    + "start_station_latitude FLOAT NOT NULL, start_station_longitude FLOAT NOT NULL, "
+                    + "end_station_id INT NOT NULL, end_station_name VARCHAR(255), end_station_latitude FLOAT NOT NULL, "
+                    + "end_station_longitude FLOAT NOT NULL, bike_id BIGINT NOT NULL, user_type VARCHAR(255), "
+                    + "birth_year INT, gender CHAR)");
         }
     };
 
@@ -38,9 +38,9 @@ public class TableHelper {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute("DROP TABLE IF EXISTS bike_trip_distance");
             stmt.execute(
-                    "CREATE TABLE bike_trip_distance (id INT NOT NULL AUTO_INCREMENT, tripduration INT NOT NULL, distance DOUBLE, "
+                    "CREATE TABLE bike_trip_distance (id INT NOT NULL IDENTITY PRIMARY KEY, tripduration INT NOT NULL, distance FLOAT, "
                     + "bike_id BIGINT NOT NULL, user_type VARCHAR(255), "
-                    + "birth_year INT, gender CHAR, PRIMARY KEY (id))");
+                    + "birth_year INT, gender CHAR)");
         }
     };
 
