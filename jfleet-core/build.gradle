@@ -36,7 +36,7 @@ dependencies {
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.1'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
 }
 
 test {
