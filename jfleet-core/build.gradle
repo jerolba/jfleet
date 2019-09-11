@@ -22,7 +22,7 @@ dependencies {
 		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
 		compileOnly project(':jfleet-mock-mysql8')
 	}
-    compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+    compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
 
 	testCompile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 	if (project.hasProperty("mysql8")) {
@@ -32,7 +32,7 @@ dependencies {
 		testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
 		testCompile project(':jfleet-mock-mysql8')
     }
-	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
+	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.1'
