@@ -15,6 +15,8 @@
  */
 package org.jfleet.common;
 
+import java.util.concurrent.Executor;
+
 import org.jfleet.EntityInfo;
 
 public interface JFleetBatchConfig {
@@ -26,4 +28,7 @@ public interface JFleetBatchConfig {
     boolean isAutocommit();
 
     boolean isConcurrent();
+
+    Executor getExecutor();
+
 }
