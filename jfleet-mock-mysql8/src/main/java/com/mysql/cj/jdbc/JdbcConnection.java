@@ -18,19 +18,13 @@ package com.mysql.cj.jdbc;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class JdbcConnection implements AutoCloseable {
+public interface JdbcConnection extends AutoCloseable {
 
-    public java.sql.Statement createStatement() throws SQLException {
-        throw new SQLException();
-    }
+    java.sql.Statement createStatement() throws SQLException;
+
+    Properties getProperties();
 
     @Override
-    public void close() {
-
-    }
-
-    public Properties getProperties() {
-        return null;
-    }
+    void close();
 
 }

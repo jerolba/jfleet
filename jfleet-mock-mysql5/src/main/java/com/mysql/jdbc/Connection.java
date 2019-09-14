@@ -15,20 +15,13 @@
  */
 package com.mysql.jdbc;
 
-import java.sql.SQLException;
+public interface Connection extends AutoCloseable {
 
-public class Connection implements AutoCloseable {
+    void setAllowLoadLocalInfile(boolean b);
 
-    public void setAllowLoadLocalInfile(boolean b) {
-    }
-
-    public java.sql.Statement createStatement() throws SQLException{
-        throw new SQLException();
-    }
+    java.sql.Statement createStatement();
 
     @Override
-    public void close() {
-
-    }
+    void close();
 
 }
