@@ -15,6 +15,8 @@
  */
 package org.jfleet.postgres;
 
+import java.util.concurrent.Executor;
+
 import org.jfleet.EntityInfo;
 import org.jfleet.common.JFleetBatchConfig;
 import org.jfleet.inspection.JpaEntityInspector;
@@ -25,6 +27,7 @@ public class PgCopyConfiguration implements JFleetBatchConfig {
     private int batchSize;
     private boolean autocommit;
     private boolean concurrent;
+    private Executor executor;
 
     @Override
     public EntityInfo getEntityInfo() {
@@ -46,6 +49,12 @@ public class PgCopyConfiguration implements JFleetBatchConfig {
         return concurrent;
     }
 
+    @Override
+    public Executor getExecutor() {
+        return executor;
+    }
+
+
     public static class PgCopyConfigurationBuilder {
 
         private Class<?> clazz;
@@ -53,6 +62,7 @@ public class PgCopyConfiguration implements JFleetBatchConfig {
         private int batchSize = 10 * 1_024 * 1_024;
         private boolean autocommit = true;
         private boolean concurrent = true;
+        private Executor executor = null;
 
         public static PgCopyConfigurationBuilder from(Class<?> clazz) {
             return new PgCopyConfigurationBuilder(clazz);
@@ -85,6 +95,11 @@ public class PgCopyConfiguration implements JFleetBatchConfig {
             return this;
         }
 
+        public PgCopyConfigurationBuilder executor(Executor executor) {
+            this.executor = executor;
+            return this;
+        }
+
         public PgCopyConfiguration build() {
             if (entityInfo == null) {
                 JpaEntityInspector inspector = new JpaEntityInspector(clazz);
@@ -94,6 +109,7 @@ public class PgCopyConfiguration implements JFleetBatchConfig {
             conf.autocommit = this.autocommit;
             conf.batchSize = this.batchSize;
             conf.concurrent = this.concurrent;
+            conf.executor = this.executor;
             conf.entityInfo = this.entityInfo;
             return conf;
         }

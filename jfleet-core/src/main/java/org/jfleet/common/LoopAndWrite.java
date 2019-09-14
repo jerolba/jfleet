@@ -38,7 +38,8 @@ public class LoopAndWrite {
     }
 
     public <T> void go(Stream<T> stream) throws SQLException, JFleetException {
-        ContentWriter writer = config.isConcurrent() ? new ParallelContentWriter(contentWriter) : contentWriter;
+        ContentWriter writer = config.isConcurrent() ? new ParallelContentWriter(config.getExecutor(), contentWriter)
+                : contentWriter;
         ContentBuilder contentBuilder = new ContentBuilder(rowBuilder, config.getBatchSize(), config.isConcurrent());
         Iterator<T> iterator = stream.iterator();
         while (iterator.hasNext()) {

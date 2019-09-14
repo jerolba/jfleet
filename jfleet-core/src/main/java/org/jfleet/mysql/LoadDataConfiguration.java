@@ -16,6 +16,7 @@
 package org.jfleet.mysql;
 
 import java.nio.charset.Charset;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 import org.jfleet.EntityInfo;
@@ -32,6 +33,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
     private boolean concurrent;
     private boolean errorOnMissingRow;
     private Function<ContentWriter, ContentWriter> writerWrapper;
+    private Executor executor;
 
     @Override
     public EntityInfo getEntityInfo() {
@@ -57,6 +59,11 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
         return concurrent;
     }
 
+    @Override
+    public Executor getExecutor() {
+        return executor;
+    }
+
     public boolean isErrorOnMissingRow() {
         return errorOnMissingRow;
     }
@@ -73,6 +80,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
         private int batchSize = 10 * 1_024 * 1_024;
         private boolean autocommit = true;
         private boolean concurrent = true;
+        private Executor executor = null;
         private boolean errorOnMissingRow = false;
         private Function<ContentWriter, ContentWriter> writerWrapper = id -> id;
 
@@ -112,6 +120,11 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
             return this;
         }
 
+        public LoadDataConfigurationBuilder executor(Executor executor) {
+            this.executor = executor;
+            return this;
+        }
+
         public LoadDataConfigurationBuilder errorOnMissingRow(boolean errorOnMissingRow) {
             this.errorOnMissingRow = errorOnMissingRow;
             return this;
@@ -144,6 +157,7 @@ public class LoadDataConfiguration implements JFleetBatchConfig {
             conf.autocommit = this.autocommit;
             conf.batchSize = this.batchSize;
             conf.concurrent = this.concurrent;
+            conf.executor = this.executor;
             conf.encoding = this.encoding;
             conf.entityInfo = this.entityInfo;
             conf.errorOnMissingRow = this.errorOnMissingRow;

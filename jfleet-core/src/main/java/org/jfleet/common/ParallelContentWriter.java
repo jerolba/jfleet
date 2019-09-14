@@ -18,16 +18,24 @@ package org.jfleet.common;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 import org.jfleet.JFleetException;
 
 public class ParallelContentWriter implements ContentWriter {
 
+    private final Executor executor;
     private final ContentWriter contentWriter;
     private Future<Exception> last = null;
 
-    public ParallelContentWriter(ContentWriter contentWriter) {
+    public ParallelContentWriter(Executor executor, ContentWriter contentWriter) {
+        if (executor == null) {
+            this.executor = ForkJoinPool.commonPool();
+        } else {
+            this.executor = executor;
+        }
         this.contentWriter = contentWriter;
     }
 
@@ -41,7 +49,7 @@ public class ParallelContentWriter implements ContentWriter {
             } catch (SQLException | JFleetException e) {
                 return e;
             }
-        });
+        }, executor);
     }
 
     @Override
