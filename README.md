@@ -180,11 +180,11 @@ JFleet is uploaded to Maven Central Repository and to use it, you need to add th
 <dependency>
     <groupId>org.jfleet</groupId>
     <artifactId>jfleet</artifactId>
-    <version>0.6.3</version>
+    <version>0.6.4</version>
 </dependency>
 ```
 
-or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.6.3/jfleet-0.6.3.jar) from Maven repository.
+or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.6.4/jfleet-0.6.4.jar) from Maven repository.
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 

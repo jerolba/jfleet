@@ -125,7 +125,7 @@ if (project.hasProperty('bintrayUser')){
             vcsUrl = 'https://github.com/jerolba/jfleet.git'
             labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
             version {
-                name = '0.6.3'
+                name = '0.6.4'
                 desc = 'Add support for MySQL 8'
                 released  = new Date()
             }
