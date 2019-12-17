@@ -13,7 +13,7 @@ compileJava   {
 }
 
 dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 	if (project.hasProperty("mysql8")) {
 		compileOnly project(':jfleet-mock-mysql5')
