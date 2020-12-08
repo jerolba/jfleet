@@ -204,9 +204,9 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 ## Supported database versions
 
-JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 10.9** and **PostgreSQL 11.5**.
+JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 12.5** and **PostgreSQL 13.1**.
 
-**JFleet is currently running in production against AWS Aurora MySQL edition**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.   
+**JFleet is currently running in production against AWS Aurora MySQL and Aurora PostgreSQL**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.   
 
 Any database engine with a standard JDBC driver should be used with the `JdbcBulkInsert` implementation.
 
@@ -215,6 +215,14 @@ Any database engine with a standard JDBC driver should be used with the `JdbcBul
 Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exist and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
 
 You can modify this settings changing locally [mysql-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/mysql-test.properties) and [postgres-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/postgres-test.properties) files.
+
+If you have docker installed, you can launch them using the following commands:
+
+```bash
+docker run --name mysql-jfleet -e MYSQL_ROOT_PASSWORD=jfleet -e MYSQL_USER=test -e MYSQL_PASSWORD=test -e MYSQL_DATABASE=testdb -p 3306:3306 -d mysql:5.7
+
+docker run --name postgres-jfleet -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=testdb -p 5432:5432 -d postgres:12.5
+```
 
 To execute all test you must execute the command:
 

@@ -8,7 +8,7 @@ jobs:
             - MYSQL_USER=test
             - MYSQL_PASSWORD=test
             - MYSQL_DATABASE=testdb
-      - image: circleci/postgres:10.9
+      - image: circleci/postgres:12.5
         environment:
             - POSTGRES_USER=test
             - POSTGRES_PASSWORD=test
@@ -38,7 +38,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
         
-      - run: ./gradlew test
+      - run: ./gradlew test --console=plain
       
       # Jacoco and codecov
       - run: ./gradlew jacocoTestReport
@@ -54,7 +54,7 @@ jobs:
             - MYSQL_DATABASE=testdb
         #In MySql 8 local-infile is not active by default
         command: mysqld --local-infile=1
-      - image: circleci/postgres:11.5
+      - image: circleci/postgres:13.1
         environment:
             - POSTGRES_USER=test
             - POSTGRES_PASSWORD=test
@@ -84,7 +84,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}
         
-      - run: ./gradlew test -Pmysql8
+      - run: ./gradlew test -Pmysql8 --console=plain
       
 workflows:
   version: 2.0

@@ -13,13 +13,13 @@ compileJava   {
 }
 
 dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 	if (project.hasProperty("mysql8")) {
 		compileOnly project(':jfleet-mock-mysql5')
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
 	} else {
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
 		compileOnly project(':jfleet-mock-mysql8')
 	}
     compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
@@ -27,28 +27,20 @@ dependencies {
 	testCompile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 	if (project.hasProperty("mysql8")) {
 		testCompile project(':jfleet-mock-mysql5')
-		testCompile group: 'mysql', name: 'mysql-connector-java', version: '8.0.17'
+		testCompile group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
     } else {
-		testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
+		testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
 		testCompile project(':jfleet-mock-mysql8')
     }
-	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
+	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
 	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.5.2'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.0'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
 }
 
 test {
     useJUnitPlatform()
-    testLogging {
-    	showStandardStreams true
-    	showExceptions true
-    	showStackTraces true
-    	showCauses true
-		exceptionFormat "full"
-        events "passed", "skipped", "failed", "standardOut", "standardError"
-    }
 }
 
 jacocoTestReport {
