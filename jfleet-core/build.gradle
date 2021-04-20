@@ -17,9 +17,9 @@ dependencies {
 	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 	if (project.hasProperty("mysql8")) {
 		compileOnly project(':jfleet-mock-mysql5')
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.24'
 	} else {
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.24'
 		compileOnly project(':jfleet-mock-mysql8')
 	}
     compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
