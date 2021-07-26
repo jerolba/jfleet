@@ -3,6 +3,6 @@ apply plugin: 'java'
 dependencies {
 	compile project(':jfleet-core')
 	compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
-	compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+	compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.4-groovyless'
 	compile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 }
