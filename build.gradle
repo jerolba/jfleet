@@ -1,17 +1,17 @@
 plugins {
-  id "com.github.hierynomus.license" version "0.15.0"
+    id "com.github.hierynomus.license" version "0.15.0"
 }
 
 allprojects {
-  apply plugin: 'license'
-  license {
-    header rootProject.file("config/HEADER")
-    exclude "**/*.properties"
-    exclude "**/*.txt"
-    exclude "**/ReaderInputStream.java"
-  }
-  
-  repositories {
-    mavenCentral()
-  }
+    apply plugin: 'license'
+    license {
+        header rootProject.file("config/HEADER")
+        exclude "**/*.properties"
+        exclude "**/*.txt"
+        exclude "**/ReaderInputStream.java"
+    }
+
+    repositories {
+        mavenCentral()
+    }
 }
