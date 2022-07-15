@@ -11,7 +11,6 @@ public class TestEntity {
     private Boolean fooBoolean;
 
 
-
     public String getFooString() {
         return fooString;
     }
