@@ -2,6 +2,7 @@ package org.jfleet.avro;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -60,79 +61,77 @@ public class AvroWriter<T> {
 
     private Schema buildSchema(AvroConfiguration avroConfiguration) {
         EntityInfo entityInfo = avroConfiguration.getEntityInfo();
-        SchemaBuilder.FieldAssembler<Schema> fields = SchemaBuilder.record(entityInfo.getEntityClass().getName())
+        FieldAssembler<Schema> fields = SchemaBuilder.record(entityInfo.getEntityClass().getName())
                 .namespace(entityInfo.getEntityClass().getPackage().getName()).fields();
 
         for (ColumnInfo columnInfo : entityInfo.getColumns()) {
-            SchemaBuilder.FieldTypeBuilder<Schema> type = fields.name(columnInfo.getColumnName()).type();
-            boolean isPrimitive = columnInfo.getFieldType().isPrimitive();
-
-            switch (columnInfo.getFieldType().getFieldType()) {
-                case STRING:
-                case ENUMSTRING:
-                    fields = buildAsString(type);
-                    break;
-                case ENUMORDINAL:
-                    fields = buildAsInteger(type, false);
-                    break;
-                case INT:
-                case SHORT:
-                case BYTE:
-                    fields = buildAsInteger(type, isPrimitive);
-                    break;
-                case DOUBLE:
-                    fields = buildAsDouble(type, isPrimitive);
-                    break;
-                case LONG:
-                    fields = buildAsLong(type, isPrimitive);
-                    break;
-                case FLOAT:
-                    fields = buildAsFloat(type, isPrimitive);
-                    break;
-                case BOOLEAN:
-                    fields = buildAsBoolean(type, isPrimitive);
-                    break;
-                default:
-                    throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType().getFieldType()));
-            }
+            fields = getFieldSchema(columnInfo, fields);
         }
 
         return fields.endRecord();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsString(SchemaBuilder.FieldTypeBuilder<Schema> type) {
+    private FieldAssembler<Schema> getFieldSchema(ColumnInfo columnInfo, FieldAssembler<Schema> fields) {
+        SchemaBuilder.FieldTypeBuilder<Schema> type = fields.name(columnInfo.getColumnName()).type();
+        boolean isPrimitive = columnInfo.getFieldType().isPrimitive();
+
+        switch (columnInfo.getFieldType().getFieldType()) {
+            case STRING:
+            case ENUMSTRING:
+                return buildAsString(type);
+            case ENUMORDINAL:
+                return buildAsInteger(type, false);
+            case INT:
+            case SHORT:
+            case BYTE:
+                return buildAsInteger(type, isPrimitive);
+            case DOUBLE:
+                return buildAsDouble(type, isPrimitive);
+            case LONG:
+                return buildAsLong(type, isPrimitive);
+            case FLOAT:
+                return buildAsFloat(type, isPrimitive);
+            case BOOLEAN:
+                return buildAsBoolean(type, isPrimitive);
+            default:
+                throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType().getFieldType()));
+        }
+
+    }
+
+    private FieldAssembler<Schema> buildAsString(SchemaBuilder.FieldTypeBuilder<Schema> type) {
         return type.unionOf().stringType().and().nullType().endUnion().noDefault();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsBoolean(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
+    private FieldAssembler<Schema> buildAsBoolean(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
         if (isPrimitive) {
             return type.booleanType().noDefault();
         }
         return type.unionOf().booleanType().and().nullType().endUnion().noDefault();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsFloat(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
+    private FieldAssembler<Schema> buildAsFloat(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
         if (isPrimitive) {
             return type.floatType().noDefault();
         }
         return type.unionOf().floatType().and().nullType().endUnion().noDefault();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsLong(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
+    private FieldAssembler<Schema> buildAsLong(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
         if (isPrimitive) {
             return type.longType().noDefault();
         }
         return type.unionOf().longType().and().nullType().endUnion().noDefault();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsInteger(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
+    private FieldAssembler<Schema> buildAsInteger(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
         if (isPrimitive) {
             return type.intType().noDefault();
         }
         return type.unionOf().intType().and().nullType().endUnion().noDefault();
     }
 
-    private SchemaBuilder.FieldAssembler<Schema> buildAsDouble(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
+    private FieldAssembler<Schema> buildAsDouble(SchemaBuilder.FieldTypeBuilder<Schema> type, boolean isPrimitive) {
         if (isPrimitive) {
             return type.doubleType().noDefault();
         }
