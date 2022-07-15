@@ -69,24 +69,51 @@ public class AvroWriter<T> {
                 case ENUMSTRING:
                     fields = fields.name(columnInfo.getColumnName()).type().unionOf().stringType().and().nullType().endUnion().noDefault();
                     break;
-                case INT:
-                case SHORT:
-                case BYTE:
                 case ENUMORDINAL:
                     fields = fields.name(columnInfo.getColumnName()).type().unionOf().intType().and().nullType().endUnion().noDefault();
                     break;
-                case DOUBLE:
-                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().doubleType().and().nullType().endUnion().noDefault();
+
+                case INT:
+                case SHORT:
+                case BYTE:
+                    if (columnInfo.getFieldType().isPrimitive()) {
+                        fields = fields.name(columnInfo.getColumnName()).type().intType().noDefault();
+                    } else {
+                        fields = fields.name(columnInfo.getColumnName()).type().unionOf().intType().and().nullType().endUnion().noDefault();
+                    }
                     break;
+
+                case DOUBLE:
+                    if (columnInfo.getFieldType().isPrimitive()) {
+                        fields = fields.name(columnInfo.getColumnName()).type().doubleType().noDefault();
+                    } else {
+                        fields = fields.name(columnInfo.getColumnName()).type().unionOf().doubleType().and().nullType().endUnion().noDefault();
+                    }
+                    break;
+
                 case LONG:
-                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().longType().and().nullType().endUnion().noDefault();
+                    if (columnInfo.getFieldType().isPrimitive()) {
+                        fields = fields.name(columnInfo.getColumnName()).type().longType().noDefault();
+                    } else {
+                        fields = fields.name(columnInfo.getColumnName()).type().unionOf().longType().and().nullType().endUnion().noDefault();
+                    }
                     break;
                 case FLOAT:
-                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().floatType().and().nullType().endUnion().noDefault();
+                    if (columnInfo.getFieldType().isPrimitive()) {
+                        fields = fields.name(columnInfo.getColumnName()).type().floatType().noDefault();
+                    } else {
+                        fields = fields.name(columnInfo.getColumnName()).type().unionOf().floatType().and().nullType().endUnion().noDefault();
+                    }
                     break;
+
                 case BOOLEAN:
-                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().booleanType().and().nullType().endUnion().noDefault();
+                    if (columnInfo.getFieldType().isPrimitive()) {
+                        fields = fields.name(columnInfo.getColumnName()).type().booleanType().noDefault();
+                    } else {
+                        fields = fields.name(columnInfo.getColumnName()).type().unionOf().booleanType().and().nullType().endUnion().noDefault();
+                    }
                     break;
+
                 default:
                     throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType().getFieldType()));
             }
