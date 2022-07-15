@@ -277,10 +277,7 @@ class AvroWriterTest {
                 .build();
 
         AvroConfiguration avroConfiguration = new AvroConfiguration(entityInfo);
-        AvroWriter<TestEntity> avroWriter = new AvroWriter<>(avroConfiguration);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        TestEntity testEntity = new TestEntity();
-        assertThrows(UnsupportedTypeException.class, () -> avroWriter.writeAll(outputStream, Arrays.asList(testEntity)));
+        assertThrows(UnsupportedTypeException.class, () -> new AvroWriter<>(avroConfiguration));
     }
 
     @Test
