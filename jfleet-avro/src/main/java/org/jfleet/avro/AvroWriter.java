@@ -8,7 +8,7 @@ import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
 import org.jfleet.ColumnInfo;
-import org.jfleet.EntityFieldType;
+import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 
 import java.io.IOException;
@@ -33,14 +33,25 @@ public class AvroWriter<T> {
             for (T entity : collection) {
                 GenericRecord genericRecord = new GenericData.Record(schema);
                 for (ColumnInfo columnInfo : entityInfo.getColumns()) {
-                    Object accessor = columnInfo.getAccessor().apply(entity);
-                    if (accessor != null) {
-                        genericRecord.put(columnInfo.getColumnName(), accessor);
+                    Object value = columnInfo.getAccessor().apply(entity);
+                    if (value != null) {
+                        value = extractValue(columnInfo, value);
+                        genericRecord.put(columnInfo.getColumnName(), value);
                     }
                 }
                 dataFileWriter.append(genericRecord);
             }
         }
+    }
+
+    private Object extractValue(ColumnInfo columnInfo, Object value) {
+        FieldTypeEnum fieldType = columnInfo.getFieldType().getFieldType();
+        if (fieldType == FieldTypeEnum.BYTE) {
+            value = ((Byte) value).intValue();
+        } else if (fieldType == FieldTypeEnum.SHORT) {
+            value = ((Short) value).intValue();
+        }
+        return value;
     }
 
     private Schema buildSchema(AvroConfiguration avroConfiguration) {
@@ -49,8 +60,29 @@ public class AvroWriter<T> {
                 .namespace(entityInfo.getEntityClass().getPackage().getName()).fields();
 
         for (ColumnInfo columnInfo : entityInfo.getColumns()) {
-            if (columnInfo.getFieldType().getFieldType() == EntityFieldType.FieldTypeEnum.STRING) {
-                fields = fields.name(columnInfo.getColumnName()).type().unionOf().stringType().and().nullType().endUnion().noDefault();
+            switch (columnInfo.getFieldType().getFieldType()) {
+                case STRING:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().stringType().and().nullType().endUnion().noDefault();
+                    break;
+                case INT:
+                case SHORT:
+                case BYTE:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().intType().and().nullType().endUnion().noDefault();
+                    break;
+                case DOUBLE:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().doubleType().and().nullType().endUnion().noDefault();
+                    break;
+                case LONG:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().longType().and().nullType().endUnion().noDefault();
+                    break;
+                case FLOAT:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().floatType().and().nullType().endUnion().noDefault();
+                    break;
+                case BOOLEAN:
+                    fields = fields.name(columnInfo.getColumnName()).type().unionOf().booleanType().and().nullType().endUnion().noDefault();
+                    break;
+                default:
+                    throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType()));
             }
         }
 
