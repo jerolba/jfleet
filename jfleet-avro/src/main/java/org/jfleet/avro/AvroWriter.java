@@ -33,7 +33,10 @@ public class AvroWriter<T> {
             for (T entity : collection) {
                 GenericRecord genericRecord = new GenericData.Record(schema);
                 for (ColumnInfo columnInfo : entityInfo.getColumns()) {
-                    genericRecord.put(columnInfo.getColumnName(), columnInfo.getAccessor().apply(entity));
+                    Object accessor = columnInfo.getAccessor().apply(entity);
+                    if (accessor != null) {
+                        genericRecord.put(columnInfo.getColumnName(), accessor);
+                    }
                 }
                 dataFileWriter.append(genericRecord);
             }
@@ -47,7 +50,7 @@ public class AvroWriter<T> {
 
         for (ColumnInfo columnInfo : entityInfo.getColumns()) {
             if (columnInfo.getFieldType().getFieldType() == EntityFieldType.FieldTypeEnum.STRING) {
-                fields = fields.requiredString(columnInfo.getColumnName());
+                fields = fields.name(columnInfo.getColumnName()).type().unionOf().stringType().and().nullType().endUnion().noDefault();
             }
         }
 

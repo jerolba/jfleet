@@ -41,13 +41,45 @@ class AvroWriterTest {
         }
 
         Schema schema = SchemaBuilder.record("TestEntity").namespace("org.jfleet.avro")
-                .fields().requiredString("foo").endRecord();
+                .fields().name("foo").type().unionOf().stringType().and().nullType().endUnion().noDefault()
+                .endRecord();
         DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
 
         try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(new File("/tmp/foo.avro"), datumReader)) {
             assertTrue(dataFileReader.hasNext());
             GenericRecord genericRecord = dataFileReader.next();
             assertEquals(new Utf8("foo"), genericRecord.get("foo"));
+        }
+    }
+
+    @Test
+    void shouldConvertEntityInfoWithNullStringType() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
+                .addColumn("foo", EntityFieldType.FieldTypeEnum.STRING, TestEntity::getFoo)
+                .build();
+
+        AvroConfiguration avroConfiguration = new AvroConfiguration(entityInfo);
+        AvroWriter<TestEntity> avroWriter = new AvroWriter<>(avroConfiguration);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        TestEntity testEntity = new TestEntity(null, null, null);
+        avroWriter.writeAll(outputStream, Arrays.asList(testEntity));
+
+        assertNotNull(avroWriter);
+        assertTrue(outputStream.size() > 0);
+
+        try (FileOutputStream fos = new FileOutputStream("/tmp/foo.avro")) {
+            fos.write(outputStream.toByteArray());
+        }
+
+        Schema schema = SchemaBuilder.record("TestEntity").namespace("org.jfleet.avro")
+                .fields().name("foo").type().unionOf().stringType().and().nullType().endUnion().noDefault()
+                .endRecord();
+        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
+
+        try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(new File("/tmp/foo.avro"), datumReader)) {
+            assertTrue(dataFileReader.hasNext());
+            GenericRecord genericRecord = dataFileReader.next();
+            assertNull(genericRecord.get("foo"));
         }
     }
 }
