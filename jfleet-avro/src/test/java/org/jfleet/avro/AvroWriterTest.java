@@ -23,6 +23,7 @@ import static org.jfleet.avro.TestEntityWithEnum.WeekDays.SATURDAY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AvroWriterTest {
+    
     @Test
     void shouldFillOutputStream() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)

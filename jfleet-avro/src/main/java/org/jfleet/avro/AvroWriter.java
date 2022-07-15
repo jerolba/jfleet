@@ -8,37 +8,60 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
 import org.jfleet.ColumnInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.EntityInfo;
+import org.jfleet.inspection.JpaEntityInspector;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class AvroWriter<T> {
-    private final AvroConfiguration avroConfiguration;
+    private final AvroConfiguration<T> avroConfiguration;
     private final Schema schema;
+    private final EntityInfo entityInfo;
 
-    public AvroWriter(AvroConfiguration avroConfiguration) {
+    public AvroWriter(AvroConfiguration<T> avroConfiguration) {
         this.avroConfiguration = avroConfiguration;
-        schema = new AvroSchemaBuilder(avroConfiguration.getEntityInfo()).build();
+        entityInfo = getEntityInfo(avroConfiguration);
+        schema = new AvroSchemaBuilder(entityInfo).build();
     }
 
-    public void writeAll(OutputStream output, Collection<T> collection) throws IOException {
+    public void writeAll(OutputStream output, Collection<T> entities) throws IOException {
+        writeAll(output, entities.stream());
+    }
+
+    public void writeAll(OutputStream output, Stream<T> entities) throws IOException {
 
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter)) {
             dataFileWriter.create(schema, output);
-            for (T entity : collection) {
-                GenericRecord genericRecord = new GenericData.Record(schema);
-                for (ColumnInfo columnInfo : avroConfiguration.getEntityInfo().getColumns()) {
-                    Object value = columnInfo.getAccessor().apply(entity);
-                    if (value != null) {
-                        value = extractValue(columnInfo, value);
-                        genericRecord.put(columnInfo.getColumnName(), value);
-                    }
-                }
-                dataFileWriter.append(genericRecord);
+            Iterator<T> iterator = entities.iterator();
+            while (iterator.hasNext()) {
+                dataFileWriter.append(buildAvroRecord(iterator.next()));
             }
         }
+    }
+
+    private static <T> EntityInfo getEntityInfo(AvroConfiguration<T> config) {
+        EntityInfo configEntityInfo = config.getEntityInfo();
+        if (configEntityInfo != null) {
+            return configEntityInfo;
+        }
+        return new JpaEntityInspector(config.getClazz()).inspect();
+    }
+
+    private GenericRecord buildAvroRecord(T entity) {
+        GenericRecord genericRecord = new GenericData.Record(schema);
+        for (ColumnInfo columnInfo : entityInfo.getColumns()) {
+            Object value = columnInfo.getAccessor().apply(entity);
+            if (value != null) {
+                Object extractedValue = extractValue(columnInfo, value);
+                genericRecord.put(columnInfo.getColumnName(), extractedValue);
+            }
+        }
+        return genericRecord;
     }
 
     private Object extractValue(ColumnInfo columnInfo, Object value) {
