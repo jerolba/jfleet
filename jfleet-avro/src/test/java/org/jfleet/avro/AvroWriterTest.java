@@ -7,26 +7,27 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AvroWriterTest {
+class AvroWriterTest {
     @Test
-    void shouldConvertEntityInfoToAvro() throws IOException {
+    void shouldConvertEntityInfoWithStringTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
                 .addColumn("foo", EntityFieldType.FieldTypeEnum.STRING, TestEntity::getFoo)
-                .addColumn("bar", EntityFieldType.FieldTypeEnum.STRING, TestEntity::getBar)
                 .build();
-        
+
         AvroConfiguration avroConfiguration = new AvroConfiguration(entityInfo);
-        AvroWriter avroWriter = new AvroWriter<TestEntity>(avroConfiguration);
+        AvroWriter<TestEntity> avroWriter = new AvroWriter<>(avroConfiguration);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        TestEntity testEntity = new TestEntity("foo", "bar");
-        avroWriter.writeAll(outputStream, List.of(testEntity));
+        TestEntity testEntity = new TestEntity("foo", null, null);
+        avroWriter.writeAll(outputStream, Arrays.asList(testEntity));
 
         assertNotNull(avroWriter);
         assertTrue(outputStream.size() > 0);
     }
+
+
 }
