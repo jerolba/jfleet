@@ -50,6 +50,10 @@ public class AvroWriter<T> {
             value = ((Byte) value).intValue();
         } else if (fieldType == FieldTypeEnum.SHORT) {
             value = ((Short) value).intValue();
+        } else if (fieldType == FieldTypeEnum.ENUMSTRING) {
+            value = ((Enum<?>) value).name();
+        } else if (fieldType == FieldTypeEnum.ENUMORDINAL) {
+            value = ((Enum<?>) value).ordinal();
         }
         return value;
     }
@@ -62,11 +66,13 @@ public class AvroWriter<T> {
         for (ColumnInfo columnInfo : entityInfo.getColumns()) {
             switch (columnInfo.getFieldType().getFieldType()) {
                 case STRING:
+                case ENUMSTRING:
                     fields = fields.name(columnInfo.getColumnName()).type().unionOf().stringType().and().nullType().endUnion().noDefault();
                     break;
                 case INT:
                 case SHORT:
                 case BYTE:
+                case ENUMORDINAL:
                     fields = fields.name(columnInfo.getColumnName()).type().unionOf().intType().and().nullType().endUnion().noDefault();
                     break;
                 case DOUBLE:
@@ -82,7 +88,7 @@ public class AvroWriter<T> {
                     fields = fields.name(columnInfo.getColumnName()).type().unionOf().booleanType().and().nullType().endUnion().noDefault();
                     break;
                 default:
-                    throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType()));
+                    throw new UnsupportedTypeException(String.format("Unsupported type: %s", columnInfo.getFieldType().getFieldType()));
             }
         }
 

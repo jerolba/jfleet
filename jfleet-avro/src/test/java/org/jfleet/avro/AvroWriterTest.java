@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import static org.jfleet.avro.TestEntityWithEnum.WeekDays.FRIDAY;
+import static org.jfleet.avro.TestEntityWithEnum.WeekDays.SATURDAY;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AvroWriterTest {
@@ -128,7 +130,7 @@ class AvroWriterTest {
 
 
         TestEntity testEntity = new TestEntity();
-        
+
         try (DataFileReader<GenericRecord> dataFileReader = serializeAndRead(entityInfo, testEntity)) {
 
             assertTrue(dataFileReader.hasNext());
@@ -155,9 +157,49 @@ class AvroWriterTest {
         assertThrows(UnsupportedTypeException.class, () -> avroWriter.writeAll(outputStream, Arrays.asList(testEntity)));
     }
 
-    private DataFileReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, TestEntity testEntity) throws IOException {
+    @Test
+    void shouldConvertEnumTypesToAvro() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
+                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
+                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+                .build();
+
+
+        TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
+        testEntityWithEnum.setFoo(FRIDAY);
+        testEntityWithEnum.setBar(SATURDAY);
+
+        try (DataFileReader<GenericRecord> dataFileReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
+
+            assertTrue(dataFileReader.hasNext());
+            GenericRecord genericRecord = dataFileReader.next();
+            assertEquals(4, genericRecord.get("foo"));
+            assertEquals(new Utf8("SATURDAY"), genericRecord.get("bar"));
+        }
+    }
+
+    @Test
+    void shouldConvertNullableEnumTypesToAvro() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
+                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
+                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+                .build();
+
+
+        TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
+
+        try (DataFileReader<GenericRecord> dataFileReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
+
+            assertTrue(dataFileReader.hasNext());
+            GenericRecord genericRecord = dataFileReader.next();
+            assertNull(genericRecord.get("foo"));
+            assertNull(genericRecord.get("bar"));
+        }
+    }
+
+    private <T> DataFileReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity) throws IOException {
         AvroConfiguration avroConfiguration = new AvroConfiguration(entityInfo);
-        AvroWriter<TestEntity> avroWriter = new AvroWriter<>(avroConfiguration);
+        AvroWriter<T> avroWriter = new AvroWriter<>(avroConfiguration);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         avroWriter.writeAll(outputStream, Arrays.asList(testEntity));
