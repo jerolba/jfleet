@@ -86,6 +86,21 @@ class AvroWriterTest {
     }
 
     @Test
+    void shouldConvertEntityInfoWithNullBoolean() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
+                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+                .build();
+
+        TestEntity testEntity = new TestEntity();
+
+        try (DataFileReader<GenericRecord> dataFileReader = serializeAndRead(entityInfo, testEntity)) {
+            assertTrue(dataFileReader.hasNext());
+            GenericRecord genericRecord = dataFileReader.next();
+            assertNull(genericRecord.get("fooBoolean"));
+        }
+    }
+
+    @Test
     void shouldConvertEntityInfoWithNumericTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
                 .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
@@ -209,7 +224,6 @@ class AvroWriterTest {
         }
 
         DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
-        DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(new File("/tmp/foo.avro"), datumReader);
-        return dataFileReader;
+        return new DataFileReader<>(new File("/tmp/foo.avro"), datumReader);
     }
 }
