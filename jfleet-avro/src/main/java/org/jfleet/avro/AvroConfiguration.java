@@ -7,12 +7,12 @@ public class AvroConfiguration<T> {
     private EntityInfo entityInfo;
     private Class<T> clazz;
 
+    @SuppressWarnings("unchecked")
     public AvroConfiguration(EntityInfo entityInfo) {
         this.entityInfo = entityInfo;
         clazz = (Class<T>) entityInfo.getEntityClass();
     }
 
-    @SuppressWarnings("unchecked")
     public AvroConfiguration(Class<T> clazz) {
         this.clazz = clazz;
     }

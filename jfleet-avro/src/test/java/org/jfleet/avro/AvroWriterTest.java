@@ -1,5 +1,18 @@
 package org.jfleet.avro;
 
+import static org.jfleet.avro.TestEntityWithEnum.WeekDays.FRIDAY;
+import static org.jfleet.avro.TestEntityWithEnum.WeekDays.SATURDAY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericDatumReader;
@@ -11,24 +24,13 @@ import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Arrays;
-
-import static org.jfleet.avro.TestEntityWithEnum.WeekDays.FRIDAY;
-import static org.jfleet.avro.TestEntityWithEnum.WeekDays.SATURDAY;
-import static org.junit.jupiter.api.Assertions.*;
-
 class AvroWriterTest {
-    
+
     @Test
     void shouldFillOutputStream() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
-                .build();
+            .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+            .build();
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
 
@@ -43,8 +45,8 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithStringTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
-                .build();
+            .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+            .build();
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
 
@@ -59,8 +61,8 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullStringType() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
-                .build();
+            .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+            .build();
 
         TestEntity testEntity = new TestEntity();
 
@@ -74,8 +76,8 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithBooleanType() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
-                .build();
+            .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+            .build();
 
         TestEntity testEntity = new TestEntity();
         testEntity.setFooBoolean(true);
@@ -90,14 +92,14 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityWithPrimitives() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithPrimitives.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
-                .build();
+            .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
+            .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
+            .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
+            .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
+            .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
+            .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
+            .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
+            .build();
 
         TestEntityWithPrimitives testEntity = new TestEntityWithPrimitives();
         testEntity.setFooBoolean(true);
@@ -124,14 +126,14 @@ class AvroWriterTest {
     @Test
     void shouldCreateSchemaWithoutNullTypesForPrimitives() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithPrimitives.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
-                .build();
+            .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
+            .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
+            .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
+            .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
+            .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
+            .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
+            .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
+            .build();
 
         TestEntityWithPrimitives testEntity = new TestEntityWithPrimitives();
         testEntity.setFooBoolean(true);
@@ -161,14 +163,14 @@ class AvroWriterTest {
     @Test
     void shouldCreateSchemaWithNullTypesForObjects() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
-                .build();
+            .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+            .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
+            .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
+            .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
+            .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
+            .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
+            .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+            .build();
 
         TestEntity testEntity = new TestEntity();
         testEntity.setFooBoolean(true);
@@ -200,8 +202,8 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullBoolean() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
-                .build();
+            .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+            .build();
 
         TestEntity testEntity = new TestEntity();
 
@@ -215,13 +217,13 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithNumericTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
-                .build();
+            .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
+            .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
+            .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
+            .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
+            .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
+            .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+            .build();
 
 
         TestEntity testEntity = new TestEntity();
@@ -247,13 +249,13 @@ class AvroWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullNumericTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
-                .build();
+            .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
+            .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
+            .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
+            .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
+            .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
+            .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+            .build();
 
 
         TestEntity testEntity = new TestEntity();
@@ -274,8 +276,8 @@ class AvroWriterTest {
     @Test
     void shouldThrowUnsupportedTypeException() {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.BIGDECIMAL, a -> BigDecimal.ZERO)
-                .build();
+            .addColumn("foo", FieldTypeEnum.BIGDECIMAL, a -> BigDecimal.ZERO)
+            .build();
 
         AvroConfiguration avroConfiguration = new AvroConfiguration(entityInfo);
         assertThrows(UnsupportedTypeException.class, () -> new AvroWriter<>(avroConfiguration));
@@ -284,9 +286,9 @@ class AvroWriterTest {
     @Test
     void shouldConvertEnumTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
-                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
-                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
-                .build();
+            .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
+            .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+            .build();
 
 
         TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
@@ -305,9 +307,9 @@ class AvroWriterTest {
     @Test
     void shouldConvertNullableEnumTypesToAvro() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
-                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
-                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
-                .build();
+            .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
+            .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+            .build();
 
 
         TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
