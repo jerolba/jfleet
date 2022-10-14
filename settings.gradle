@@ -3,5 +3,6 @@ include 'jfleet-samples'
 include 'jfleet-mock-mysql5'
 include 'jfleet-mock-mysql8'
 include 'jfleet-avro'
+include 'jfleet-parquet'
 
 rootProject.name = 'jfleet'

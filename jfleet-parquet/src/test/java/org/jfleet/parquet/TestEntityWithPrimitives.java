@@ -1,67 +1,68 @@
-package org.jfleet.avro;
+package org.jfleet.parquet;
 
 public class TestEntityWithPrimitives {
-    private int fooInt;
-    private short fooShort;
-    private byte fooByte;
-    private double fooDouble;
-    private long fooLong;
-    private float fooFloat;
-    private boolean fooBoolean;
 
-    public int getFooInt() {
-        return fooInt;
-    }
+  private int fooInt;
+  private short fooShort;
+  private byte fooByte;
+  private double fooDouble;
+  private long fooLong;
+  private float fooFloat;
+  private boolean fooBoolean;
 
-    public void setFooInt(int fooInt) {
-        this.fooInt = fooInt;
-    }
+  public int getFooInt() {
+    return fooInt;
+  }
 
-    public short getFooShort() {
-        return fooShort;
-    }
+  public void setFooInt(int fooInt) {
+    this.fooInt = fooInt;
+  }
 
-    public void setFooShort(short fooShort) {
-        this.fooShort = fooShort;
-    }
+  public short getFooShort() {
+    return fooShort;
+  }
 
-    public byte getFooByte() {
-        return fooByte;
-    }
+  public void setFooShort(short fooShort) {
+    this.fooShort = fooShort;
+  }
 
-    public void setFooByte(byte fooByte) {
-        this.fooByte = fooByte;
-    }
+  public byte getFooByte() {
+    return fooByte;
+  }
 
-    public double getFooDouble() {
-        return fooDouble;
-    }
+  public void setFooByte(byte fooByte) {
+    this.fooByte = fooByte;
+  }
 
-    public void setFooDouble(double fooDouble) {
-        this.fooDouble = fooDouble;
-    }
+  public double getFooDouble() {
+    return fooDouble;
+  }
 
-    public long getFooLong() {
-        return fooLong;
-    }
+  public void setFooDouble(double fooDouble) {
+    this.fooDouble = fooDouble;
+  }
 
-    public void setFooLong(long fooLong) {
-        this.fooLong = fooLong;
-    }
+  public long getFooLong() {
+    return fooLong;
+  }
 
-    public float getFooFloat() {
-        return fooFloat;
-    }
+  public void setFooLong(long fooLong) {
+    this.fooLong = fooLong;
+  }
 
-    public void setFooFloat(float fooFloat) {
-        this.fooFloat = fooFloat;
-    }
+  public float getFooFloat() {
+    return fooFloat;
+  }
 
-    public boolean isFooBoolean() {
-        return fooBoolean;
-    }
+  public void setFooFloat(float fooFloat) {
+    this.fooFloat = fooFloat;
+  }
 
-    public void setFooBoolean(boolean fooBoolean) {
-        this.fooBoolean = fooBoolean;
-    }
+  public boolean isFooBoolean() {
+    return fooBoolean;
+  }
+
+  public void setFooBoolean(boolean fooBoolean) {
+    this.fooBoolean = fooBoolean;
+  }
 }
