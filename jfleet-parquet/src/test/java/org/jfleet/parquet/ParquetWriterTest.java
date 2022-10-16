@@ -1,8 +1,7 @@
 package org.jfleet.parquet;
 
-import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
 import org.apache.avro.util.Utf8;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -361,7 +360,9 @@ public class ParquetWriterTest {
             parquetWriter.writeAll(Arrays.asList(testEntity));
         }
         InputFile file = HadoopInputFile.fromPath(new Path("/tmp/foo.parquet"), new Configuration());
-        return AvroParquetReader.<GenericRecord>builder(file).build();
+        return AvroParquetReader.<GenericRecord>builder(file)
+                .withDataModel(GenericData.get())
+                .build();
     }
 
 }
