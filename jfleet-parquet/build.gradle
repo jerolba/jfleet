@@ -19,10 +19,11 @@ dependencies {
     api project(':jfleet-core')
     implementation project(':jfleet-avro')
 
-    api 'org.apache.parquet:parquet-common:1.12.3'
-    api 'org.apache.parquet:parquet-column:1.12.3'
-    api 'org.apache.parquet:parquet-hadoop:1.12.3'
-    implementation 'org.apache.parquet:parquet-avro:1.12.3'
+    api group: 'org.apache.parquet', name: 'parquet-common', version: '1.12.3'
+    api group: 'org.apache.parquet', name: 'parquet-column', version: '1.12.3'
+    api group: 'org.apache.parquet', name: 'parquet-hadoop', version: '1.12.3'
+    implementation group: 'org.apache.parquet', name: 'parquet-avro', version: '1.12.3'
+
     compileOnly 'org.apache.hadoop:hadoop-client:3.3.2'
     implementation('org.apache.hadoop:hadoop-mapreduce-client-core:3.3.2') {
         exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
