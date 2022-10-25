@@ -3,6 +3,6 @@ apply plugin: 'java'
 dependencies {
     implementation project(':jfleet-core')
     implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.43'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.4'
     implementation group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
 }

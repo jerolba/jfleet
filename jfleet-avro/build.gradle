@@ -1,7 +1,10 @@
-apply plugin: 'maven-publish'
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'maven-publish'
+}
 
 compileJava {
     sourceCompatibility = '1.8'
@@ -9,15 +12,14 @@ compileJava {
 }
 
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
     implementation project(':jfleet-core')
     
     implementation group: 'org.apache.avro', name: 'avro', version: '1.11.0'
 
-    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.0'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.9.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
 }
 
 test {
