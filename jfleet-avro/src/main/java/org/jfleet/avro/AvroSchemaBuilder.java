@@ -35,8 +35,12 @@ public class AvroSchemaBuilder {
     }
 
     public Schema build() {
-        FieldAssembler<Schema> fields = SchemaBuilder.record(entityInfo.getEntityClass().getName())
-                .namespace(entityInfo.getEntityClass().getPackage().getName())
+        Class<?> recordClass = entityInfo.getEntityClass();
+        String canonicalName = recordClass.getCanonicalName();
+        String record = recordClass.getSimpleName();
+        String namespace = canonicalName.substring(0, canonicalName.length() - record.length() - 1);
+        FieldAssembler<Schema> fields = SchemaBuilder.record(record)
+                .namespace(namespace)
                 .fields();
         for (ColumnInfo columnInfo : entityInfo.getColumns()) {
             fields = getFieldSchema(columnInfo, fields);
