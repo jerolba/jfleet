@@ -17,35 +17,36 @@ package org.jfleet.parquet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.io.PositionOutputStream;
 
 public class OutputStreamOutputFile implements OutputFile {
 
-  private final OutputStream outputStream;
+    private final OutputStream outputStream;
 
-  public OutputStreamOutputFile(OutputStream outputStream) {
-    this.outputStream = outputStream;
-  }
+    public OutputStreamOutputFile(OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
 
-  @Override
-  public PositionOutputStream create(long blockSizeHint) throws IOException {
-    return new CountedPositionOutputStream(outputStream);
-  }
+    @Override
+    public PositionOutputStream create(long blockSizeHint) throws IOException {
+        return new CountedPositionOutputStream(outputStream);
+    }
 
-  @Override
-  public PositionOutputStream createOrOverwrite(long blockSizeHint) throws IOException {
-    return new CountedPositionOutputStream(outputStream);
-  }
+    @Override
+    public PositionOutputStream createOrOverwrite(long blockSizeHint) throws IOException {
+        return new CountedPositionOutputStream(outputStream);
+    }
 
-  @Override
-  public boolean supportsBlockSize() {
-    return false;
-  }
+    @Override
+    public boolean supportsBlockSize() {
+        return false;
+    }
 
-  @Override
-  public long defaultBlockSize() {
-    return 0;
-  }
+    @Override
+    public long defaultBlockSize() {
+        return 0;
+    }
 
 }

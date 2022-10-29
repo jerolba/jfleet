@@ -18,48 +18,49 @@ package org.jfleet.parquet;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.apache.parquet.io.PositionOutputStream;
 
 class CountedPositionOutputStream extends PositionOutputStream {
 
-  private final BufferedOutputStream bos;
-  private int pos = 0;
+    private final BufferedOutputStream bos;
+    private int pos = 0;
 
-  CountedPositionOutputStream(OutputStream os) {
-    bos = new BufferedOutputStream(os);
-  }
-
-  @Override
-  public long getPos() throws IOException {
-    return pos;
-  }
-
-  @Override
-  public void flush() throws IOException {
-    bos.flush();
-  }
+    CountedPositionOutputStream(OutputStream os) {
+        bos = new BufferedOutputStream(os);
+    }
 
     @Override
-  public void close() throws IOException {
-    bos.close();
-  }
+    public long getPos() throws IOException {
+        return pos;
+    }
 
     @Override
-  public void write(int b) throws IOException {
-    bos.write(b);
-    pos++;
-  }
+    public void flush() throws IOException {
+        bos.flush();
+    }
 
-  @Override
-  public void write(byte[] b, int off, int len) throws IOException {
-    bos.write(b, off, len);
-    pos += len;
-  }
+    @Override
+    public void close() throws IOException {
+        bos.close();
+    }
 
-  @Override
-  public void write(byte[] b) throws IOException {
-    bos.write(b);
-    pos += b.length;
-  }
+    @Override
+    public void write(int b) throws IOException {
+        bos.write(b);
+        pos++;
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        bos.write(b, off, len);
+        pos += len;
+    }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        bos.write(b);
+        pos += b.length;
+    }
 
 }

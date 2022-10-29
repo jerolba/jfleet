@@ -19,17 +19,18 @@ import org.jfleet.EntityInfo;
 
 public class AvroConfiguration<T> {
 
-    private EntityInfo entityInfo;
-    private Class<T> clazz;
+    private final EntityInfo entityInfo;
+    private final Class<T> clazz;
 
     @SuppressWarnings("unchecked")
     public AvroConfiguration(EntityInfo entityInfo) {
         this.entityInfo = entityInfo;
-        clazz = (Class<T>) entityInfo.getEntityClass();
+        this.clazz = (Class<T>) entityInfo.getEntityClass();
     }
 
     public AvroConfiguration(Class<T> clazz) {
         this.clazz = clazz;
+        this.entityInfo = null;
     }
 
     public EntityInfo getEntityInfo() {
@@ -39,4 +40,5 @@ public class AvroConfiguration<T> {
     public Class<T> getClazz() {
         return clazz;
     }
+
 }

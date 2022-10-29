@@ -16,7 +16,11 @@
 package org.jfleet.avro;
 
 public class UnsupportedTypeException extends RuntimeException {
+
+    private static final long serialVersionUID = 7960456770825529263L;
+
     public UnsupportedTypeException(String message) {
         super(message);
     }
+
 }

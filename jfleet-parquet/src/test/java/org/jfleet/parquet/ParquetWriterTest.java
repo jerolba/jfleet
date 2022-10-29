@@ -15,6 +15,32 @@
  */
 package org.jfleet.parquet;
 
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BIGDECIMAL;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BOOLEAN;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.BYTE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.DOUBLE;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.ENUMORDINAL;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.ENUMSTRING;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.FLOAT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.INT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.LONG;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.SHORT;
+import static org.jfleet.EntityFieldType.FieldTypeEnum.STRING;
+import static org.jfleet.parquet.TestEntityWithEnum.WeekDays.FRIDAY;
+import static org.jfleet.parquet.TestEntityWithEnum.WeekDays.SATURDAY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Arrays;
+
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -23,36 +49,24 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
-import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
-import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
 import org.jfleet.avro.UnsupportedTypeException;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Arrays;
-
-import static org.jfleet.parquet.TestEntityWithEnum.WeekDays.FRIDAY;
-import static org.jfleet.parquet.TestEntityWithEnum.WeekDays.SATURDAY;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ParquetWriterTest {
 
     @Test
     public void shouldWrite() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+                .addColumn("fooInt", INT, TestEntity::getFooInt)
+                .addColumn("fooShort", SHORT, TestEntity::getFooShort)
+                .addColumn("fooByte", BYTE, TestEntity::getFooByte)
+                .addColumn("fooDouble", DOUBLE, TestEntity::getFooDouble)
+                .addColumn("fooLong", LONG, TestEntity::getFooLong)
+                .addColumn("fooFloat", FLOAT, TestEntity::getFooFloat)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -64,7 +78,8 @@ class ParquetWriterTest {
         testEntity.setFooFloat(50.1F);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(outputStream, entityInfo).build();
+        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
+                outputStream, entityInfo).build();
         ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
         parquetWriter.writeAll(Arrays.asList(testEntity));
 
@@ -73,13 +88,14 @@ class ParquetWriterTest {
     @Test
     void shouldFillOutputStream() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+                .addColumn("foo", STRING, TestEntity::getFooString)
                 .build();
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(outputStream, entityInfo).build();
+        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
+                outputStream, entityInfo).build();
         ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
         parquetWriter.writeAll(Arrays.asList(testEntity));
 
@@ -89,7 +105,7 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithStringTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+                .addColumn("foo", STRING, TestEntity::getFooString)
                 .build();
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
@@ -104,7 +120,7 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullStringType() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.STRING, TestEntity::getFooString)
+                .addColumn("foo", STRING, TestEntity::getFooString)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -119,7 +135,7 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithBooleanType() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+                .addColumn("fooBoolean", BOOLEAN, TestEntity::getFooBoolean)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -135,13 +151,13 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityWithPrimitives() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithPrimitives.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
+                .addColumn("fooBoolean", BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
+                .addColumn("fooInt", INT, true, TestEntityWithPrimitives::getFooInt)
+                .addColumn("fooShort", SHORT, true, TestEntityWithPrimitives::getFooShort)
+                .addColumn("fooByte", BYTE, true, TestEntityWithPrimitives::getFooByte)
+                .addColumn("fooDouble", DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
+                .addColumn("fooLong", LONG, true, TestEntityWithPrimitives::getFooLong)
+                .addColumn("fooFloat", FLOAT, true, TestEntityWithPrimitives::getFooFloat)
                 .build();
 
         TestEntityWithPrimitives testEntity = new TestEntityWithPrimitives();
@@ -169,13 +185,13 @@ class ParquetWriterTest {
     @Test
     void shouldCreateSchemaWithoutNullTypesForPrimitives() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithPrimitives.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, true, TestEntityWithPrimitives::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, true, TestEntityWithPrimitives::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, true, TestEntityWithPrimitives::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, true, TestEntityWithPrimitives::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, true, TestEntityWithPrimitives::getFooFloat)
+                .addColumn("fooBoolean", BOOLEAN, true, TestEntityWithPrimitives::isFooBoolean)
+                .addColumn("fooInt", INT, true, TestEntityWithPrimitives::getFooInt)
+                .addColumn("fooShort", SHORT, true, TestEntityWithPrimitives::getFooShort)
+                .addColumn("fooByte", BYTE, true, TestEntityWithPrimitives::getFooByte)
+                .addColumn("fooDouble", DOUBLE, true, TestEntityWithPrimitives::getFooDouble)
+                .addColumn("fooLong", LONG, true, TestEntityWithPrimitives::getFooLong)
+                .addColumn("fooFloat", FLOAT, true, TestEntityWithPrimitives::getFooFloat)
                 .build();
 
         TestEntityWithPrimitives testEntity = new TestEntityWithPrimitives();
@@ -206,13 +222,13 @@ class ParquetWriterTest {
     @Test
     void shouldCreateSchemaWithNullTypesForObjects() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+                .addColumn("fooBoolean", BOOLEAN, TestEntity::getFooBoolean)
+                .addColumn("fooInt", INT, TestEntity::getFooInt)
+                .addColumn("fooShort", SHORT, TestEntity::getFooShort)
+                .addColumn("fooByte", BYTE, TestEntity::getFooByte)
+                .addColumn("fooDouble", DOUBLE, TestEntity::getFooDouble)
+                .addColumn("fooLong", LONG, TestEntity::getFooLong)
+                .addColumn("fooFloat", FLOAT, TestEntity::getFooFloat)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -245,7 +261,7 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullBoolean() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooBoolean", FieldTypeEnum.BOOLEAN, TestEntity::getFooBoolean)
+                .addColumn("fooBoolean", BOOLEAN, TestEntity::getFooBoolean)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -260,12 +276,12 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithNumericTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+                .addColumn("fooInt", INT, TestEntity::getFooInt)
+                .addColumn("fooShort", SHORT, TestEntity::getFooShort)
+                .addColumn("fooByte", BYTE, TestEntity::getFooByte)
+                .addColumn("fooDouble", DOUBLE, TestEntity::getFooDouble)
+                .addColumn("fooLong", LONG, TestEntity::getFooLong)
+                .addColumn("fooFloat", FLOAT, TestEntity::getFooFloat)
                 .build();
 
         TestEntity testEntity = new TestEntity();
@@ -291,18 +307,17 @@ class ParquetWriterTest {
     @Test
     void shouldConvertEntityInfoWithNullNumericTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("fooInt", FieldTypeEnum.INT, TestEntity::getFooInt)
-                .addColumn("fooShort", FieldTypeEnum.SHORT, TestEntity::getFooShort)
-                .addColumn("fooByte", FieldTypeEnum.BYTE, TestEntity::getFooByte)
-                .addColumn("fooDouble", FieldTypeEnum.DOUBLE, TestEntity::getFooDouble)
-                .addColumn("fooLong", FieldTypeEnum.LONG, TestEntity::getFooLong)
-                .addColumn("fooFloat", FieldTypeEnum.FLOAT, TestEntity::getFooFloat)
+                .addColumn("fooInt", INT, TestEntity::getFooInt)
+                .addColumn("fooShort", SHORT, TestEntity::getFooShort)
+                .addColumn("fooByte", BYTE, TestEntity::getFooByte)
+                .addColumn("fooDouble", DOUBLE, TestEntity::getFooDouble)
+                .addColumn("fooLong", LONG, TestEntity::getFooLong)
+                .addColumn("fooFloat", FLOAT, TestEntity::getFooFloat)
                 .build();
 
         TestEntity testEntity = new TestEntity();
 
         try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
-
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("fooInt"));
@@ -317,18 +332,19 @@ class ParquetWriterTest {
     @Test
     void shouldThrowUnsupportedTypeException() {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
-                .addColumn("foo", FieldTypeEnum.BIGDECIMAL, a -> BigDecimal.ZERO)
+                .addColumn("foo", BIGDECIMAL, a -> BigDecimal.ZERO)
                 .build();
 
-        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(new ByteArrayOutputStream(), entityInfo).build();
+        ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
+                new ByteArrayOutputStream(), entityInfo).build();
         assertThrows(UnsupportedTypeException.class, () -> new ParquetWriter<>(parquetConfiguration));
     }
 
     @Test
     void shouldConvertEnumTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
-                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
-                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+                .addColumn("foo", ENUMORDINAL, TestEntityWithEnum::getFoo)
+                .addColumn("bar", ENUMSTRING, TestEntityWithEnum::getBar)
                 .build();
 
         TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
@@ -336,7 +352,6 @@ class ParquetWriterTest {
         testEntityWithEnum.setBar(SATURDAY);
 
         try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
-
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertEquals(4, genericRecord.get("foo"));
@@ -347,14 +362,13 @@ class ParquetWriterTest {
     @Test
     void shouldConvertNullableEnumTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntityWithEnum.class)
-                .addColumn("foo", FieldTypeEnum.ENUMORDINAL, TestEntityWithEnum::getFoo)
-                .addColumn("bar", FieldTypeEnum.ENUMSTRING, TestEntityWithEnum::getBar)
+                .addColumn("foo", ENUMORDINAL, TestEntityWithEnum::getFoo)
+                .addColumn("bar", ENUMSTRING, TestEntityWithEnum::getBar)
                 .build();
 
         TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
 
         try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
-
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("foo"));
@@ -364,12 +378,8 @@ class ParquetWriterTest {
 
     private <T> ParquetReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity) throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
-            ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(outputStream, entityInfo)
-                    .withCompressionCodec(CompressionCodecName.SNAPPY)
-                    .withRowGroupSize(org.apache.parquet.hadoop.ParquetWriter.DEFAULT_BLOCK_SIZE)
-                    .withPageSize(org.apache.parquet.hadoop.ParquetWriter.DEFAULT_PAGE_SIZE)
+            ParquetConfiguration<T> parquetConfiguration = new ParquetConfiguration.Builder<T>(outputStream, entityInfo)
                     .withValidation(true)
-                    .withDictionaryEncoding(true)
                     .build();
             ParquetWriter<T> parquetWriter = new ParquetWriter<>(parquetConfiguration);
             parquetWriter.writeAll(Arrays.asList(testEntity));

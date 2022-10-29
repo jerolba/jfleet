@@ -16,6 +16,7 @@
 package org.jfleet.parquet;
 
 import java.io.OutputStream;
+
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.avro.AvroParquetWriter;
@@ -28,181 +29,182 @@ import org.jfleet.EntityInfo;
 
 public class ParquetConfiguration<T> {
 
-  private final AvroParquetWriter.Builder<GenericRecord> builder;
-  private final Class<T> recordClass;
-  private final EntityInfo entityInfo;
-
-  ParquetConfiguration(AvroParquetWriter.Builder<GenericRecord> builder, Class<T> recordClass, EntityInfo entityInfo) {
-    this.builder = builder;
-    this.recordClass = recordClass;
-    this.entityInfo = entityInfo;
-  }
-
-  Class<T> getRecordClass() {
-    return recordClass;
-  }
-
-  AvroParquetWriter.Builder<GenericRecord> getWriterBuilder() {
-    return builder;
-  }
-
-  public EntityInfo getEntityInfo() {
-    return entityInfo;
-  }
-
-  public static class Builder<T> {
-
     private final AvroParquetWriter.Builder<GenericRecord> builder;
     private final Class<T> recordClass;
     private final EntityInfo entityInfo;
 
-    public Builder(OutputFile path, Class<T> recordClass) {
-      this.recordClass = recordClass;
-      entityInfo = null;
-      builder = AvroParquetWriter.builder(path);
-      builder.withWriteMode(Mode.OVERWRITE)
-        .withValidation(true);
+    ParquetConfiguration(AvroParquetWriter.Builder<GenericRecord> builder, Class<T> recordClass,
+            EntityInfo entityInfo) {
+        this.builder = builder;
+        this.recordClass = recordClass;
+        this.entityInfo = entityInfo;
     }
 
-    public Builder(OutputFile path, EntityInfo entityInfo) {
-      recordClass = (Class<T>) entityInfo.getEntityClass();
-      this.entityInfo = entityInfo;
-      builder = AvroParquetWriter.builder(path);
-      builder.withWriteMode(Mode.OVERWRITE)
-        .withValidation(true);
+    Class<T> getRecordClass() {
+        return recordClass;
     }
 
-    public Builder(OutputStream outputStream, Class<T> recordClass) {
-      this(new OutputStreamOutputFile(outputStream), recordClass);
+    AvroParquetWriter.Builder<GenericRecord> getWriterBuilder() {
+        return builder;
     }
 
-    public Builder(OutputStream outputStream, EntityInfo entityInfo) {
-      this(new OutputStreamOutputFile(outputStream), entityInfo);
+    public EntityInfo getEntityInfo() {
+        return entityInfo;
     }
 
-    public Builder<T> withConf(Configuration conf) {
-      builder.withConf(conf);
-      return this;
-    }
+    public static class Builder<T> {
 
-    public Builder<T> withWriteMode(Mode mode) {
-      builder.withWriteMode(mode);
-      return this;
-    }
+        private final AvroParquetWriter.Builder<GenericRecord> builder;
+        private final Class<T> recordClass;
+        private final EntityInfo entityInfo;
 
-    public Builder<T> withCompressionCodec(CompressionCodecName codecName) {
-      builder.withCompressionCodec(codecName);
-      return this;
-    }
+        public Builder(OutputFile path, Class<T> recordClass) {
+            this.recordClass = recordClass;
+            entityInfo = null;
+            builder = AvroParquetWriter.builder(path);
+            builder.withWriteMode(Mode.OVERWRITE)
+                    .withValidation(true);
+        }
 
-    public Builder<T> withEncryption(FileEncryptionProperties encryptionProperties) {
-      builder.withEncryption(encryptionProperties);
-      return this;
-    }
+        public Builder(OutputFile path, EntityInfo entityInfo) {
+            recordClass = (Class<T>) entityInfo.getEntityClass();
+            this.entityInfo = entityInfo;
+            builder = AvroParquetWriter.builder(path);
+            builder.withWriteMode(Mode.OVERWRITE)
+                    .withValidation(true);
+        }
 
-    public Builder<T> withRowGroupSize(long rowGroupSize) {
-      builder.withRowGroupSize(rowGroupSize);
-      return this;
-    }
+        public Builder(OutputStream outputStream, Class<T> recordClass) {
+            this(new OutputStreamOutputFile(outputStream), recordClass);
+        }
 
-    public Builder<T> withMaxPaddingSize(int maxPaddingSize) {
-      builder.withMaxPaddingSize(maxPaddingSize);
-      return this;
-    }
+        public Builder(OutputStream outputStream, EntityInfo entityInfo) {
+            this(new OutputStreamOutputFile(outputStream), entityInfo);
+        }
 
-    public Builder<T> enableValidation() {
-      builder.enableValidation();
-      return this;
-    }
+        public Builder<T> withConf(Configuration conf) {
+            builder.withConf(conf);
+            return this;
+        }
 
-    public Builder<T> withValidation(boolean enableValidation) {
-      builder.withValidation(enableValidation);
-      return this;
-    }
+        public Builder<T> withWriteMode(Mode mode) {
+            builder.withWriteMode(mode);
+            return this;
+        }
 
-    public Builder<T> withPageSize(int pageSize) {
-      builder.withPageSize(pageSize);
-      return this;
-    }
+        public Builder<T> withCompressionCodec(CompressionCodecName codecName) {
+            builder.withCompressionCodec(codecName);
+            return this;
+        }
 
-    public Builder<T> withPageRowCountLimit(int rowCount) {
-      builder.withPageRowCountLimit(rowCount);
-      return this;
-    }
+        public Builder<T> withEncryption(FileEncryptionProperties encryptionProperties) {
+            builder.withEncryption(encryptionProperties);
+            return this;
+        }
 
-    public Builder<T> withDictionaryPageSize(int dictionaryPageSize) {
-      builder.withDictionaryPageSize(dictionaryPageSize);
-      return this;
-    }
+        public Builder<T> withRowGroupSize(long rowGroupSize) {
+            builder.withRowGroupSize(rowGroupSize);
+            return this;
+        }
 
-    public Builder<T> enableDictionaryEncoding() {
-      builder.enableDictionaryEncoding();
-      return this;
-    }
+        public Builder<T> withMaxPaddingSize(int maxPaddingSize) {
+            builder.withMaxPaddingSize(maxPaddingSize);
+            return this;
+        }
 
-    public Builder<T> withDictionaryEncoding(boolean enableDictionary) {
-      builder.withDictionaryEncoding(enableDictionary);
-      return this;
-    }
+        public Builder<T> enableValidation() {
+            builder.enableValidation();
+            return this;
+        }
 
-    public Builder<T> withByteStreamSplitEncoding(boolean enableByteStreamSplit) {
-      builder.withByteStreamSplitEncoding(enableByteStreamSplit);
-      return this;
-    }
+        public Builder<T> withValidation(boolean enableValidation) {
+            builder.withValidation(enableValidation);
+            return this;
+        }
 
-    public Builder<T> withDictionaryEncoding(String columnPath, boolean enableDictionary) {
-      builder.withDictionaryEncoding(columnPath, enableDictionary);
-      return this;
-    }
+        public Builder<T> withPageSize(int pageSize) {
+            builder.withPageSize(pageSize);
+            return this;
+        }
 
-    public Builder<T> withWriterVersion(WriterVersion version) {
-      builder.withWriterVersion(version);
-      return this;
-    }
+        public Builder<T> withPageRowCountLimit(int rowCount) {
+            builder.withPageRowCountLimit(rowCount);
+            return this;
+        }
 
-    public Builder<T> enablePageWriteChecksum() {
-      builder.withPageWriteChecksumEnabled(true);
-      return this;
-    }
+        public Builder<T> withDictionaryPageSize(int dictionaryPageSize) {
+            builder.withDictionaryPageSize(dictionaryPageSize);
+            return this;
+        }
 
-    public Builder<T> withPageWriteChecksumEnabled(boolean enablePageWriteChecksum) {
-      builder.withPageWriteChecksumEnabled(enablePageWriteChecksum);
-      return this;
-    }
+        public Builder<T> enableDictionaryEncoding() {
+            builder.enableDictionaryEncoding();
+            return this;
+        }
 
-    public Builder<T> withBloomFilterNDV(String columnPath, long ndv) {
-      builder.withBloomFilterNDV(columnPath, ndv);
-      return this;
-    }
+        public Builder<T> withDictionaryEncoding(boolean enableDictionary) {
+            builder.withDictionaryEncoding(enableDictionary);
+            return this;
+        }
 
-    public Builder<T> withBloomFilterEnabled(boolean enabled) {
-      builder.withBloomFilterEnabled(enabled);
-      return this;
-    }
+        public Builder<T> withByteStreamSplitEncoding(boolean enableByteStreamSplit) {
+            builder.withByteStreamSplitEncoding(enableByteStreamSplit);
+            return this;
+        }
 
-    public Builder<T> withBloomFilterEnabled(String columnPath, boolean enabled) {
-      builder.withBloomFilterEnabled(columnPath, enabled);
-      return this;
-    }
+        public Builder<T> withDictionaryEncoding(String columnPath, boolean enableDictionary) {
+            builder.withDictionaryEncoding(columnPath, enableDictionary);
+            return this;
+        }
 
-    public Builder<T> withMinRowCountForPageSizeCheck(int min) {
-      builder.withMinRowCountForPageSizeCheck(min);
-      return this;
-    }
+        public Builder<T> withWriterVersion(WriterVersion version) {
+            builder.withWriterVersion(version);
+            return this;
+        }
 
-    public Builder<T> withMaxRowCountForPageSizeCheck(int max) {
-      builder.withMaxRowCountForPageSizeCheck(max);
-      return this;
-    }
+        public Builder<T> enablePageWriteChecksum() {
+            builder.withPageWriteChecksumEnabled(true);
+            return this;
+        }
 
-    public Builder<T> config(String property, String value) {
-      builder.config(property, value);
-      return this;
-    }
+        public Builder<T> withPageWriteChecksumEnabled(boolean enablePageWriteChecksum) {
+            builder.withPageWriteChecksumEnabled(enablePageWriteChecksum);
+            return this;
+        }
 
-    public ParquetConfiguration<T> build() {
-      return new ParquetConfiguration<>(builder, recordClass, entityInfo);
+        public Builder<T> withBloomFilterNDV(String columnPath, long ndv) {
+            builder.withBloomFilterNDV(columnPath, ndv);
+            return this;
+        }
+
+        public Builder<T> withBloomFilterEnabled(boolean enabled) {
+            builder.withBloomFilterEnabled(enabled);
+            return this;
+        }
+
+        public Builder<T> withBloomFilterEnabled(String columnPath, boolean enabled) {
+            builder.withBloomFilterEnabled(columnPath, enabled);
+            return this;
+        }
+
+        public Builder<T> withMinRowCountForPageSizeCheck(int min) {
+            builder.withMinRowCountForPageSizeCheck(min);
+            return this;
+        }
+
+        public Builder<T> withMaxRowCountForPageSizeCheck(int max) {
+            builder.withMaxRowCountForPageSizeCheck(max);
+            return this;
+        }
+
+        public Builder<T> config(String property, String value) {
+            builder.config(property, value);
+            return this;
+        }
+
+        public ParquetConfiguration<T> build() {
+            return new ParquetConfiguration<>(builder, recordClass, entityInfo);
+        }
     }
-  }
 
 }

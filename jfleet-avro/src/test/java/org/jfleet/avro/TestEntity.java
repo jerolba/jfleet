@@ -16,6 +16,7 @@
 package org.jfleet.avro;
 
 public class TestEntity {
+
     private String fooString;
     private Integer fooInt;
     private Short fooShort;
@@ -24,7 +25,6 @@ public class TestEntity {
     private Long fooLong;
     private Float fooFloat;
     private Boolean fooBoolean;
-
 
     public String getFooString() {
         return fooString;
@@ -89,4 +89,5 @@ public class TestEntity {
     public void setFooBoolean(Boolean fooBoolean) {
         this.fooBoolean = fooBoolean;
     }
+
 }

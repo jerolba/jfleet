@@ -16,6 +16,7 @@
 package org.jfleet.avro;
 
 public class TestEntityWithEnum {
+
     private WeekDays foo;
     private WeekDays bar;
 
@@ -38,4 +39,5 @@ public class TestEntityWithEnum {
     public enum WeekDays {
         MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
     }
+
 }

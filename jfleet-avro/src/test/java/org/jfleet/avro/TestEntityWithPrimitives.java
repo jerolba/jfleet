@@ -16,6 +16,7 @@
 package org.jfleet.avro;
 
 public class TestEntityWithPrimitives {
+
     private int fooInt;
     private short fooShort;
     private byte fooByte;
@@ -79,4 +80,5 @@ public class TestEntityWithPrimitives {
     public void setFooBoolean(boolean fooBoolean) {
         this.fooBoolean = fooBoolean;
     }
+
 }
