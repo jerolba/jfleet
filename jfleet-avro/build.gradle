@@ -4,11 +4,18 @@ plugins {
     id 'jacoco'
     id 'checkstyle'
     id 'maven-publish'
+    id 'signing'    
 }
 
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
 dependencies {
@@ -36,11 +43,80 @@ jacocoTestReport {
 check.dependsOn jacocoTestReport
 
 task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
     classifier "sources"
+    from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    classifier "javadoc"
     from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            customizePom(pom)
+
+            from components.java
+            artifact sourceJar
+            artifact javadocJar
+            version version
+        }
+    }
+    if (project.hasProperty('sonatypeUsername')){
+	    repositories {
+	        maven {
+	            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+	            credentials {
+	                username sonatypeUsername
+	                password sonatypePassword
+	            }
+	        }
+	    }    
+    } else {
+		println 'No sonatype configuration found. Expected user and password at $HOME/.gradle/gradle.properties file.'    	
+    }    
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            name 'JFleet Avro'
+            description 'JFleet Avro serialize Java classes into Avro files'
+            url 'https://github.com/jerolba/jfleet/tree/master/jfleet-avro'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            developers {
+                developer {
+                    id 'jerolba'
+                    name 'Jerónimo López'
+                    email 'jerolba+jfleet@gmail.com'
+                }
+            }
+            scm {
+                connection 'scm:git:git://github.com/jerolba/jfleet.git'
+                developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
+                url 'https://github.com/jerolba/jfleet'
+            }
+        }
+    }
 }

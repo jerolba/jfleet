@@ -3,12 +3,19 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'checkstyle'
-    id 'maven-publish'    
+    id 'maven-publish'
+    id 'signing'    
 }
 
 compileJava {
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
 dependencies {
@@ -85,4 +92,92 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+check.dependsOn jacocoTestReport
+
+task sourceJar(type: Jar) {
+    classifier "sources"
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier "javadoc"
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            customizePom(pom)
+
+            from components.java
+            artifact sourceJar
+            artifact javadocJar
+            version version
+        }
+    }
+    if (project.hasProperty('sonatypeUsername')){
+	    repositories {
+	        maven {
+	            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+	            credentials {
+	                username sonatypeUsername
+	                password sonatypePassword
+	            }
+	        }
+	    }    
+    } else {
+		println 'No sonatype configuration found. Expected user and password at $HOME/.gradle/gradle.properties file.'    	
+    }    
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            name 'JFleet Parquet'
+            description 'JFleet Parquet serialize Java classes into Parquet files'
+            url 'https://github.com/jerolba/jfleet/tree/master/jfleet-parquet'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            developers {
+                developer {
+                    id 'jerolba'
+                    name 'Jerónimo López'
+                    email 'jerolba+jfleet@gmail.com'
+                }
+            }
+            scm {
+                connection 'scm:git:git://github.com/jerolba/jfleet.git'
+                developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
+                url 'https://github.com/jerolba/jfleet'
+            }
+        }
+    }
 }
