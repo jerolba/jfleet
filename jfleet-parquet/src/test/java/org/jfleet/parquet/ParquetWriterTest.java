@@ -40,8 +40,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
@@ -51,9 +54,9 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
+import org.apache.parquet.io.InvalidRecordException;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
-import org.jfleet.avro.UnsupportedTypeException;
 import org.junit.jupiter.api.Test;
 
 class ParquetWriterTest {
@@ -274,6 +277,61 @@ class ParquetWriterTest {
     }
 
     @Test
+    void shouldConvertEntityInfoWithNonNullString() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
+                .addColumn("fooString", STRING, true, TestEntity::getFooString)
+                .build();
+
+        TestEntity testEntity = new TestEntity();
+        testEntity.setFooString("some value 1");
+
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+            GenericRecord genericRecord = parquetReader.read();
+            Schema schema = genericRecord.getSchema();
+            Field fooStringField = schema.getField("fooString");
+            assertEquals(Type.STRING, fooStringField.schema().getType());
+            assertNotNull(genericRecord);
+            assertEquals("some value 1", genericRecord.get("fooString").toString());
+        }
+
+        assertThrows(InvalidRecordException.class, () -> {
+            TestEntity testEntityNull = new TestEntity();
+            try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
+                ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
+                        outputStream, entityInfo).build();
+                ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
+                parquetWriter.writeAll(Arrays.asList(testEntityNull));
+            }
+        });
+    }
+
+    @Test
+    void valuesWithNull() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
+                .addColumn("fooString", STRING, false, TestEntity::getFooString)
+                .addColumn("fooInt", INT, false, TestEntity::getFooInt)
+                .build();
+
+        TestEntity testEntity1 = new TestEntity();
+        testEntity1.setFooString("some value 1");
+        testEntity1.setFooInt(null);
+        TestEntity testEntity2 = new TestEntity();
+        testEntity2.setFooString(null);
+        testEntity2.setFooInt(2);
+
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity1, testEntity2)) {
+            GenericRecord record1 = parquetReader.read();
+            assertNotNull(record1);
+            assertEquals("some value 1", record1.get("fooString").toString());
+            assertNull(record1.get("fooInt"));
+            GenericRecord record2 = parquetReader.read();
+            assertNotNull(record2);
+            assertNull(record2.get("fooString"));
+            assertEquals(2, record2.get("fooInt"));
+        }
+    }
+
+    @Test
     void shouldConvertEntityInfoWithNumericTypesToParquet() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
                 .addColumn("fooInt", INT, TestEntity::getFooInt)
@@ -337,7 +395,12 @@ class ParquetWriterTest {
 
         ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
                 new ByteArrayOutputStream(), entityInfo).build();
-        assertThrows(UnsupportedTypeException.class, () -> new ParquetWriter<>(parquetConfiguration));
+
+        assertThrows(UnsupportedTypeException.class, () -> {
+            ParquetWriter<TestEntity> writer = new ParquetWriter<>(parquetConfiguration);
+            TestEntity testEntity = new TestEntity();
+            writer.writeAll(Stream.of(testEntity));
+        });
     }
 
     @Test
@@ -376,7 +439,8 @@ class ParquetWriterTest {
         }
     }
 
-    private <T> ParquetReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity) throws IOException {
+    private <T> ParquetReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T... testEntity)
+            throws IOException {
         try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
             ParquetConfiguration<T> parquetConfiguration = new ParquetConfiguration.Builder<T>(outputStream, entityInfo)
                     .withValidation(true)

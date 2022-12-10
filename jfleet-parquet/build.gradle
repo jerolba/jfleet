@@ -20,15 +20,20 @@ java {
 
 dependencies {
     api project(':jfleet-core')
-    implementation project(':jfleet-avro')
 
-    api group: 'org.apache.parquet', name: 'parquet-common', version: '1.12.3'
-    api group: 'org.apache.parquet', name: 'parquet-column', version: '1.12.3'
-    api group: 'org.apache.parquet', name: 'parquet-hadoop', version: '1.12.3'
-    implementation group: 'org.apache.parquet', name: 'parquet-avro', version: '1.12.3'
+    api group: 'org.apache.parquet', name: 'parquet-common', version: parquetVersion
+    api group: 'org.apache.parquet', name: 'parquet-column', version: parquetVersion
+    api group: 'org.apache.parquet', name: 'parquet-hadoop', version: parquetVersion
 
-    compileOnly group: 'org.apache.hadoop', name: 'hadoop-client', version: '3.3.2'
-    implementation('org.apache.hadoop:hadoop-mapreduce-client-core:3.3.2') {
+    compileOnly (group: 'org.apache.hadoop', name: 'hadoop-client', version: hadoopVersion) {
+        exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs-client'
+        exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-api'
+        exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
+        exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-core'
+        exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-jobclient'
+    }
+    
+    implementation(group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: hadoopVersion) {
         exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
         exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
         exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs-client'
@@ -41,7 +46,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-reload4j'
     }
 
-    api('org.apache.hadoop:hadoop-common:3.3.2') {
+    api(group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion) {
         exclude group: 'org.apache.curator', module: 'curator-recipes'
         exclude group: 'org.apache.kerby', module: 'kerb-core'
         exclude group: 'org.apache.avro', module: 'avro'
@@ -83,11 +88,18 @@ dependencies {
         exclude group: 'dnsjava', module: 'dnsjava'
         exclude group: 'log4j', module: 'log4j'
     }
+    
+    constraints {
+        compileOnly(group: 'org.apache.avro', name: 'avro', version: '1.10.2') {
+             because 'Because hadoop-common includes avro:1.7.7'
+        }
+    }
 
     testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
-    testRuntimeOnly group: 'org.apache.hadoop', name: 'hadoop-common', version: '3.3.2'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
+    testRuntimeOnly group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion
+    testImplementation group: 'org.apache.parquet', name: 'parquet-avro', version: parquetVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 }
 
 test {

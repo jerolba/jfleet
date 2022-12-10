@@ -16,62 +16,44 @@
 package org.jfleet.parquet;
 
 import java.io.OutputStream;
+import java.util.Map;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.column.ParquetProperties.WriterVersion;
 import org.apache.parquet.crypto.FileEncryptionProperties;
 import org.apache.parquet.hadoop.ParquetFileWriter.Mode;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.io.OutputFile;
 import org.jfleet.EntityInfo;
+import org.jfleet.inspection.JpaEntityInspector;
 
 public class ParquetConfiguration<T> {
 
-    private final AvroParquetWriter.Builder<GenericRecord> builder;
-    private final Class<T> recordClass;
-    private final EntityInfo entityInfo;
+    private final JFleetParquetConfigBuilder<T> builder;
 
-    ParquetConfiguration(AvroParquetWriter.Builder<GenericRecord> builder, Class<T> recordClass,
-            EntityInfo entityInfo) {
+    ParquetConfiguration(JFleetParquetConfigBuilder<T> builder) {
         this.builder = builder;
-        this.recordClass = recordClass;
-        this.entityInfo = entityInfo;
     }
 
-    Class<T> getRecordClass() {
-        return recordClass;
-    }
-
-    AvroParquetWriter.Builder<GenericRecord> getWriterBuilder() {
+    JFleetParquetConfigBuilder<T> getWriterBuilder() {
         return builder;
-    }
-
-    public EntityInfo getEntityInfo() {
-        return entityInfo;
     }
 
     public static class Builder<T> {
 
-        private final AvroParquetWriter.Builder<GenericRecord> builder;
+        private final JFleetParquetConfigBuilder<T> builder;
         private final Class<T> recordClass;
-        private final EntityInfo entityInfo;
 
         public Builder(OutputFile path, Class<T> recordClass) {
-            this.recordClass = recordClass;
-            entityInfo = null;
-            builder = AvroParquetWriter.builder(path);
-            builder.withWriteMode(Mode.OVERWRITE)
-                    .withValidation(true);
+            this(path, new JpaEntityInspector(recordClass).inspect());
         }
 
         public Builder(OutputFile path, EntityInfo entityInfo) {
-            recordClass = (Class<T>) entityInfo.getEntityClass();
-            this.entityInfo = entityInfo;
-            builder = AvroParquetWriter.builder(path);
-            builder.withWriteMode(Mode.OVERWRITE)
+            this.recordClass = (Class<T>) entityInfo.getEntityClass();
+            JFleetParquetConfigBuilder<T> builder = JFleetParquetConfigBuilder.builder(path, entityInfo);
+            this.builder = builder.withWriteMode(Mode.OVERWRITE)
                     .withValidation(true);
+
         }
 
         public Builder(OutputStream outputStream, Class<T> recordClass) {
@@ -202,9 +184,15 @@ public class ParquetConfiguration<T> {
             return this;
         }
 
-        public ParquetConfiguration<T> build() {
-            return new ParquetConfiguration<>(builder, recordClass, entityInfo);
+        public Builder<T> withExtraMetaData(Map<String, String> extraMetaData) {
+            builder.withExtraMetaData(extraMetaData);
+            return this;
         }
+
+        public ParquetConfiguration<T> build() {
+            return new ParquetConfiguration<>(builder);
+        }
+
     }
 
 }

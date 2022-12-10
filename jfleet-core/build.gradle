@@ -40,9 +40,9 @@ dependencies {
     }
     testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
     testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.9.1'
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 }
 
 test {
