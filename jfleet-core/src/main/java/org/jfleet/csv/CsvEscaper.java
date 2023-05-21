@@ -15,7 +15,7 @@
  */
 package org.jfleet.csv;
 
-public class CsvEscaper {
+class CsvEscaper {
 
     private static final char NEWLINE_CHAR = '\n';
     private static final char CARRIAGE_RETURN_CHAR = '\r';
@@ -25,7 +25,7 @@ public class CsvEscaper {
     private final boolean alwaysDelimit;
     private StringState baseState = ROOT_STATE;
 
-    public CsvEscaper(CsvConfiguration<?> configuration) {
+    CsvEscaper(CsvConfiguration<?> configuration) {
         this.delimiterChar = configuration.getTextDelimiter();
         this.separatorChar = configuration.getFieldSeparator();
         this.alwaysDelimit = configuration.isAlwaysDelimitText();

@@ -15,27 +15,28 @@
  */
 package org.jfleet.csv;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Stream;
 
-import org.jfleet.ColumnInfo;
-import org.jfleet.EntityInfo;
-import org.jfleet.common.TypeSerializer;
-import org.jfleet.inspection.JpaEntityInspector;
-
+/**
+ *
+ * Writes a JFleet entity to an OutputStream a CSV.
+ *
+ * Accepts a collection of objects and writes all into the OutputStream
+ *
+ * The class doesn't support to call writeAll multiple times on the given
+ * OutputStream if the header is written.
+ *
+ * @deprecated {@link org.jfleet.csv.JFleetCsvWriter}
+ * @param <T> Type of the object to write
+ */
+@Deprecated
 public class CsvWriter<T> {
 
     private final CsvConfiguration<T> config;
-    private final TypeSerializer typeSerializer;
-    private final List<ColumnInfo> columns;
-    private final CsvEscaper csvEscaper;
-    private final String emptyText;
 
     public CsvWriter(Class<T> clazz) {
         this(new CsvConfiguration<>(clazz));
@@ -43,18 +44,6 @@ public class CsvWriter<T> {
 
     public CsvWriter(CsvConfiguration<T> config) {
         this.config = config;
-        this.typeSerializer = config.getTypeSerializer();
-        this.columns = getEntityInfo(config).getColumns();
-        this.csvEscaper = new CsvEscaper(config);
-        this.emptyText = Character.toString(config.getTextDelimiter()) + config.getTextDelimiter();
-    }
-
-    private EntityInfo getEntityInfo(CsvConfiguration<T> config) {
-        EntityInfo entityInfo = config.getEntityInfo();
-        if (entityInfo != null) {
-            return entityInfo;
-        }
-        return new JpaEntityInspector(config.getClazz()).inspect();
     }
 
     public void writeAll(OutputStream output, Collection<T> collection) throws IOException {
@@ -62,44 +51,15 @@ public class CsvWriter<T> {
     }
 
     public void writeAll(OutputStream output, Stream<T> stream) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(output, config.getCharset()));
+        CsvSerializer<T> serializer = new CsvSerializer<>(output, config);
         if (config.isHeader()) {
-            writeHeader(writer, columns);
+            serializer.writeHeader();
         }
         Iterator<T> iterator = stream.iterator();
         while (iterator.hasNext()) {
-            add(writer, iterator.next());
+            serializer.add(iterator.next());
         }
-        writer.flush();
-    }
-
-    private void writeHeader(BufferedWriter writer, List<ColumnInfo> columns) throws IOException {
-        for (int i = 0; i < columns.size(); i++) {
-            ColumnInfo info = columns.get(i);
-            writer.write(csvEscaper.escapeAndDelimite(info.getColumnName()));
-            if (i < columns.size() - 1) {
-                writer.write(config.getFieldSeparator());
-            }
-        }
-        writer.write(config.getLineDelimiter());
-    }
-
-    private void add(BufferedWriter writer, T entity) throws IOException {
-        for (int i = 0; i < columns.size(); i++) {
-            ColumnInfo column = columns.get(i);
-            Object value = column.getAccessor().apply(entity);
-            if (value != null) {
-                String valueStr = typeSerializer.toString(value, column.getFieldType());
-                String escapedValue = csvEscaper.escapeAndDelimite(valueStr);
-                writer.write(escapedValue);
-            } else if (config.isAlwaysDelimitText()) {
-                writer.write(emptyText);
-            }
-            if (i < columns.size() - 1) {
-                writer.write(config.getFieldSeparator());
-            }
-        }
-        writer.write(config.getLineDelimiter());
+        serializer.flush();
     }
 
 }

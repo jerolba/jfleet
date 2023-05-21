@@ -26,9 +26,10 @@ import org.jfleet.EntityInfoBuilder;
 public class CsvTestHelper {
 
     public static <T> String writeCsvToString(CsvConfiguration<T> config, List<T> collection) throws IOException {
-        CsvWriter<T> writer = new CsvWriter<>(config);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        writer.writeAll(baos, collection);
+        try (JFleetCsvWriter<T> writer = new JFleetCsvWriter<>(baos, config)) {
+            writer.writeAll(collection);
+        }
         return baos.toString(Charset.defaultCharset().name());
     }
 
