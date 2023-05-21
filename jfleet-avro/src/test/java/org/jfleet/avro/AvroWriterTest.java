@@ -15,6 +15,7 @@
  */
 package org.jfleet.avro;
 
+import static java.util.Arrays.asList;
 import static org.jfleet.EntityFieldType.FieldTypeEnum.BIGDECIMAL;
 import static org.jfleet.EntityFieldType.FieldTypeEnum.BOOLEAN;
 import static org.jfleet.EntityFieldType.FieldTypeEnum.BYTE;
@@ -39,7 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
@@ -62,10 +63,10 @@ class AvroWriterTest {
         testEntity.setFooString("foo");
 
         AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
-        AvroWriter<TestEntity> avroWriter = new AvroWriter<>(avroConfiguration);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        avroWriter.writeAll(outputStream, Arrays.asList(testEntity));
+        try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(outputStream, avroConfiguration)) {
+            avroWriter.write(testEntity);
+        }
         assertTrue(outputStream.size() > 0);
     }
 
@@ -302,8 +303,9 @@ class AvroWriterTest {
                 .addColumn("foo", BIGDECIMAL, a -> BigDecimal.ZERO)
                 .build();
 
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
-        assertThrows(UnsupportedTypeException.class, () -> new AvroWriter<>(avroConfiguration));
+        assertThrows(UnsupportedTypeException.class, () -> new AvroWriter<>(outputStream, avroConfiguration));
     }
 
     @Test
@@ -342,19 +344,71 @@ class AvroWriterTest {
         }
     }
 
-    private <T> DataFileReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity) throws IOException {
-        AvroConfiguration<T> avroConfiguration = new AvroConfiguration<>(entityInfo);
-        AvroWriter<T> avroWriter = new AvroWriter<>(avroConfiguration);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    @Test
+    void writeCanBeCalledMultipleTimes() throws IOException {
+        EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
+                .addColumn("fooString", STRING, TestEntity::getFooString)
+                .addColumn("fooInt", INT, TestEntity::getFooInt)
+                .addColumn("fooLong", LONG, TestEntity::getFooLong)
+                .build();
 
-        avroWriter.writeAll(outputStream, Arrays.asList(testEntity));
+        TestEntity e1 = new TestEntity();
+        e1.setFooString("Madrid");
+        e1.setFooInt(1000);
+        e1.setFooLong(191929273673L);
+        TestEntity e2 = new TestEntity();
+        e2.setFooString("Zaragoza");
+        e2.setFooInt(2000);
+        e2.setFooLong(48923742839L);
+        TestEntity e3 = new TestEntity();
+        e3.setFooString("Barcelona");
+        e3.setFooInt(3000);
+        e3.setFooLong(93024898L);
+        TestEntity e4 = new TestEntity();
+        e4.setFooString("Sevilla");
+        e4.setFooInt(4000);
+        e4.setFooLong(43252L);
+        TestEntity e5 = new TestEntity();
+        e5.setFooString("Valladolid");
+        e5.setFooInt(5000);
+        e5.setFooLong(4243432L);
+        TestEntity e6 = new TestEntity();
+        e6.setFooString("Pamplona");
+        e6.setFooInt(6000);
+        e6.setFooLong(63453L);
 
-        try (FileOutputStream fos = new FileOutputStream("/tmp/foo.avro")) {
-            fos.write(outputStream.toByteArray());
+        String path = "/tmp/foo.avro";
+        try (FileOutputStream fos = new FileOutputStream(path)) {
+            AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
+            try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(fos, avroConfiguration)) {
+                avroWriter.writeAll(asList(e1, e2, e3));
+                avroWriter.write(e4);
+                avroWriter.writeAll(Stream.of(e5, e6));
+            }
         }
-
         DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
-        return new DataFileReader<>(new File("/tmp/foo.avro"), datumReader);
+        try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(new File(path), datumReader)) {
+            assertTrue(dataFileReader.hasNext());
+            assertEquals("Madrid", dataFileReader.next().get("fooString").toString());
+            assertEquals("Zaragoza", dataFileReader.next().get("fooString").toString());
+            assertEquals("Barcelona", dataFileReader.next().get("fooString").toString());
+            assertEquals("Sevilla", dataFileReader.next().get("fooString").toString());
+            assertEquals("Valladolid", dataFileReader.next().get("fooString").toString());
+            assertEquals("Pamplona", dataFileReader.next().get("fooString").toString());
+        }
+    }
+
+    private <T> DataFileReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity)
+            throws IOException {
+        String path = "/tmp/foo.avro";
+        AvroConfiguration<T> avroConfiguration = new AvroConfiguration<>(entityInfo);
+        try (FileOutputStream fos = new FileOutputStream(path)) {
+            try (AvroWriter<T> avroWriter = new AvroWriter<>(fos, avroConfiguration)) {
+                avroWriter.write(testEntity);
+            }
+        }
+        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
+        return new DataFileReader<>(new File(path), datumReader);
     }
 
 }

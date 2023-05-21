@@ -15,10 +15,13 @@
  */
 package org.jfleet.avro;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.avro.Schema;
@@ -29,31 +32,18 @@ import org.apache.avro.io.DatumWriter;
 import org.jfleet.EntityInfo;
 import org.jfleet.inspection.JpaEntityInspector;
 
-public class AvroWriter<T> {
+public class AvroWriter<T> implements Closeable, Consumer<T> {
 
-    private final Schema schema;
-    private final EntityInfo entityInfo;
     private final EntityGenericRecordMapper<T> mapper;
+    private final DataFileWriter<GenericRecord> dataFileWriter;
 
-    public AvroWriter(AvroConfiguration<T> avroConfiguration) {
-        this.entityInfo = getEntityInfo(avroConfiguration);
-        this.schema = new AvroSchemaBuilder(entityInfo).build();
-        this.mapper = new EntityGenericRecordMapper<>(schema, entityInfo);
-    }
-
-    public void writeAll(OutputStream output, Collection<T> entities) throws IOException {
-        writeAll(output, entities.stream());
-    }
-
-    public void writeAll(OutputStream output, Stream<T> entities) throws IOException {
+    public AvroWriter(OutputStream outputStream, AvroConfiguration<T> avroConfiguration) throws IOException {
+        EntityInfo entityInfo = getEntityInfo(avroConfiguration);
+        Schema schema = new AvroSchemaBuilder(entityInfo).build();
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
-        try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter)) {
-            dataFileWriter.create(schema, output);
-            Iterator<T> iterator = entities.iterator();
-            while (iterator.hasNext()) {
-                dataFileWriter.append(mapper.buildAvroRecord(iterator.next()));
-            }
-        }
+        this.dataFileWriter = new DataFileWriter<>(datumWriter);
+        this.dataFileWriter.create(schema, outputStream);
+        this.mapper = new EntityGenericRecordMapper<>(schema, entityInfo);
     }
 
     private static <T> EntityInfo getEntityInfo(AvroConfiguration<T> config) {
@@ -62,6 +52,44 @@ public class AvroWriter<T> {
             return configEntityInfo;
         }
         return new JpaEntityInspector(config.getClazz()).inspect();
+    }
+
+    public void writeAll(Collection<T> entities) throws IOException {
+        for (T entity : entities) {
+            write(entity);
+        }
+    }
+
+    public void writeAll(Stream<T> entities) throws IOException {
+        Iterator<T> iterator = entities.iterator();
+        while (iterator.hasNext()) {
+            write(iterator.next());
+        }
+    }
+
+    public void write(T entity) throws IOException {
+        dataFileWriter.append(mapper.buildAvroRecord(entity));
+    }
+
+    /**
+     *
+     * Writes the specified Java object to an Avro file implementing Consumer<T>
+     *
+     * @param entity object to write
+     * @throws UncheckedIOException if an error occurs while writing the records
+     */
+    @Override
+    public void accept(T entity) {
+        try {
+            write(entity);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        dataFileWriter.close();
     }
 
 }
