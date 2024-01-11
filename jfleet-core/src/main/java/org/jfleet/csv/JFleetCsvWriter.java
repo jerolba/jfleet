@@ -58,7 +58,7 @@ public class JFleetCsvWriter<T> implements Closeable, Consumer<T> {
 
     /**
      *
-     * Writes the specified Java object to a CSV file implementing Consumer<T>
+     * Writes the specified Java object to a CSV file implementing Consumer
      *
      * @param entity object to write
      * @throws UncheckedIOException if an error occurs while writing the records
