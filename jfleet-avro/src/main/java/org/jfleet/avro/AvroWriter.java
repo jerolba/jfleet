@@ -37,13 +37,20 @@ public class AvroWriter<T> implements Closeable, Consumer<T> {
     private final EntityGenericRecordMapper<T> mapper;
     private final DataFileWriter<GenericRecord> dataFileWriter;
 
-    public AvroWriter(OutputStream outputStream, AvroConfiguration<T> avroConfiguration) throws IOException {
-        EntityInfo entityInfo = getEntityInfo(avroConfiguration);
+    public AvroWriter(OutputStream outputStream, EntityInfo entityInfo) throws IOException {
         Schema schema = new AvroSchemaBuilder(entityInfo).build();
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         this.dataFileWriter = new DataFileWriter<>(datumWriter);
         this.dataFileWriter.create(schema, outputStream);
         this.mapper = new EntityGenericRecordMapper<>(schema, entityInfo);
+    }
+
+    public AvroWriter(OutputStream outputStream, Class<T> clazz) throws IOException {
+        this(outputStream, buildEntityInfo(clazz));
+    }
+
+    public AvroWriter(OutputStream outputStream, AvroConfiguration<T> avroConfiguration) throws IOException {
+        this(outputStream, getEntityInfo(avroConfiguration));
     }
 
     private static <T> EntityInfo getEntityInfo(AvroConfiguration<T> config) {
@@ -52,6 +59,10 @@ public class AvroWriter<T> implements Closeable, Consumer<T> {
             return configEntityInfo;
         }
         return new JpaEntityInspector(config.getClazz()).inspect();
+    }
+
+    private static <T> EntityInfo buildEntityInfo(Class<T> clazz) {
+        return new JpaEntityInspector(clazz).inspect();
     }
 
     public void writeAll(Collection<T> entities) throws IOException {

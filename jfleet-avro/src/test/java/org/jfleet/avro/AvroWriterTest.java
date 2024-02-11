@@ -62,9 +62,8 @@ class AvroWriterTest {
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
 
-        AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(outputStream, avroConfiguration)) {
+        try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(outputStream, entityInfo)) {
             avroWriter.write(testEntity);
         }
         assertTrue(outputStream.size() > 0);
@@ -398,12 +397,29 @@ class AvroWriterTest {
         }
     }
 
+    @Test
+    void mapJpaAnnotatedEntities() throws IOException {
+        TestAnnotatedEntity testEntity = new TestAnnotatedEntity("FOO", "BAR", 1L);
+
+        try (FileOutputStream fos = new FileOutputStream("/tmp/bar.avro")) {
+            try (AvroWriter<TestAnnotatedEntity> avroWriter = new AvroWriter<>(fos, TestAnnotatedEntity.class)) {
+                avroWriter.write(testEntity);
+            }
+        }
+        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
+        DataFileReader<GenericRecord> reader = new DataFileReader<>(new File("/tmp/bar.avro"), datumReader);
+        assertTrue(reader.hasNext());
+        GenericRecord genericRecord = reader.next();
+        assertEquals("FOO", ((Utf8) genericRecord.get("id")).toString());
+        assertEquals("BAR", ((Utf8) genericRecord.get("someCode")).toString());
+        assertEquals(1L, genericRecord.get("some_column"));
+    }
+
     private <T> DataFileReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T testEntity)
             throws IOException {
         String path = "/tmp/foo.avro";
-        AvroConfiguration<T> avroConfiguration = new AvroConfiguration<>(entityInfo);
         try (FileOutputStream fos = new FileOutputStream(path)) {
-            try (AvroWriter<T> avroWriter = new AvroWriter<>(fos, avroConfiguration)) {
+            try (AvroWriter<T> avroWriter = new AvroWriter<>(fos, entityInfo)) {
                 avroWriter.write(testEntity);
             }
         }
