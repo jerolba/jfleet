@@ -24,7 +24,7 @@ dependencies {
     
     implementation group: 'org.apache.avro', name: 'avro', version: '1.11.3'
     
-    testCompileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
+    testImplementation group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
