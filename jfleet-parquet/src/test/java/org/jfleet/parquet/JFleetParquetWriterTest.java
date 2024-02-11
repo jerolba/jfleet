@@ -40,26 +40,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.parquet.ParquetReadOptions;
 import org.apache.parquet.avro.AvroParquetReader;
+import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.InputFile;
 import org.apache.parquet.io.InvalidRecordException;
+import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.Type.Repetition;
 import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
 import org.junit.jupiter.api.Test;
 
-class ParquetWriterTest {
+class JFleetParquetWriterTest {
 
     @Test
     public void shouldWrite() throws IOException {
@@ -83,8 +84,9 @@ class ParquetWriterTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
                 outputStream, entityInfo).build();
-        ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
-        parquetWriter.writeAll(Arrays.asList(testEntity));
+        try (JFleetParquetWriter<TestEntity> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
+            parquetWriter.write(testEntity);
+        }
 
     }
 
@@ -99,9 +101,9 @@ class ParquetWriterTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
                 outputStream, entityInfo).build();
-        ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
-        parquetWriter.writeAll(Arrays.asList(testEntity));
-
+        try (JFleetParquetWriter<TestEntity> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
+            parquetWriter.write(testEntity);
+        }
         assertTrue(outputStream.size() > 0);
     }
 
@@ -285,12 +287,22 @@ class ParquetWriterTest {
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("some value 1");
 
+        try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
+            ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
+                    outputStream, entityInfo).build();
+            try (JFleetParquetWriter<TestEntity> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
+                parquetWriter.write(testEntity);
+            }
+        }
+        InputFile file = HadoopInputFile.fromPath(new Path("/tmp/foo.parquet"), new Configuration());
+        try (ParquetFileReader reader = new ParquetFileReader(file, ParquetReadOptions.builder().build())) {
+            MessageType schema = reader.getFileMetaData().getSchema();
+            assertTrue(schema.containsField("fooString"));
+            assertTrue(schema.getFields().get(0).isRepetition(Repetition.REQUIRED));
+        }
+
         try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
-            Schema schema = genericRecord.getSchema();
-            Field fooStringField = schema.getField("fooString");
-            assertEquals(Type.STRING, fooStringField.schema().getType());
-            assertNotNull(genericRecord);
             assertEquals("some value 1", genericRecord.get("fooString").toString());
         }
 
@@ -298,9 +310,10 @@ class ParquetWriterTest {
             TestEntity testEntityNull = new TestEntity();
             try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
                 ParquetConfiguration<TestEntity> parquetConfiguration = new ParquetConfiguration.Builder<TestEntity>(
-                        outputStream, entityInfo).build();
-                ParquetWriter<TestEntity> parquetWriter = new ParquetWriter<>(parquetConfiguration);
-                parquetWriter.writeAll(Arrays.asList(testEntityNull));
+                        outputStream, entityInfo).enableValidation().build();
+                try (JFleetParquetWriter<TestEntity> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
+                    parquetWriter.write(testEntityNull);
+                }
             }
         });
     }
@@ -397,9 +410,9 @@ class ParquetWriterTest {
                 new ByteArrayOutputStream(), entityInfo).build();
 
         assertThrows(UnsupportedTypeException.class, () -> {
-            ParquetWriter<TestEntity> writer = new ParquetWriter<>(parquetConfiguration);
-            TestEntity testEntity = new TestEntity();
-            writer.writeAll(Stream.of(testEntity));
+            try (JFleetParquetWriter<TestEntity> writer = new JFleetParquetWriter<>(parquetConfiguration)) {
+                writer.write(new TestEntity());
+            }
         });
     }
 
@@ -445,8 +458,9 @@ class ParquetWriterTest {
             ParquetConfiguration<T> parquetConfiguration = new ParquetConfiguration.Builder<T>(outputStream, entityInfo)
                     .withValidation(true)
                     .build();
-            ParquetWriter<T> parquetWriter = new ParquetWriter<>(parquetConfiguration);
-            parquetWriter.writeAll(Arrays.asList(testEntity));
+            try (JFleetParquetWriter<T> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
+                parquetWriter.writeAll(Arrays.asList(testEntity));
+            }
         }
         InputFile file = HadoopInputFile.fromPath(new Path("/tmp/foo.parquet"), new Configuration());
         return AvroParquetReader.<GenericRecord>builder(file)

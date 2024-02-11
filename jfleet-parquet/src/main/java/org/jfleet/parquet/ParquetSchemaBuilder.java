@@ -16,6 +16,7 @@
 package org.jfleet.parquet;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.enumType;
+import static org.apache.parquet.schema.LogicalTypeAnnotation.intType;
 import static org.apache.parquet.schema.LogicalTypeAnnotation.stringType;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 
@@ -52,27 +53,29 @@ class ParquetSchemaBuilder {
 
     private Type getFieldSchema(ColumnInfo columnInfo) {
         boolean isPrimitive = columnInfo.getFieldType().isPrimitive();
-        Repetition required = isPrimitive ? Repetition.REQUIRED : Repetition.OPTIONAL;
+        Repetition repetition = isPrimitive ? Repetition.REQUIRED : Repetition.OPTIONAL;
         String name = columnInfo.getColumnName();
         switch (columnInfo.getFieldType().getFieldType()) {
         case STRING:
-            return Types.primitive(BINARY, required).as(stringType()).named(name);
+            return Types.primitive(BINARY, repetition).as(stringType()).named(name);
         case ENUMSTRING:
-            return Types.primitive(BINARY, required).as(enumType()).named(name);
+            return Types.primitive(BINARY, repetition).as(enumType()).named(name);
         case ENUMORDINAL:
-            return new PrimitiveType(required, PrimitiveTypeName.INT32, name);
+            return new PrimitiveType(repetition, PrimitiveTypeName.INT32, name);
         case INT:
+            return new PrimitiveType(repetition, PrimitiveTypeName.INT32, name);
         case SHORT:
+            return Types.primitive(PrimitiveTypeName.INT32, repetition).as(intType(16, true)).named(name);
         case BYTE:
-            return new PrimitiveType(required, PrimitiveTypeName.INT32, name);
+            return Types.primitive(PrimitiveTypeName.INT32, repetition).as(intType(8, true)).named(name);
         case DOUBLE:
-            return new PrimitiveType(required, PrimitiveTypeName.DOUBLE, name);
+            return new PrimitiveType(repetition, PrimitiveTypeName.DOUBLE, name);
         case LONG:
-            return new PrimitiveType(required, PrimitiveTypeName.INT64, name);
+            return new PrimitiveType(repetition, PrimitiveTypeName.INT64, name);
         case FLOAT:
-            return new PrimitiveType(required, PrimitiveTypeName.FLOAT, name);
+            return new PrimitiveType(repetition, PrimitiveTypeName.FLOAT, name);
         case BOOLEAN:
-            return new PrimitiveType(required, PrimitiveTypeName.BOOLEAN, name);
+            return new PrimitiveType(repetition, PrimitiveTypeName.BOOLEAN, name);
         default:
             throw new UnsupportedTypeException(
                     String.format("Unsupported type: %s", columnInfo.getFieldType().getFieldType()));

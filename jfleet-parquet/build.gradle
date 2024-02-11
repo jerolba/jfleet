@@ -25,15 +25,9 @@ dependencies {
     api group: 'org.apache.parquet', name: 'parquet-column', version: parquetVersion
     api group: 'org.apache.parquet', name: 'parquet-hadoop', version: parquetVersion
 
-    compileOnly (group: 'org.apache.hadoop', name: 'hadoop-client', version: hadoopVersion) {
-        exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs-client'
-        exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-api'
-        exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
-        exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-core'
-        exclude group: 'org.apache.hadoop', module: 'hadoop-mapreduce-client-jobclient'
-    }
-    
-    implementation(group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: hadoopVersion) {
+    compileOnly ("org.apache.hadoop:hadoop-client:${hadoopVersion}")
+    implementation("org.apache.hadoop:hadoop-mapreduce-client-core:${hadoopVersion}"){
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
         exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
         exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs-client'
@@ -42,25 +36,21 @@ dependencies {
         exclude group: 'com.google.protobuf', module: 'protobuf-java'
         exclude group: 'javax.ws.rs', module: 'javax.ws.rs-api'
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        exclude group: 'org.slf4j', module: 'slf4j-reload4j'       
+        exclude group: 'org.apache.avro', module: 'avro'   
+    } 
+    api("org.apache.hadoop:hadoop-common:${hadoopVersion}") {
         exclude group: 'org.apache.avro', module: 'avro'
-        exclude group: 'org.slf4j', module: 'slf4j-reload4j'
-    }
-
-    api(group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion) {
-        exclude group: 'org.apache.curator', module: 'curator-recipes'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'org.apache.kerby', module: 'kerb-core'
-        exclude group: 'org.apache.avro', module: 'avro'
+        exclude group: 'org.apache.curator', module: 'curator-recipes'
         exclude group: 'org.apache.curator', module: 'curator-client'
-        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-        exclude group: 'org.apache.hadoop', module: 'hadoop-auth'
         exclude group: 'org.apache.hadoop', module: 'hadoop-annotations'
         exclude group: 'org.apache.hadoop.thirdparty', module: 'hadoop-shaded-protobuf_3_7'
-        exclude group: 'org.apache.commons', module: 'commons-configuration2'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
         exclude group: 'org.apache.commons', module: 'commons-text'
         exclude group: 'org.apache.commons', module: 'commons-math3'
-        exclude group: 'org.apache.commons', module: 'commons-lang3'
         exclude group: 'org.apache.zookeeper', module: 'zookeeper'
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'org.eclipse.jetty', module: 'jetty-server'
         exclude group: 'org.eclipse.jetty', module: 'jetty-servlet'
         exclude group: 'org.eclipse.jetty', module: 'jetty-webapp'
@@ -79,27 +69,92 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
         exclude group: 'commons-net', module: 'commons-net'
         exclude group: 'commons-cli', module: 'commons-cli'
-        exclude group: 'commons-logging', module: 'commons-logging'
         exclude group: 'commons-pool', module: 'commons-pool'
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
         exclude group: 'org.slf4j', module: 'slf4j-reload4j'
-        exclude group: 'com.jcraft', module: 'jsch'
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+        exclude group: 'log4j', module: 'log4j'    
+        exclude group: 'com.jcraft', module: 'jsch'
         exclude group: 'dnsjava', module: 'dnsjava'
-        exclude group: 'log4j', module: 'log4j'
-    }
-    
-    constraints {
-        compileOnly(group: 'org.apache.avro', name: 'avro', version: '1.10.2') {
-             because 'Because hadoop-common includes avro:1.7.7'
-        }
+        exclude group: 'com.github.pjfanning', module: 'jersey-json'        
+
+        exclude group: 'org.apache.kerby', module: 'kerb-simplekdc'
+        exclude group: 'com.nimbusds', module: 'nimbus-jose-jwt'
+        exclude group: 'net.minidev', module: 'json-smart'
+        exclude group: 'org.apache.curator', module: 'curator-framework'
     }
 
     testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
     testRuntimeOnly group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion
     testImplementation group: 'org.apache.parquet', name: 'parquet-avro', version: parquetVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+}
+
+configurations.implementation {
+    //hadoop-mapreduce-client-core
+    exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-client'
+    exclude group: 'org.apache.hadoop', module: 'hadoop-yarn-common'
+    exclude group: 'org.apache.hadoop', module: 'hadoop-hdfs-client'
+    exclude group: 'com.google.inject.extensions', module: 'guice-servlet'
+    exclude group: 'io.netty', module: 'netty'
+    exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    exclude group: 'javax.ws.rs', module: 'javax.ws.rs-api'
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'org.slf4j', module: 'slf4j-reload4j'  
+
+    //hadoop-common
+    //Following dependencies are needed for Path
+    //exclude group: 'org.apache.commons', module: 'commons-lang3'
+    //exclude group: 'commons-logging', module: 'commons-logging'
+    //exclude group: 'org.apache.commons', module: 'commons-configuration2'
+    //exclude group: 'org.apache.hadoop', module: 'hadoop-auth'
+    exclude group: 'org.apache.kerby', module: 'kerb-core'
+    exclude group: 'org.apache.curator', module: 'curator-recipes'
+    exclude group: 'org.apache.curator', module: 'curator-client'
+    exclude group: 'org.apache.hadoop', module: 'hadoop-annotations'
+    exclude group: 'org.apache.hadoop.thirdparty', module: 'hadoop-shaded-protobuf_3_7'
+    exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    exclude group: 'org.apache.commons', module: 'commons-text'
+    exclude group: 'org.apache.commons', module: 'commons-math3'
+    exclude group: 'org.apache.zookeeper', module: 'zookeeper'
+    exclude group: 'org.eclipse.jetty', module: 'jetty-server'
+    exclude group: 'org.eclipse.jetty', module: 'jetty-servlet'
+    exclude group: 'org.eclipse.jetty', module: 'jetty-webapp'
+    exclude group: 'org.eclipse.jetty', module: 'jetty-util'
+    exclude group: 'javax.servlet', module: 'javax.servlet-api'
+    exclude group: 'javax.servlet.jsp', module: 'jsp-api'
+    exclude group: 'com.sun.jersey', module: 'jersey-json'
+    exclude group: 'com.sun.jersey', module: 'jersey-core'
+    exclude group: 'com.sun.jersey', module: 'jersey-servlet'
+    exclude group: 'com.sun.jersey', module: 'jersey-server'
+    exclude group: 'com.google.guava', module: 'guava'
+    exclude group: 'com.google.code.findbugs', module: 'jsr305'
+    exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    exclude group: 'commons-beanutils', module: 'commons-beanutils'
+    exclude group: 'commons-codec', module: 'commons-codec'
+    exclude group: 'commons-io', module: 'commons-io'
+    exclude group: 'commons-net', module: 'commons-net'
+    exclude group: 'commons-cli', module: 'commons-cli'
+    exclude group: 'commons-pool', module: 'commons-pool'
+    exclude group: 'ch.qos.reload4j', module: 'reload4j'
+    exclude group: 'org.slf4j', module: 'slf4j-reload4j'
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'log4j', module: 'log4j'    
+    exclude group: 'com.jcraft', module: 'jsch'
+    exclude group: 'dnsjava', module: 'dnsjava'
+    
+    //Following dependencies excluded from included hadoop-auth
+    exclude group: 'org.apache.kerby', module: 'kerb-simplekdc'
+    exclude group: 'com.nimbusds', module: 'nimbus-jose-jwt'
+    exclude group: 'net.minidev', module: 'json-smart'
+    exclude group: 'org.apache.curator', module: 'curator-framework'
+}
+
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module("org.apache.avro:avro:1.7.7") using module("org.apache.avro:avro:1.10.2")
+    }        
 }
 
 test {

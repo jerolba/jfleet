@@ -42,18 +42,15 @@ public class ParquetConfiguration<T> {
     public static class Builder<T> {
 
         private final JFleetParquetConfigBuilder<T> builder;
-        private final Class<T> recordClass;
 
         public Builder(OutputFile path, Class<T> recordClass) {
             this(path, new JpaEntityInspector(recordClass).inspect());
         }
 
         public Builder(OutputFile path, EntityInfo entityInfo) {
-            this.recordClass = (Class<T>) entityInfo.getEntityClass();
             JFleetParquetConfigBuilder<T> builder = JFleetParquetConfigBuilder.builder(path, entityInfo);
             this.builder = builder.withWriteMode(Mode.OVERWRITE)
-                    .withValidation(true);
-
+                    .withCompressionCodec(CompressionCodecName.SNAPPY);
         }
 
         public Builder(OutputStream outputStream, Class<T> recordClass) {
