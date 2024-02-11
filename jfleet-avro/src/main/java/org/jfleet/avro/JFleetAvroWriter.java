@@ -32,12 +32,12 @@ import org.apache.avro.io.DatumWriter;
 import org.jfleet.EntityInfo;
 import org.jfleet.inspection.JpaEntityInspector;
 
-public class AvroWriter<T> implements Closeable, Consumer<T> {
+public class JFleetAvroWriter<T> implements Closeable, Consumer<T> {
 
     private final EntityGenericRecordMapper<T> mapper;
     private final DataFileWriter<GenericRecord> dataFileWriter;
 
-    public AvroWriter(OutputStream outputStream, EntityInfo entityInfo) throws IOException {
+    public JFleetAvroWriter(OutputStream outputStream, EntityInfo entityInfo) throws IOException {
         Schema schema = new AvroSchemaBuilder(entityInfo).build();
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         this.dataFileWriter = new DataFileWriter<>(datumWriter);
@@ -45,11 +45,11 @@ public class AvroWriter<T> implements Closeable, Consumer<T> {
         this.mapper = new EntityGenericRecordMapper<>(schema, entityInfo);
     }
 
-    public AvroWriter(OutputStream outputStream, Class<T> clazz) throws IOException {
+    public JFleetAvroWriter(OutputStream outputStream, Class<T> clazz) throws IOException {
         this(outputStream, buildEntityInfo(clazz));
     }
 
-    public AvroWriter(OutputStream outputStream, AvroConfiguration<T> avroConfiguration) throws IOException {
+    public JFleetAvroWriter(OutputStream outputStream, AvroConfiguration<T> avroConfiguration) throws IOException {
         this(outputStream, getEntityInfo(avroConfiguration));
     }
 

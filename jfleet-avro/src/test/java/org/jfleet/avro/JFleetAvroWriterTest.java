@@ -52,7 +52,7 @@ import org.jfleet.EntityInfo;
 import org.jfleet.EntityInfoBuilder;
 import org.junit.jupiter.api.Test;
 
-class AvroWriterTest {
+class JFleetAvroWriterTest {
 
     @Test
     void shouldFillOutputStream() throws IOException {
@@ -63,7 +63,7 @@ class AvroWriterTest {
         testEntity.setFooString("foo");
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(outputStream, entityInfo)) {
+        try (JFleetAvroWriter<TestEntity> avroWriter = new JFleetAvroWriter<>(outputStream, entityInfo)) {
             avroWriter.write(testEntity);
         }
         assertTrue(outputStream.size() > 0);
@@ -304,7 +304,7 @@ class AvroWriterTest {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
-        assertThrows(UnsupportedTypeException.class, () -> new AvroWriter<>(outputStream, avroConfiguration));
+        assertThrows(UnsupportedTypeException.class, () -> new JFleetAvroWriter<>(outputStream, avroConfiguration));
     }
 
     @Test
@@ -379,7 +379,7 @@ class AvroWriterTest {
         String path = "/tmp/foo.avro";
         try (FileOutputStream fos = new FileOutputStream(path)) {
             AvroConfiguration<TestEntity> avroConfiguration = new AvroConfiguration<>(entityInfo);
-            try (AvroWriter<TestEntity> avroWriter = new AvroWriter<>(fos, avroConfiguration)) {
+            try (JFleetAvroWriter<TestEntity> avroWriter = new JFleetAvroWriter<>(fos, avroConfiguration)) {
                 avroWriter.writeAll(asList(e1, e2, e3));
                 avroWriter.write(e4);
                 avroWriter.writeAll(Stream.of(e5, e6));
@@ -402,7 +402,7 @@ class AvroWriterTest {
         TestAnnotatedEntity testEntity = new TestAnnotatedEntity("FOO", "BAR", 1L);
 
         try (FileOutputStream fos = new FileOutputStream("/tmp/bar.avro")) {
-            try (AvroWriter<TestAnnotatedEntity> avroWriter = new AvroWriter<>(fos, TestAnnotatedEntity.class)) {
+            try (JFleetAvroWriter<TestAnnotatedEntity> avroWriter = new JFleetAvroWriter<>(fos, TestAnnotatedEntity.class)) {
                 avroWriter.write(testEntity);
             }
         }
@@ -419,7 +419,7 @@ class AvroWriterTest {
             throws IOException {
         String path = "/tmp/foo.avro";
         try (FileOutputStream fos = new FileOutputStream(path)) {
-            try (AvroWriter<T> avroWriter = new AvroWriter<>(fos, entityInfo)) {
+            try (JFleetAvroWriter<T> avroWriter = new JFleetAvroWriter<>(fos, entityInfo)) {
                 avroWriter.write(testEntity);
             }
         }
