@@ -33,34 +33,56 @@ public class JFleetParquetWriter<T> implements Closeable, Consumer<T> {
         this.writer = config.getWriterBuilder().build();
     }
 
-    public void writeAll(Collection<T> entities) throws IOException {
-        for (T entity : entities) {
-            write(entity);
+    /**
+     *
+     * Writes the specified Collection of Java objects to a Parquet file.
+     *
+     * @param collection the collection of objects to write
+     * @throws IOException if an error occurs while writing the records
+     */
+    public void writeAll(Collection<T> collection) throws IOException {
+        for (T value : collection) {
+            writer.write(value);
         }
-    }
-
-    public void writeAll(Stream<T> entities) throws IOException {
-        Iterator<T> iterator = entities.iterator();
-        while (iterator.hasNext()) {
-            write(iterator.next());
-        }
-    }
-
-    public void write(T entity) throws IOException {
-        writer.write(entity);
     }
 
     /**
      *
-     * Writes the specified Java object to an Avro file implementing Consumer<T>
+     * Writes the specified stream of Java objects to a Parquet file.
      *
-     * @param entity object to write
+     * @param stream the stream of objects to write
+     *
+     * @throws IOException if an error occurs while writing the records
+     */
+    public void writeAll(Stream<T> stream) throws IOException {
+        Iterator<T> it = stream.iterator();
+        while (it.hasNext()) {
+            writer.write(it.next());
+        }
+    }
+
+    /**
+     *
+     * Writes the specified Java object to a Parquet file
+     *
+     * @param value object to write
+     * @throws IOException if an error occurs while writing the records
+     */
+    public void write(T value) throws IOException {
+        writer.write(value);
+    }
+
+    /**
+     *
+     * Writes the specified Java object to a Parquet file implementing Consumer<T>
+     *
+     * @param value object to write
      * @throws UncheckedIOException if an error occurs while writing the records
      */
     @Override
-    public void accept(T entity) {
+    public void accept(T value) {
         try {
-            write(entity);
+            writer.write(value);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

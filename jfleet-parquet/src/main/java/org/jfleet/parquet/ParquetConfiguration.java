@@ -48,8 +48,8 @@ public class ParquetConfiguration<T> {
         }
 
         public Builder(OutputFile path, EntityInfo entityInfo) {
-            JFleetParquetConfigBuilder<T> builder = JFleetParquetConfigBuilder.builder(path, entityInfo);
-            this.builder = builder.withWriteMode(Mode.OVERWRITE)
+            JFleetParquetConfigBuilder<T> jgleetBuilder = JFleetParquetConfigBuilder.builder(path, entityInfo);
+            this.builder = jgleetBuilder.withWriteMode(Mode.OVERWRITE)
                     .withCompressionCodec(CompressionCodecName.SNAPPY);
         }
 
