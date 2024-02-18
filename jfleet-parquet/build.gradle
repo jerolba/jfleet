@@ -12,12 +12,6 @@ compileJava {
     targetCompatibility = '1.8'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-}
-
 dependencies {
     api project(':jfleet-core')
 

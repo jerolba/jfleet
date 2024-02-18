@@ -12,12 +12,6 @@ compileJava {
     targetCompatibility = '1.8'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
-}
-
 dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
     implementation project(':jfleet-core')
