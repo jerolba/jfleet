@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.jfleet.EntityInfo;
+
 public class JFleetCsvWriter<T> implements Closeable, Consumer<T> {
 
     private final CsvSerializer<T> serializer;
@@ -37,6 +39,10 @@ public class JFleetCsvWriter<T> implements Closeable, Consumer<T> {
         if (config.isHeader()) {
             serializer.writeHeader();
         }
+    }
+
+    public JFleetCsvWriter(OutputStream outputStream, EntityInfo entityInfo) throws IOException {
+        this(outputStream, new CsvConfiguration<>(entityInfo));
     }
 
     public void writeAll(Collection<T> collection) throws IOException {
