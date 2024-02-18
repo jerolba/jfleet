@@ -8,35 +8,16 @@ plugins {
 }
 
 compileJava {
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
 }
 
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
-    compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-    if (project.hasProperty("mysql8")) {
-        compileOnly project(':jfleet-mock-mysql5')
-        compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
-    } else {
-        compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
-        compileOnly project(':jfleet-mock-mysql8')
-    }
-    compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
-
-    testImplementation group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-    if (project.hasProperty("mysql8")) {
-        testImplementation project(':jfleet-mock-mysql5')
-        testImplementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
-    } else {
-        testImplementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
-        testImplementation project(':jfleet-mock-mysql8')
-    }
-    testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
-    testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+    api project(':jfleet-core')
+    
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
 }
 
 test {
@@ -47,7 +28,7 @@ jacocoTestReport {
     reports {
          xml.required = true
          html.required = true
-     }
+    }
 }
 
 check.dependsOn jacocoTestReport
@@ -73,9 +54,9 @@ publishing {
         mavenJava(MavenPublication) {
             customizePom(pom)
             groupId 'org.jfleet'
-            artifactId 'jfleet'
+            artifactId 'jfleet-record'
             version version
-
+            
             from components.java
 
             artifact sourceJar
@@ -109,9 +90,9 @@ def customizePom(pom) {
         root.children().last() + {
             resolveStrategy = Closure.DELEGATE_FIRST
 
-            description 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
-            name 'JFleet'
-            url 'https://github.com/jerolba/jfleet'
+            description 'Persist Java records with JFleet'
+            name 'JFleet Record'
+            url 'https://github.com/jerolba/jfleet/tree/master/jfleet-record'
             licenses {
                 license {
                     name 'The Apache Software License, Version 2.0'

@@ -15,6 +15,8 @@
  */
 package org.jfleet;
 
+import java.util.Objects;
+
 public class EntityFieldType {
 
     public enum FieldTypeEnum {
@@ -50,6 +52,26 @@ public class EntityFieldType {
 
     public boolean isIdentityId() {
         return identityId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldType, identityId, primitive);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EntityFieldType other = (EntityFieldType) obj;
+        return fieldType == other.fieldType && identityId == other.identityId && primitive == other.primitive;
     }
 
 }

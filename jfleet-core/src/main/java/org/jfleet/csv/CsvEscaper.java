@@ -15,7 +15,7 @@
  */
 package org.jfleet.csv;
 
-class CsvEscaper {
+public class CsvEscaper {
 
     private static final char NEWLINE_CHAR = '\n';
     private static final char CARRIAGE_RETURN_CHAR = '\r';
