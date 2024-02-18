@@ -26,7 +26,7 @@ class FieldToColumnMapper {
     private final ColumnNamingStrategy columnNamingStrategy;
     private final CaseType caseType;
 
-    public FieldToColumnMapper(ColumnNamingStrategy columnNamingStrategy, CaseType caseType) {
+    FieldToColumnMapper(ColumnNamingStrategy columnNamingStrategy, CaseType caseType) {
         this.columnNamingStrategy = columnNamingStrategy;
         this.caseType = caseType;
     }
