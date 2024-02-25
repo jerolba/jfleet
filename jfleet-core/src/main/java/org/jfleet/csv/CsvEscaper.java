@@ -25,7 +25,7 @@ public class CsvEscaper {
     private final boolean alwaysDelimit;
     private StringState baseState = ROOT_STATE;
 
-    CsvEscaper(CsvConfiguration<?> configuration) {
+    public CsvEscaper(CsvConfiguration<?> configuration) {
         this.delimiterChar = configuration.getTextDelimiter();
         this.separatorChar = configuration.getFieldSeparator();
         this.alwaysDelimit = configuration.isAlwaysDelimitText();
