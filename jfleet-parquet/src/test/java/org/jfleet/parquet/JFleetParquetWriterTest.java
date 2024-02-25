@@ -36,9 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.apache.avro.Schema;
@@ -63,7 +65,7 @@ import org.junit.jupiter.api.Test;
 class JFleetParquetWriterTest {
 
     @Test
-    public void shouldWrite() throws IOException {
+    void shouldWrite() throws IOException {
         EntityInfo entityInfo = new EntityInfoBuilder<>(TestEntity.class)
                 .addColumn("fooInt", INT, TestEntity::getFooInt)
                 .addColumn("fooShort", SHORT, TestEntity::getFooShort)
@@ -87,7 +89,6 @@ class JFleetParquetWriterTest {
         try (JFleetParquetWriter<TestEntity> parquetWriter = new JFleetParquetWriter<>(parquetConfiguration)) {
             parquetWriter.write(testEntity);
         }
-
     }
 
     @Test
@@ -115,7 +116,7 @@ class JFleetParquetWriterTest {
         TestEntity testEntity = new TestEntity();
         testEntity.setFooString("foo");
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertEquals(new Utf8("foo"), genericRecord.get("foo"));
@@ -130,7 +131,7 @@ class JFleetParquetWriterTest {
 
         TestEntity testEntity = new TestEntity();
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("foo"));
@@ -146,7 +147,7 @@ class JFleetParquetWriterTest {
         TestEntity testEntity = new TestEntity();
         testEntity.setFooBoolean(true);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertTrue((Boolean) genericRecord.get("fooBoolean"));
@@ -174,7 +175,7 @@ class JFleetParquetWriterTest {
         testEntity.setFooLong(100L);
         testEntity.setFooFloat(50.1F);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertTrue((Boolean) genericRecord.get("fooBoolean"));
@@ -208,7 +209,7 @@ class JFleetParquetWriterTest {
         testEntity.setFooLong(100L);
         testEntity.setFooFloat(50.1F);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             Schema schema = parquetReader.read().getSchema();
             assertFieldIsNotUnionType(schema, "fooBoolean");
             assertFieldIsNotUnionType(schema, "fooInt");
@@ -245,7 +246,7 @@ class JFleetParquetWriterTest {
         testEntity.setFooLong(100L);
         testEntity.setFooFloat(50.1F);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             Schema schema = parquetReader.read().getSchema();
             assertUnionFieldContainsNullType(schema, "fooBoolean");
             assertUnionFieldContainsNullType(schema, "fooInt");
@@ -271,7 +272,7 @@ class JFleetParquetWriterTest {
 
         TestEntity testEntity = new TestEntity();
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("fooBoolean"));
@@ -301,7 +302,7 @@ class JFleetParquetWriterTest {
             assertTrue(schema.getFields().get(0).isRepetition(Repetition.REQUIRED));
         }
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertEquals("some value 1", genericRecord.get("fooString").toString());
         }
@@ -332,7 +333,7 @@ class JFleetParquetWriterTest {
         testEntity2.setFooString(null);
         testEntity2.setFooInt(2);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity1, testEntity2)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity1, testEntity2)) {
             GenericRecord record1 = parquetReader.read();
             assertNotNull(record1);
             assertEquals("some value 1", record1.get("fooString").toString());
@@ -363,7 +364,7 @@ class JFleetParquetWriterTest {
         testEntity.setFooLong(100L);
         testEntity.setFooFloat(50.1F);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertEquals(1, genericRecord.get("fooInt"));
@@ -388,7 +389,7 @@ class JFleetParquetWriterTest {
 
         TestEntity testEntity = new TestEntity();
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntity)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntity)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("fooInt"));
@@ -427,7 +428,7 @@ class JFleetParquetWriterTest {
         testEntityWithEnum.setFoo(FRIDAY);
         testEntityWithEnum.setBar(SATURDAY);
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntityWithEnum)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertEquals(4, genericRecord.get("foo"));
@@ -444,7 +445,7 @@ class JFleetParquetWriterTest {
 
         TestEntityWithEnum testEntityWithEnum = new TestEntityWithEnum();
 
-        try (ParquetReader<GenericRecord> parquetReader = serializeAndRead(entityInfo, testEntityWithEnum)) {
+        try (ParquetReader<GenericRecord> parquetReader = serializeAndReadAvro(entityInfo, testEntityWithEnum)) {
             GenericRecord genericRecord = parquetReader.read();
             assertNotNull(genericRecord);
             assertNull(genericRecord.get("foo"));
@@ -452,9 +453,10 @@ class JFleetParquetWriterTest {
         }
     }
 
-    private <T> ParquetReader<GenericRecord> serializeAndRead(EntityInfo entityInfo, T... testEntity)
+    private <T> ParquetReader<GenericRecord> serializeAndReadAvro(EntityInfo entityInfo, T... testEntity)
             throws IOException {
-        try (FileOutputStream outputStream = new FileOutputStream("/tmp/foo.parquet")) {
+        File testFile = Files.createTempFile("foo", ".parquet").toFile();
+        try (FileOutputStream outputStream = new FileOutputStream(testFile)) {
             ParquetConfiguration<T> parquetConfiguration = new ParquetConfiguration.Builder<T>(outputStream, entityInfo)
                     .withValidation(true)
                     .build();
@@ -462,7 +464,7 @@ class JFleetParquetWriterTest {
                 parquetWriter.writeAll(Arrays.asList(testEntity));
             }
         }
-        InputFile file = HadoopInputFile.fromPath(new Path("/tmp/foo.parquet"), new Configuration());
+        InputFile file = HadoopInputFile.fromPath(new Path(testFile.toString()), new Configuration());
         return AvroParquetReader.<GenericRecord>builder(file)
                 .withDataModel(GenericData.get())
                 .build();

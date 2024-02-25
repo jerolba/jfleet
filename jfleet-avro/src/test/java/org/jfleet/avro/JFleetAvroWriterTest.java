@@ -402,7 +402,8 @@ class JFleetAvroWriterTest {
         TestAnnotatedEntity testEntity = new TestAnnotatedEntity("FOO", "BAR", 1L);
 
         try (FileOutputStream fos = new FileOutputStream("/tmp/bar.avro")) {
-            try (JFleetAvroWriter<TestAnnotatedEntity> avroWriter = new JFleetAvroWriter<>(fos, TestAnnotatedEntity.class)) {
+            try (JFleetAvroWriter<TestAnnotatedEntity> avroWriter = new JFleetAvroWriter<>(fos,
+                    TestAnnotatedEntity.class)) {
                 avroWriter.write(testEntity);
             }
         }
