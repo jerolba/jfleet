@@ -74,7 +74,7 @@ public class JFleetParquetWriter<T> implements Closeable, Consumer<T> {
 
     /**
      *
-     * Writes the specified Java object to a Parquet file implementing Consumer<T>
+     * Writes the specified Java object to a Parquet file implementing Consumer of T
      *
      * @param value object to write
      * @throws UncheckedIOException if an error occurs while writing the records

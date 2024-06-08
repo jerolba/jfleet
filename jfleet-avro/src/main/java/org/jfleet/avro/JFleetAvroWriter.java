@@ -65,12 +65,27 @@ public class JFleetAvroWriter<T> implements Closeable, Consumer<T> {
         return new JpaEntityInspector(clazz).inspect();
     }
 
+    /**
+     *
+     * Writes the specified Collection of Java objects to an Avro file.
+     *
+     * @param entities the collection of objects to write
+     * @throws IOException if an error occurs while writing the records
+     */
     public void writeAll(Collection<T> entities) throws IOException {
         for (T entity : entities) {
             write(entity);
         }
     }
 
+    /**
+     *
+     * Writes the specified stream of Java objects to an Avro file.
+     *
+     * @param entities the stream of objects to write
+     *
+     * @throws IOException if an error occurs while writing the records
+     */
     public void writeAll(Stream<T> entities) throws IOException {
         Iterator<T> iterator = entities.iterator();
         while (iterator.hasNext()) {
@@ -78,13 +93,20 @@ public class JFleetAvroWriter<T> implements Closeable, Consumer<T> {
         }
     }
 
+    /**
+     *
+     * Writes the specified Java object to an Avro file.
+     *
+     * @param entity object to write
+     * @throws IOException if an error occurs while writing the records
+     */
     public void write(T entity) throws IOException {
         dataFileWriter.append(mapper.buildAvroRecord(entity));
     }
 
     /**
      *
-     * Writes the specified Java object to an Avro file implementing Consumer<T>
+     * Writes the specified Java object to an Avro file implementing Consumer of T
      *
      * @param entity object to write
      * @throws UncheckedIOException if an error occurs while writing the records
