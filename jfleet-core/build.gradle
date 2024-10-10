@@ -1,42 +1,42 @@
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+    id 'java'
+    id 'java-library'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'maven-publish'
+    id 'signing'    
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
-
-compileJava   {
-  sourceCompatibility = '1.8'
-  targetCompatibility = '1.8'
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 }
 
 dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-	compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-	if (project.hasProperty("mysql8")) {
-		compileOnly project(':jfleet-mock-mysql5')
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
-	} else {
-		compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
-		compileOnly project(':jfleet-mock-mysql8')
-	}
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    compileOnly group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
+    if (project.hasProperty("mysql8")) {
+        compileOnly project(':jfleet-mock-mysql5')
+        compileOnly group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+    } else {
+        compileOnly group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+        compileOnly project(':jfleet-mock-mysql8')
+    }
     compileOnly group: 'org.postgresql', name: 'postgresql', version: '42.2.7'
 
-	testCompile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
-	if (project.hasProperty("mysql8")) {
-		testCompile project(':jfleet-mock-mysql5')
-		testCompile group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+    testImplementation group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
+    if (project.hasProperty("mysql8")) {
+        testImplementation project(':jfleet-mock-mysql5')
+        testImplementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
     } else {
-		testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
-		testCompile project(':jfleet-mock-mysql8')
+        testImplementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.49'
+        testImplementation project(':jfleet-mock-mysql8')
     }
-	testCompile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
-	testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.0'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.7.0'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0'
+    testRuntimeOnly group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
+    testImplementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 }
 
 test {
@@ -45,84 +45,91 @@ test {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled false
-    }
+         xml.required = true
+         html.required = true
+     }
 }
 
 check.dependsOn jacocoTestReport
 
 task sourceJar(type: Jar) {
+    archiveClassifier = "sources"
     from sourceSets.main.allJava
-    classifier "sources"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = "javadoc"
     from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            artifact javadocJar
+            customizePom(pom)
+            groupId 'org.jfleet'
             artifactId 'jfleet'
             version version
-            pom.withXml {
-                asNode().children().last() + {
-                    resolveStrategy = Closure.DELEGATE_FIRST
-                    name 'JFleet'
-                    description 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
-                    url 'https://github.com/jerolba/jfleet'
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id 'jerolba'
-                            name 'Jerónimo López'
-                            email 'jerolba+jfleet@gmail.com'
-                        }
-                    }
-                    scm {
-                        connection 'scm:git:git://github.com/jerolba/jfleet.git'
-                        developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
-                        url 'https://github.com/jerolba/jfleet'
-                                             
-                    }
+
+            from components.java
+
+            artifact sourceJar
+            artifact javadocJar
+        }
+    }
+    if (project.hasProperty('sonatypeUsername')){
+	    repositories {
+	        maven {
+	            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+	            credentials {
+	                username sonatypeUsername
+	                password sonatypePassword
+	            }
+	        }
+	    }    
+    } else {
+		println 'No sonatype configuration found. Expected user and password at $HOME/.gradle/gradle.properties file.'    	
+    }    
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
+            name 'JFleet'
+            url 'https://github.com/jerolba/jfleet'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url 'https://github.com/jerolba/jfleet'
+                connection 'scm:git:git://github.com/jerolba/jfleet.git'
+                developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
+            }
+            developers {
+                developer {
+                    id 'jerolba'
+                    name 'Jerónimo López'
                 }
             }
         }
     }
-}
-
-if (project.hasProperty('bintrayUser')){
-    bintray {
-        user = bintrayUser
-        key = bintrayKey
-        publications = ['mavenJava'] 
-        pkg {
-            repo = 'JFleet'
-            name = 'jfleet'
-            desc = 'JFleet loads data mapped as JPA into DB with alternate and fast way from JPA'
-            websiteUrl = 'https://github.com/jerolba/jfleet'
-            issueTrackerUrl = 'https://github.com/jerolba/jfleet/issues'
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/jerolba/jfleet.git'
-            labels = ['jpa', 'jdbc', 'mysql', 'postgres','load data','copy']
-            version {
-                name = '0.6.4'
-                desc = 'Add support for MySQL 8'
-                released  = new Date()
-            }
-        }
-    }
-}else {
-    println 'No bintray configuration found. Expected bintray user and API key at $HOME/.gradle/gradle.properties file.'
 }

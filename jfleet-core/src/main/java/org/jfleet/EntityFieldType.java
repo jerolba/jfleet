@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 Jerónimo López Bezanilla
+ * Copyright 2022 Jerónimo López Bezanilla
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.jfleet;
+
+import java.util.Objects;
 
 public class EntityFieldType {
 
@@ -50,6 +52,26 @@ public class EntityFieldType {
 
     public boolean isIdentityId() {
         return identityId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldType, identityId, primitive);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        EntityFieldType other = (EntityFieldType) obj;
+        return fieldType == other.fieldType && identityId == other.identityId && primitive == other.primitive;
     }
 
 }

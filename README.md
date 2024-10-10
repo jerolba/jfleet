@@ -2,7 +2,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
 [![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
 [![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
-[ ![Download](https://api.bintray.com/packages/jerolba/JFleet/jfleet/images/download.svg) ](https://bintray.com/jerolba/JFleet/jfleet/_latestVersion)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # JFleet
@@ -180,11 +179,13 @@ JFleet is uploaded to Maven Central Repository and to use it, you need to add th
 <dependency>
     <groupId>org.jfleet</groupId>
     <artifactId>jfleet</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.7</version>
 </dependency>
 ```
 
-or download the single [jar](http://central.maven.org/maven2/org/jfleet/jfleet/0.6.4/jfleet-0.6.4.jar) from Maven repository.
+```
+implementation 'org.jfleet:jfleet:0.6.7'
+```
 
 You can always find the latest published version in the [MvnRepository searcher](https://mvnrepository.com/artifact/org.jfleet/jfleet).
 

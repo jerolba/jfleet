@@ -1,0 +1,116 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'maven-publish'
+    id 'signing'    
+}
+
+compileJava {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+dependencies {
+    api project(':jfleet-core')
+    
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+         xml.required = true
+         html.required = true
+    }
+}
+
+check.dependsOn jacocoTestReport
+
+task sourceJar(type: Jar) {
+    archiveClassifier = "sources"
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = "javadoc"
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            customizePom(pom)
+            groupId 'org.jfleet'
+            artifactId 'jfleet-record'
+            version version
+            
+            from components.java
+
+            artifact sourceJar
+            artifact javadocJar
+        }
+    }
+    if (project.hasProperty('sonatypeUsername')){
+	    repositories {
+	        maven {
+	            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+	            credentials {
+	                username sonatypeUsername
+	                password sonatypePassword
+	            }
+	        }
+	    }    
+    } else {
+		println 'No sonatype configuration found. Expected user and password at $HOME/.gradle/gradle.properties file.'    	
+    }    
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+
+def customizePom(pom) {
+    pom.withXml {
+        def root = asNode()
+
+        root.children().last() + {
+            resolveStrategy = Closure.DELEGATE_FIRST
+
+            description 'Persist Java records with JFleet'
+            name 'JFleet Record'
+            url 'https://github.com/jerolba/jfleet/tree/master/jfleet-record'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                url 'https://github.com/jerolba/jfleet'
+                connection 'scm:git:git://github.com/jerolba/jfleet.git'
+                developerConnection 'scm:git:ssh://github.com:jerolba/jfleet.git'
+            }
+            developers {
+                developer {
+                    id 'jerolba'
+                    name 'Jerónimo López'
+                }
+            }
+        }
+    }
+}
