@@ -15,26 +15,25 @@
  */
 package org.jfleet.postgres;
 
-import static org.jfleet.parameterized.Databases.JdbcPosgres;
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.DBs;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PostgresReservedWordTest {
 

@@ -15,8 +15,13 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.entities.Address;
+import org.jfleet.entities.Company;
+import org.jfleet.entities.Person;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -25,13 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.entities.Address;
-import org.jfleet.entities.Company;
-import org.jfleet.entities.Person;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EmbeddedEntityPersistenceTest {
 

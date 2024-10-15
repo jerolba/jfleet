@@ -15,32 +15,28 @@
  */
 package org.jfleet.util;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.function.Supplier;
 
 public class DatabaseTestConnectionProvider implements Supplier<Connection> {
 
-    private Properties prop;
+    private final JdbcDatabaseContainer<?> container;
 
-    public DatabaseTestConnectionProvider(String propertiesName) throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(propertiesName);
-        Properties p = new Properties();
-        p.load(is);
-        prop = p;
+    public DatabaseTestConnectionProvider(JdbcDatabaseContainer<?> container) {
+        this.container = container;
     }
 
     @Override
     public Connection get() {
-        String driver = prop.getProperty("driver");
+        String driver = container.getDriverClassName();
         try {
             Class.forName(driver).newInstance();
-            Connection conn = DriverManager.getConnection(prop.getProperty("urlConnection"), prop.getProperty("user"),
-                    prop.getProperty("password"));
+            Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(),
+                    container.getPassword());
             return conn;
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
             throw new RuntimeException("Can not instantiate driver " + driver, ex);

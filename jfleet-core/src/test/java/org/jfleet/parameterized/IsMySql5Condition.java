@@ -15,13 +15,12 @@
  */
 package org.jfleet.parameterized;
 
-import static org.jfleet.parameterized.DatabaseArgumentProvider.isMySql5Present;
-import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
-import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
-
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
+import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 
 public class IsMySql5Condition implements ExecutionCondition {
 
@@ -31,6 +30,15 @@ public class IsMySql5Condition implements ExecutionCondition {
             return enabled("MySql 5.x driver is present");
         }
         return disabled("MySql 5.x driver is not present");
+    }
+
+    private static boolean isMySql5Present() {
+        try {
+            Class.forName("com.mysql.jdbc.PreparedStatement");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
 }

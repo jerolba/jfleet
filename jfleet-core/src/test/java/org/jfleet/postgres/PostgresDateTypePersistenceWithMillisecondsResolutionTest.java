@@ -15,16 +15,14 @@
  */
 package org.jfleet.postgres;
 
-import static org.jfleet.parameterized.Databases.JdbcPosgres;
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -32,13 +30,10 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.stream.Stream;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.DBs;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.shared.entities.EntityWithDateTypes;
-import org.jfleet.util.Database;
-import org.jfleet.util.PostgresDatabase;
-import org.jfleet.util.SqlUtil;
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
 
@@ -53,10 +48,9 @@ public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
         entity.setSqlTimeStamp(new Timestamp(getDate("24/01/2012 23:12:48.132").getTime()));
         entity.setLocalTime(LocalTime.of(23, 12, 48, 132_000_000));
         entity.setLocalDateTime(LocalDateTime.of(2012, 01, 24, 23, 12, 48, 132_000_000));
-
         BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-        try (Connection conn = new PostgresDatabase().getConnection()) {
+        try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
             insert.insertAll(conn, Stream.of(entity));
 

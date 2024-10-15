@@ -15,22 +15,51 @@
  */
 package org.jfleet.parameterized;
 
-import java.lang.reflect.Method;
-import java.util.stream.Stream;
-
-import org.jfleet.util.Database;
-import org.jfleet.util.JdbcMysqlDatabase;
-import org.jfleet.util.JdbcPostgresDatabase;
-import org.jfleet.util.MySqlDatabase;
-import org.jfleet.util.PostgresDatabase;
+import org.jfleet.util.*;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.jfleet.parameterized.Databases.*;
 
 public class DatabaseArgumentProvider implements ArgumentsProvider {
 
+    //TODO move this
+    private static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12-alpine")
+            .withUsername("test")
+                .withPassword("test")
+                .withDatabaseName("postgresdb")
+                .withUrlParam("reWriteBatchedInserts", "true");
+    private static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:5.7.34")
+            .withUsername("test")
+                .withPassword("test")
+                .withDatabaseName("testdb")
+                .withUrlParam("useSSL","false")
+                .withUrlParam("allowPublicKeyRetrieval", "true")
+                .withUrlParam("useUnicode","true")
+                .withUrlParam("characterEncoding", "utf-8")
+                .withUrlParam("allowLoadLocalInfile", "true");
+
+    private static final Map<Databases, GenericContainer<?>> map = Map.of(
+        Postgres, postgreSQLContainer,
+        JdbcPosgres, postgreSQLContainer,
+        MySql, mySQLContainer,
+        JdbcMySql, mySQLContainer
+    );
+
+    static {
+        map.values().parallelStream().forEach(GenericContainer::start);
+    }
+
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context)  {
         Method testMethod = context.getTestMethod().get();
         DBs dbs = testMethod.getAnnotation(DBs.class);
         if (dbs != null) {
@@ -43,30 +72,16 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     private Stream<? extends Arguments> getDatabases(Databases[] dbs) {
-        return Stream.of(dbs).map(this::createDatabase).map(Arguments::of);
+        return Stream.of(dbs).map(DatabaseArgumentProvider::getDatabaseContainer).map(Arguments::of);
     }
 
-    private Database createDatabase(Databases enumValue) {
-        switch (enumValue) {
-        case JdbcMySql:
-            return new JdbcMysqlDatabase();
-        case JdbcPosgres:
-            return new JdbcPostgresDatabase();
-        case MySql:
-            return new MySqlDatabase();
-        case Postgres:
-            return new PostgresDatabase();
-        }
-        return null;
-    }
-
-    public static boolean isMySql5Present() {
-        try {
-            Class.forName("com.mysql.jdbc.PreparedStatement");
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
+    public static Database getDatabaseContainer(Databases enumValue) {
+        return switch (enumValue) {
+            case JdbcMySql -> new JdbcMysqlDatabase(mySQLContainer);
+            case JdbcPosgres -> new JdbcPostgresDatabase(postgreSQLContainer);
+            case MySql -> new MySqlDatabase(mySQLContainer);
+            case Postgres -> new PostgresDatabase(postgreSQLContainer);
+        };
     }
 
 }

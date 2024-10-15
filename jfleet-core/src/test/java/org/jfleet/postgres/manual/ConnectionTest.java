@@ -15,10 +15,13 @@
  */
 package org.jfleet.postgres.manual;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.common.StringBuilderReader;
+import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.util.PostgresDatabase;
+import org.junit.jupiter.api.Test;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.jdbc.PgConnection;
+import org.postgresql.util.PSQLException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -27,17 +30,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.jfleet.common.StringBuilderReader;
-import org.jfleet.util.Database;
-import org.jfleet.util.PostgresDatabase;
-import org.junit.jupiter.api.Test;
-import org.postgresql.copy.CopyManager;
-import org.postgresql.jdbc.PgConnection;
-import org.postgresql.util.PSQLException;
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConnectionTest {
 
-    private Database database = new PostgresDatabase();
+    private final PostgresDatabase database = (PostgresDatabase) DatabaseArgumentProvider.getDatabaseContainer(Postgres);
 
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {

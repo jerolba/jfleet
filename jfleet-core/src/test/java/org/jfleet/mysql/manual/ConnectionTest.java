@@ -15,9 +15,12 @@
  */
 package org.jfleet.mysql.manual;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
+import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.parameterized.IsMySql5Present;
+import org.jfleet.util.MySqlDatabase;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,18 +28,16 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jfleet.parameterized.IsMySql5Present;
-import org.jfleet.util.MySqlDatabase;
-import org.junit.jupiter.api.Test;
-
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ConnectionTest {
 
+    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
+
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {
-        try (java.sql.Connection conn = new MySqlDatabase().getConnection()) {
+        try (java.sql.Connection conn = database.getConnection()) {
             assertNotNull(conn);
         }
     }
@@ -47,7 +48,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");
@@ -75,7 +76,7 @@ public class ConnectionTest {
         int someValue = 12345;
         String otherValue = "foobar";
 
-        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
+        try (Connection conn = (Connection)  database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE simple_table (some_column INTEGER, other_column VARCHAR(255))");

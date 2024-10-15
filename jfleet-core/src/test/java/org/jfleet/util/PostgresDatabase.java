@@ -17,15 +17,12 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.postgres.PgCopyBulkInsert;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 public class PostgresDatabase extends Database {
 
-    public PostgresDatabase(String properties) {
-        super(properties);
-    }
-
-    public PostgresDatabase() {
-        super("postgres-test.properties");
+    public PostgresDatabase(PostgreSQLContainer<?> postgresContainer) {
+        super(postgresContainer);
     }
 
     @Override

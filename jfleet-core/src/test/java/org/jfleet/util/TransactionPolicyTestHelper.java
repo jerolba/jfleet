@@ -15,7 +15,8 @@
  */
 package org.jfleet.util;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.entities.City;
+import org.jfleet.entities.Employee;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,8 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
-import org.jfleet.entities.City;
-import org.jfleet.entities.Employee;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TransactionPolicyTestHelper {
 

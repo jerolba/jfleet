@@ -15,9 +15,13 @@
  */
 package org.jfleet.shared;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,13 +33,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EncodingTest {
 

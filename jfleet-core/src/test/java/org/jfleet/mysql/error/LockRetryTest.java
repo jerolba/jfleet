@@ -15,11 +15,18 @@
  */
 package org.jfleet.mysql.error;
 
-import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
-import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
-import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.JFleetException;
+import org.jfleet.entities.City;
+import org.jfleet.entities.Employee;
+import org.jfleet.mysql.LoadDataBulkInsert;
+import org.jfleet.mysql.LoadDataConfiguration;
+import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.util.MySqlDatabase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -27,30 +34,24 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.stream.Stream;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.JFleetException;
-import org.jfleet.entities.City;
-import org.jfleet.entities.Employee;
-import org.jfleet.mysql.LoadDataBulkInsert;
-import org.jfleet.mysql.LoadDataConfiguration;
-import org.jfleet.util.Database;
-import org.jfleet.util.MySqlDatabase;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
+import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LockRetryTest {
 
     private static Logger logger = LoggerFactory.getLogger(LockRetryTest.class);
 
-    private Database database = new MySqlDatabase();
+    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
 
     private static City city1 = new City(1, "Madrid");
     private static City city2 = new City(2, "Barcelona");
 
     @BeforeEach
-    public void setup() throws IOException, SQLException {
+    public void setup() throws SQLException, IOException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
         }

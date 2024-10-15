@@ -17,15 +17,12 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.mysql.LoadDataBulkInsert;
+import org.testcontainers.containers.MySQLContainer;
 
 public class MySqlDatabase extends Database {
 
-    public MySqlDatabase(String properties) {
-        super(properties);
-    }
-
-    public MySqlDatabase() {
-        super("mysql-test.properties");
+    public MySqlDatabase(MySQLContainer<?> mySQLContainer) {
+        super(mySQLContainer);
     }
 
     @Override
