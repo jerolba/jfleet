@@ -16,7 +16,9 @@
 package org.jfleet.mysql.manual;
 
 import static org.jfleet.parameterized.Databases.MySql;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,12 +26,13 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import org.jfleet.parameterized.DatabaseArgumentProvider;
 import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.Test;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
 
 public class ConnectionTest {
 

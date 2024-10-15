@@ -17,7 +17,12 @@ package org.jfleet.inspection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.FieldInfo;

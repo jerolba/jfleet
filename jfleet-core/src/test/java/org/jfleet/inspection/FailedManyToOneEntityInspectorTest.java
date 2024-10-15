@@ -18,8 +18,13 @@ package org.jfleet.inspection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import javax.persistence.*;
 import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.FieldInfo;

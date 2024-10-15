@@ -17,7 +17,10 @@ package org.jfleet.postgres;
 
 import static org.jfleet.parameterized.Databases.Postgres;
 import static org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder.from;
-import static org.jfleet.util.TransactionPolicyTestHelper.*;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstraintError;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
+import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
+import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -25,12 +25,13 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import org.jfleet.parameterized.DatabaseArgumentProvider;
 import org.jfleet.parameterized.IsMySql5Present;
 import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.Test;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
 
 @IsMySql5Present
 public class IdsTest {

@@ -17,7 +17,10 @@ package org.jfleet.jdbc;
 
 import static org.jfleet.parameterized.Databases.JdbcMySql;
 import static org.jfleet.parameterized.Databases.JdbcPosgres;
-import static org.jfleet.util.TransactionPolicyTestHelper.*;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstraintError;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
+import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
+import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -17,7 +17,12 @@ package org.jfleet.mysql;
 
 import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
 import static org.jfleet.parameterized.Databases.MySql;
-import static org.jfleet.util.TransactionPolicyTestHelper.*;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithForeignKeyError;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithMultipleConstraintsErrors;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
+import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithUniqueError;
+import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
+import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

@@ -19,13 +19,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.mysql.cj.jdbc.JdbcConnection;
 import org.jfleet.EntityInfo;
 import org.jfleet.inspection.JpaEntityInspector;
 import org.jfleet.util.Dialect.DDLHelper;
 import org.postgresql.jdbc.PgConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mysql.cj.jdbc.JdbcConnection;
 
 public class SqlUtil {
 

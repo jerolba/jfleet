@@ -15,14 +15,21 @@
  */
 package org.jfleet.parameterized;
 
-import static org.jfleet.parameterized.Databases.*;
+import static org.jfleet.parameterized.Databases.JdbcMySql;
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.jfleet.parameterized.Databases.Postgres;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jfleet.util.*;
+import org.jfleet.util.Database;
+import org.jfleet.util.JdbcMysqlDatabase;
+import org.jfleet.util.JdbcPostgresDatabase;
+import org.jfleet.util.MySqlDatabase;
+import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
