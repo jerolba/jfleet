@@ -15,6 +15,16 @@
  */
 package org.jfleet.mysql;
 
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.jfleet.util.TransactionPolicyTestHelper.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
@@ -24,16 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
-import static org.jfleet.parameterized.Databases.MySql;
-import static org.jfleet.util.TransactionPolicyTestHelper.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MySqlTransactionPolicyTest {
 

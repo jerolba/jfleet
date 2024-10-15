@@ -15,11 +15,11 @@
  */
 package org.jfleet.util;
 
-import org.jfleet.BulkInsert;
-import org.testcontainers.containers.JdbcDatabaseContainer;
-
 import java.io.IOException;
 import java.sql.Connection;
+
+import org.jfleet.BulkInsert;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public abstract class Database {
 
@@ -37,7 +37,7 @@ public abstract class Database {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName().replace("DatabaseContainer", "");
+        return this.getClass().getSimpleName().replace("Database", "");
     }
 
 }

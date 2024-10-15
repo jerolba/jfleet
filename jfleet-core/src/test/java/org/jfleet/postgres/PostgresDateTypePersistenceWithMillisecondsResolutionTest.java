@@ -15,12 +15,10 @@
  */
 package org.jfleet.postgres;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.DBs;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.shared.entities.EntityWithDateTypes;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.jfleet.parameterized.Databases.JdbcPosgres;
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -30,10 +28,12 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.stream.Stream;
 
-import static org.jfleet.parameterized.Databases.JdbcPosgres;
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
 public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
 

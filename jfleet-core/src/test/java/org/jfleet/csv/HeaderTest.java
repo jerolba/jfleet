@@ -19,13 +19,12 @@ import static org.jfleet.csv.CsvTestHelper.createBuilderForSomeEntity;
 import static org.jfleet.csv.CsvTestHelper.writeCsvToString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
-import java.util.Collections;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import java.io.IOException;
+import java.util.Collections;
 
 import org.jfleet.EntityFieldType.FieldTypeEnum;
 import org.jfleet.EntityInfoBuilder;

@@ -15,6 +15,16 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder.from;
+import static org.jfleet.util.TransactionPolicyTestHelper.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
 import org.jfleet.parameterized.DatabaseArgumentProvider;
@@ -23,16 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder.from;
-import static org.jfleet.util.TransactionPolicyTestHelper.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PostgresTransactionPolicyTest {
 

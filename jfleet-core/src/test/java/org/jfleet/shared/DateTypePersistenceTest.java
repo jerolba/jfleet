@@ -15,12 +15,8 @@
  */
 package org.jfleet.shared;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.IsMySql5Present;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.shared.entities.EntityWithDateTypes;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,8 +29,12 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.IsMySql5Present;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.shared.entities.EntityWithDateTypes;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
 public class DateTypePersistenceTest {
 

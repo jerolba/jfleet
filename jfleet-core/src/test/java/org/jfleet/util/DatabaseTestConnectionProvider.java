@@ -15,12 +15,12 @@
  */
 package org.jfleet.util;
 
-import org.testcontainers.containers.JdbcDatabaseContainer;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.function.Supplier;
+
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public class DatabaseTestConnectionProvider implements Supplier<Connection> {
 

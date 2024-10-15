@@ -17,15 +17,10 @@ package org.jfleet.inspection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.jupiter.api.Test;
 
 public class EmbeddedIdInspectorTest {

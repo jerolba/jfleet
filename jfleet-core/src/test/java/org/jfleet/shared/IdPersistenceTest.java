@@ -15,10 +15,7 @@
  */
 package org.jfleet.shared;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.persistence.*;
 import java.sql.Connection;
@@ -27,7 +24,10 @@ import java.sql.Statement;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
 public class IdPersistenceTest {
 

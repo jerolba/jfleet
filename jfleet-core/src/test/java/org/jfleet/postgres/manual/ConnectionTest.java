@@ -15,13 +15,8 @@
  */
 package org.jfleet.postgres.manual;
 
-import org.jfleet.common.StringBuilderReader;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.PostgresDatabase;
-import org.junit.jupiter.api.Test;
-import org.postgresql.copy.CopyManager;
-import org.postgresql.jdbc.PgConnection;
-import org.postgresql.util.PSQLException;
+import static org.jfleet.parameterized.Databases.Postgres;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -30,8 +25,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.junit.jupiter.api.Assertions.*;
+import org.jfleet.common.StringBuilderReader;
+import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.util.PostgresDatabase;
+import org.junit.jupiter.api.Test;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.jdbc.PgConnection;
+import org.postgresql.util.PSQLException;
 
 public class ConnectionTest {
 

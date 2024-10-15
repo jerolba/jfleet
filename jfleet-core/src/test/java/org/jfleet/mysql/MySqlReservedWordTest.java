@@ -15,11 +15,9 @@
  */
 package org.jfleet.mysql;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.MySqlDatabase;
-import org.jfleet.util.SqlUtil;
-import org.junit.jupiter.api.Test;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,9 +28,11 @@ import java.sql.Statement;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.jfleet.parameterized.Databases.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.util.MySqlDatabase;
+import org.jfleet.util.SqlUtil;
+import org.junit.jupiter.api.Test;
 
 public class MySqlReservedWordTest {
 

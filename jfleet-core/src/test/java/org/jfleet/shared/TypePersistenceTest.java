@@ -15,12 +15,8 @@
  */
 package org.jfleet.shared;
 
-import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.TestDBs;
-import org.jfleet.shared.entities.EntityWithBasicTypes;
-import org.jfleet.shared.entities.EnumForTest;
-import org.jfleet.util.Database;
-import org.jfleet.util.SqlUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,8 +25,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.TestDBs;
+import org.jfleet.shared.entities.EntityWithBasicTypes;
+import org.jfleet.shared.entities.EnumForTest;
+import org.jfleet.util.Database;
+import org.jfleet.util.SqlUtil;
 
 public class TypePersistenceTest {
 

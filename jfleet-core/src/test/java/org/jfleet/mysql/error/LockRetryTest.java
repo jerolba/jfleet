@@ -15,6 +15,19 @@
  */
 package org.jfleet.mysql.error;
 
+import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
+import static org.jfleet.parameterized.Databases.MySql;
+import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
+import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.stream.Stream;
+
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.City;
@@ -27,19 +40,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.stream.Stream;
-
-import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
-import static org.jfleet.parameterized.Databases.MySql;
-import static org.jfleet.util.TransactionPolicyTestHelper.numberOfRowsInEmployeeTable;
-import static org.jfleet.util.TransactionPolicyTestHelper.setupDatabase;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LockRetryTest {
 

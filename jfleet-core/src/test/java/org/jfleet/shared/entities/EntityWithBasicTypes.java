@@ -15,13 +15,12 @@
  */
 package org.jfleet.shared.entities;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Entity
 @Table(name = "table_with_basic_types")

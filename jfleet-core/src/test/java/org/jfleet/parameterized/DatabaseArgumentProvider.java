@@ -15,6 +15,13 @@
  */
 package org.jfleet.parameterized;
 
+import static org.jfleet.parameterized.Databases.*;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.jfleet.util.*;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,38 +30,32 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.jfleet.parameterized.Databases.*;
-
 public class DatabaseArgumentProvider implements ArgumentsProvider {
 
-    //TODO move this
-    private static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12-alpine")
+    private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:12-alpine")
             .withUsername("test")
-                .withPassword("test")
-                .withDatabaseName("postgresdb")
-                .withUrlParam("reWriteBatchedInserts", "true");
-    private static MySQLContainer<?> mySQLContainer = new MySQLContainer<>("mysql:5.7.34")
-            .withUsername("test")
-                .withPassword("test")
-                .withDatabaseName("testdb")
-                .withUrlParam("useSSL","false")
-                .withUrlParam("allowPublicKeyRetrieval", "true")
-                .withUrlParam("useUnicode","true")
-                .withUrlParam("characterEncoding", "utf-8")
-                .withUrlParam("allowLoadLocalInfile", "true");
+            .withPassword("test")
+            .withPassword("test")
+            .withDatabaseName("postgresdb")
+            .withUrlParam("reWriteBatchedInserts", "true");
 
-    private static final Map<Databases, GenericContainer<?>> map = Map.of(
-        Postgres, postgreSQLContainer,
-        JdbcPosgres, postgreSQLContainer,
-        MySql, mySQLContainer,
-        JdbcMySql, mySQLContainer
-    );
+    private static final MySQLContainer<?> mySqlContainer = new MySQLContainer<>("mysql:5.7.34")
+            .withUsername("test")
+            .withPassword("test")
+            .withDatabaseName("testdb")
+            .withUrlParam("useSSL","false")
+            .withUrlParam("allowPublicKeyRetrieval", "true")
+            .withUrlParam("useUnicode","true")
+            .withUrlParam("characterEncoding", "utf-8")
+            .withUrlParam("allowLoadLocalInfile", "true");
+
+    private static final Map<Databases, GenericContainer<?>> map = new HashMap<>();
 
     static {
+        map.put(Postgres, postgreSqlContainer);
+        map.put(JdbcPosgres, postgreSqlContainer);
+        map.put(MySql, mySqlContainer);
+        map.put(JdbcMySql, mySqlContainer);
         map.values().parallelStream().forEach(GenericContainer::start);
     }
 
@@ -76,12 +77,18 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     public static Database getDatabaseContainer(Databases enumValue) {
-        return switch (enumValue) {
-            case JdbcMySql -> new JdbcMysqlDatabase(mySQLContainer);
-            case JdbcPosgres -> new JdbcPostgresDatabase(postgreSQLContainer);
-            case MySql -> new MySqlDatabase(mySQLContainer);
-            case Postgres -> new PostgresDatabase(postgreSQLContainer);
-        };
+        switch (enumValue) {
+            case JdbcMySql:
+                return new JdbcMysqlDatabase(mySqlContainer);
+            case JdbcPosgres:
+                return new JdbcPostgresDatabase(postgreSqlContainer);
+            case MySql:
+                return new MySqlDatabase(mySqlContainer);
+            case Postgres:
+                return new PostgresDatabase(postgreSqlContainer);
+        }
+
+        return null;
     }
 
 }

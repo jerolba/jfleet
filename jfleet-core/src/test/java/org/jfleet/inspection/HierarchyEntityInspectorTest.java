@@ -17,13 +17,8 @@ package org.jfleet.inspection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import javax.persistence.*;
 import java.util.List;
-
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 
 import org.jfleet.FieldInfo;
 import org.junit.jupiter.api.Test;
