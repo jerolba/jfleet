@@ -26,6 +26,8 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 import org.jfleet.BulkInsert;
+import org.jfleet.parameterized.DBs;
+import org.jfleet.parameterized.Databases;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithBasicTypes;
 import org.jfleet.shared.entities.EnumForTest;

@@ -17,11 +17,11 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.mysql.LoadDataBulkInsert;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public class MySqlDatabase extends Database {
 
-    public MySqlDatabase(MySQLContainer<?> mySQLContainer) {
+    public MySqlDatabase(JdbcDatabaseContainer<?> mySQLContainer) {
         super(mySQLContainer);
     }
 

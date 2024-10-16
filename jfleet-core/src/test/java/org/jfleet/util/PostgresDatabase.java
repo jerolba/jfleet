@@ -17,11 +17,11 @@ package org.jfleet.util;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.postgres.PgCopyBulkInsert;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public class PostgresDatabase extends Database {
 
-    public PostgresDatabase(PostgreSQLContainer<?> postgresContainer) {
+    public PostgresDatabase(JdbcDatabaseContainer<?> postgresContainer) {
         super(postgresContainer);
     }
 

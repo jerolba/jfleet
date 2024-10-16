@@ -15,18 +15,11 @@
  */
 package org.jfleet.parameterized;
 
-import static org.jfleet.parameterized.Databases.JdbcMySql;
-import static org.jfleet.parameterized.Databases.JdbcPosgres;
-import static org.jfleet.parameterized.Databases.MySql;
-import static org.jfleet.parameterized.Databases.Postgres;
-import static org.jfleet.parameterized.IsMySql5Condition.isMySql5Present;
-
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jfleet.util.Database;
+import org.jfleet.util.DatabaseContainers;
 import org.jfleet.util.JdbcMysqlDatabase;
 import org.jfleet.util.JdbcPostgresDatabase;
 import org.jfleet.util.MySqlDatabase;
@@ -34,45 +27,9 @@ import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public class DatabaseArgumentProvider implements ArgumentsProvider {
-
-    private static final String MYSQL_5_VERSION = "mysql:5.7.34";
-    private static final String MYSQL_8_VERSION = "mysql:8.0.39";
-
-    private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:12-alpine")
-            .withUsername("test")
-            .withPassword("test")
-            .withPassword("test")
-            .withDatabaseName("postgresdb")
-            .withUrlParam("reWriteBatchedInserts", "true");
-
-    private static final MySQLContainer<?> mySqlContainer = new MySQLContainer<>(getMysqlVersion())
-            .withUsername("test")
-            .withPassword("test")
-            .withDatabaseName("testdb")
-            .withUrlParam("useSSL","false")
-            .withUrlParam("allowPublicKeyRetrieval", "true")
-            .withUrlParam("useUnicode","true")
-            .withUrlParam("characterEncoding", "utf-8")
-            .withUrlParam("allowLoadLocalInfile", "true");
-
-    private static String getMysqlVersion() {
-        return isMySql5Present() ? MYSQL_5_VERSION: MYSQL_8_VERSION;
-    }
-
-    private static final Map<Databases, GenericContainer<?>> map = new HashMap<>();
-
-    static {
-        map.put(Postgres, postgreSqlContainer);
-        map.put(JdbcPosgres, postgreSqlContainer);
-        map.put(MySql, mySqlContainer);
-        map.put(JdbcMySql, mySqlContainer);
-        map.values().parallelStream().forEach(GenericContainer::start);
-    }
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context)  {
@@ -92,15 +49,16 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     public static Database getDatabaseContainer(Databases enumValue) {
+        JdbcDatabaseContainer<?> container = DatabaseContainers.getContainer(enumValue);
         switch (enumValue) {
             case JdbcMySql:
-                return new JdbcMysqlDatabase(mySqlContainer);
+                return new JdbcMysqlDatabase(container);
             case JdbcPosgres:
-                return new JdbcPostgresDatabase(postgreSqlContainer);
+                return new JdbcPostgresDatabase(container);
             case MySql:
-                return new MySqlDatabase(mySqlContainer);
+                return new MySqlDatabase(container);
             case Postgres:
-                return new PostgresDatabase(postgreSqlContainer);
+                return new PostgresDatabase(container);
         }
 
         return null;
