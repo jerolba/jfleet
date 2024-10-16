@@ -19,6 +19,7 @@ import static org.jfleet.parameterized.Databases.JdbcMySql;
 import static org.jfleet.parameterized.Databases.JdbcPosgres;
 import static org.jfleet.parameterized.Databases.MySql;
 import static org.jfleet.parameterized.Databases.Postgres;
+import static org.jfleet.parameterized.IsMySql5Condition.isMySql5Present;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -39,6 +40,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 public class DatabaseArgumentProvider implements ArgumentsProvider {
 
+    private static final String MYSQL_5_VERSION = "mysql:5.7.34";
+    private static final String MYSQL_8_VERSION = "mysql:8.0.39";
+
     private static final PostgreSQLContainer<?> postgreSqlContainer = new PostgreSQLContainer<>("postgres:12-alpine")
             .withUsername("test")
             .withPassword("test")
@@ -46,7 +50,7 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
             .withDatabaseName("postgresdb")
             .withUrlParam("reWriteBatchedInserts", "true");
 
-    private static final MySQLContainer<?> mySqlContainer = new MySQLContainer<>("mysql:5.7.34")
+    private static final MySQLContainer<?> mySqlContainer = new MySQLContainer<>(getMysqlVersion())
             .withUsername("test")
             .withPassword("test")
             .withDatabaseName("testdb")
@@ -55,6 +59,10 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
             .withUrlParam("useUnicode","true")
             .withUrlParam("characterEncoding", "utf-8")
             .withUrlParam("allowLoadLocalInfile", "true");
+
+    private static String getMysqlVersion() {
+        return isMySql5Present() ? MYSQL_5_VERSION: MYSQL_8_VERSION;
+    }
 
     private static final Map<Databases, GenericContainer<?>> map = new HashMap<>();
 

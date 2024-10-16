@@ -32,7 +32,7 @@ public class IsMySql5Condition implements ExecutionCondition {
         return disabled("MySql 5.x driver is not present");
     }
 
-    private static boolean isMySql5Present() {
+    public static boolean isMySql5Present() {
         try {
             Class.forName("com.mysql.jdbc.PreparedStatement");
         } catch (ClassNotFoundException e) {

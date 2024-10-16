@@ -20,7 +20,6 @@ import java.lang.annotation.RetentionPolicy;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
-//TODO review uses
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(IsMySql5Condition.class)
 public @interface IsMySql5Present {
