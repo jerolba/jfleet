@@ -1,0 +1,46 @@
+name: JFleet CI/CD
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build with Gradle
+        run: ./gradlew test --console=plain -i
+      # Jacoco and codecov
+      - name: Jacoco
+        run: ./gradlew jacocoTestReport
+      - name: codecov
+        run: bash <(curl -s https://codecov.io/bash)
+
+  build-latest:
+    runs-on: ubuntu-latest
+    env:
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build with Gradle
+        run: ./gradlew test --console=plain -i
+      # Jacoco and codecov
+      - name: Jacoco
+        run: ./gradlew jacocoTestReport
+      - name: codecov
+        run: bash <(curl -s https://codecov.io/bash)
