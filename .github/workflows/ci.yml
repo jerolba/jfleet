@@ -5,7 +5,7 @@ on: [push, pull_request]
 defaults:
   run:
     shell: bash
-    working-directory: ./jfleet-core
+    working-directory: jfleet-core
 
 jobs:
   build:
