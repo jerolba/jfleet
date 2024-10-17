@@ -2,6 +2,11 @@ name: JFleet CI/CD
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    shell: bash
+    working-directory: ./jfleet-core
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +20,10 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Build with Gradle
-        run: ./jfleet-core/gradlew test --console=plain -i
+        run: ./gradlew test --console=plain -i
       # Jacoco and codecov
       - name: Jacoco
-        run: ./jfleet-core/gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport
       - name: codecov
         run: bash <(curl -s https://codecov.io/bash)
 
@@ -33,12 +38,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle
-        run: ./jfleet-core/gradlew test --console=plain -i
+        run: ./gradlew test --console=plain -i
       # Jacoco and codecov
       - name: Jacoco
-        run: ./jfleet-core/gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport
       - name: codecov
         run: bash <(curl -s https://codecov.io/bash)
