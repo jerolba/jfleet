@@ -37,7 +37,6 @@ import org.jfleet.parameterized.DBs;
 import org.jfleet.parameterized.TestDBs;
 import org.jfleet.shared.entities.EntityWithDateTypes;
 import org.jfleet.util.Database;
-import org.jfleet.util.PostgresDatabase;
 import org.jfleet.util.SqlUtil;
 
 public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
@@ -53,10 +52,9 @@ public class PostgresDateTypePersistenceWithMillisecondsResolutionTest {
         entity.setSqlTimeStamp(new Timestamp(getDate("24/01/2012 23:12:48.132").getTime()));
         entity.setLocalTime(LocalTime.of(23, 12, 48, 132_000_000));
         entity.setLocalDateTime(LocalDateTime.of(2012, 01, 24, 23, 12, 48, 132_000_000));
-
         BulkInsert<EntityWithDateTypes> insert = database.getBulkInsert(EntityWithDateTypes.class);
 
-        try (Connection conn = new PostgresDatabase().getConnection()) {
+        try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, EntityWithDateTypes.class);
             insert.insertAll(conn, Stream.of(entity));
 

@@ -15,14 +15,12 @@
  */
 package org.jfleet.util;
 
+import org.testcontainers.containers.JdbcDatabaseContainer;
+
 public class JdbcPostgresDatabase extends JdbcDatabase {
 
-    public JdbcPostgresDatabase(String properties) {
-        super(properties);
-    }
-
-    public JdbcPostgresDatabase() {
-        super("postgres-test.properties");
+    public JdbcPostgresDatabase(JdbcDatabaseContainer<?> postgresContainer) {
+        super(postgresContainer);
     }
 
 }

@@ -35,7 +35,7 @@ public class SpecialCharsPersistenceTest {
 
     @Entity
     @Table(name = "table_with_strings")
-    class EnityWithStrings {
+    class EntityWithStrings {
 
         private String foo;
         private String bar;
@@ -59,14 +59,14 @@ public class SpecialCharsPersistenceTest {
     }
 
     public void testWithString(Database database, String text) throws Exception {
-        EnityWithStrings entity = new EnityWithStrings();
+        EntityWithStrings entity = new EntityWithStrings();
         entity.setFoo("Some text");
         entity.setBar(text);
 
-        BulkInsert<EnityWithStrings> insert = database.getBulkInsert(EnityWithStrings.class);
+        BulkInsert<EntityWithStrings> insert = database.getBulkInsert(EntityWithStrings.class);
 
         try (Connection conn = database.getConnection()) {
-            SqlUtil.createTableForEntity(conn, EnityWithStrings.class);
+            SqlUtil.createTableForEntity(conn, EntityWithStrings.class);
             insert.insertAll(conn, Stream.of(entity));
 
             try (Statement stmt = conn.createStatement()) {

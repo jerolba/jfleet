@@ -213,17 +213,13 @@ Any database engine with a standard JDBC driver should be used with the `JdbcBul
 
 ## Running the tests
 
-Tests need a MySQL and a PostgreSQL instances running in localhost. A database called `testdb` must exist and an user `test` with password `test` must have `CREATE TABLE` and `DROP TABLE` permissions.
+The tests utilize [TestContainers](https://testcontainers.com/) to create lightweight, temporary instances of common databases.
+TestContainers automatically handles downloading the required database images and managing their lifecycle. 
 
-You can modify this settings changing locally [mysql-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/mysql-test.properties) and [postgres-test.properties](https://github.com/jerolba/jfleet/blob/master/jfleet-core/src/test/resources/postgres-test.properties) files.
+During test execution, two databases—MySQL and PostgreSQL—are instantiated and will automatically shut down once the tests complete. 
+For details on how these containers are configured, refer to the `DatabaseContainers` class in the `jfleet-core` module.
 
-If you have docker installed, you can launch them using the following commands:
-
-```bash
-docker run --name mysql-jfleet -e MYSQL_ROOT_PASSWORD=jfleet -e MYSQL_USER=test -e MYSQL_PASSWORD=test -e MYSQL_DATABASE=testdb -p 3306:3306 -d mysql:5.7
-
-docker run --name postgres-jfleet -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=testdb -p 5432:5432 -d postgres:12.5
-```
+To run the tests locally, ensure that Docker or a compatible Docker-API runtime is installed. For more information on configuring TestContainers, please consult the [System Requirements guide](https://java.testcontainers.org/supported_docker_environment/).
 
 To execute all test you must execute the command:
 

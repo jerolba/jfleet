@@ -24,8 +24,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
-import org.jfleet.FieldInfo;
 import org.jfleet.EntityFieldType.FieldTypeEnum;
+import org.jfleet.FieldInfo;
 import org.junit.jupiter.api.Test;
 
 public class EmbeddedIdInspectorTest {

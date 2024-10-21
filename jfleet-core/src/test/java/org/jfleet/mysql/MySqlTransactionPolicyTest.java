@@ -16,6 +16,7 @@
 package org.jfleet.mysql;
 
 import static org.jfleet.mysql.LoadDataConfiguration.LoadDataConfigurationBuilder.from;
+import static org.jfleet.parameterized.Databases.MySql;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithForeignKeyError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithMultipleConstraintsErrors;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
@@ -32,8 +33,8 @@ import java.sql.SQLException;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
+import org.jfleet.parameterized.DatabaseProvider;
 import org.jfleet.util.Database;
-import org.jfleet.util.MySqlDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -44,10 +45,10 @@ public class MySqlTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private Database database = new MySqlDatabase();
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     @BeforeEach
-    public void setup() throws IOException, SQLException {
+    public void setup() throws SQLException, IOException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
         }
@@ -55,6 +56,7 @@ public class MySqlTransactionPolicyTest {
 
     @Test
     public void longTransactionExecuteMultipleLoadDataOperationsTransactionaly() throws Exception {
+
         try (Connection connection = database.getConnection()) {
             connection.setAutoCommit(false);
 

@@ -18,11 +18,6 @@ package org.jfleet.parameterized;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
-import org.jfleet.util.Database;
-import org.jfleet.util.JdbcMysqlDatabase;
-import org.jfleet.util.JdbcPostgresDatabase;
-import org.jfleet.util.MySqlDatabase;
-import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -30,7 +25,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 public class DatabaseArgumentProvider implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context)  {
         Method testMethod = context.getTestMethod().get();
         DBs dbs = testMethod.getAnnotation(DBs.class);
         if (dbs != null) {
@@ -43,30 +38,7 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     private Stream<? extends Arguments> getDatabases(Databases[] dbs) {
-        return Stream.of(dbs).map(this::createDatabase).map(Arguments::of);
-    }
-
-    private Database createDatabase(Databases enumValue) {
-        switch (enumValue) {
-        case JdbcMySql:
-            return new JdbcMysqlDatabase();
-        case JdbcPosgres:
-            return new JdbcPostgresDatabase();
-        case MySql:
-            return new MySqlDatabase();
-        case Postgres:
-            return new PostgresDatabase();
-        }
-        return null;
-    }
-
-    public static boolean isMySql5Present() {
-        try {
-            Class.forName("com.mysql.jdbc.PreparedStatement");
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
+        return Stream.of(dbs).map(DatabaseProvider::getDatabase).map(Arguments::of);
     }
 
 }

@@ -3,16 +3,6 @@ jobs:
   build:
     docker:
       - image: eclipse-temurin:17.0.10_7-jdk-jammy
-      - image: circleci/mysql:5.7
-        environment:
-            - MYSQL_USER=test
-            - MYSQL_PASSWORD=test
-            - MYSQL_DATABASE=testdb
-      - image: circleci/postgres:12.5
-        environment:
-            - POSTGRES_USER=test
-            - POSTGRES_PASSWORD=test
-            - POSTGRES_DB=testdb
 
     working_directory: ~/repo
 
@@ -33,18 +23,6 @@ jobs:
   build-latest:
     docker:
       - image: eclipse-temurin:17.0.10_7-jdk-jammy
-      - image: circleci/mysql:8.0
-        environment:
-            - MYSQL_USER=test
-            - MYSQL_PASSWORD=test
-            - MYSQL_DATABASE=testdb
-        #In MySql 8 local-infile is not active by default
-        command: mysqld --local-infile=1
-      - image: circleci/postgres:13.1
-        environment:
-            - POSTGRES_USER=test
-            - POSTGRES_PASSWORD=test
-            - POSTGRES_DB=testdb
 
     working_directory: ~/repo
 

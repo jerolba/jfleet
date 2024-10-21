@@ -15,6 +15,7 @@
  */
 package org.jfleet.mysql.manual;
 
+import static org.jfleet.parameterized.Databases.MySql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,8 +25,9 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.jfleet.parameterized.DatabaseProvider;
 import org.jfleet.parameterized.IsMySql5Present;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.Test;
 
 import com.mysql.jdbc.Connection;
@@ -34,9 +36,11 @@ import com.mysql.jdbc.Statement;
 @IsMySql5Present
 public class IdsTest {
 
+    private final Database database = DatabaseProvider.getDatabase(MySql);
+
     @Test
     public void canExecuteLoadDataWithAutoIncrement() throws SQLException, IOException {
-        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "
@@ -66,7 +70,7 @@ public class IdsTest {
 
     @Test
     public void canExecuteLoadDataWithAutoIncrementIdSetted() throws SQLException, IOException {
-        try (Connection conn = (Connection) new MySqlDatabase().getConnection()) {
+        try (Connection conn = (Connection) database.getConnection()) {
             conn.setAllowLoadLocalInfile(true);
             try (Statement stmt = (Statement) conn.createStatement()) {
                 stmt.execute("CREATE TEMPORARY TABLE table_with_id "
