@@ -34,8 +34,8 @@ import org.jfleet.entities.City;
 import org.jfleet.entities.Employee;
 import org.jfleet.mysql.LoadDataBulkInsert;
 import org.jfleet.mysql.LoadDataConfiguration;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class LockRetryTest {
 
     private static Logger logger = LoggerFactory.getLogger(LockRetryTest.class);
 
-    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     private static City city1 = new City(1, "Madrid");
     private static City city2 = new City(2, "Barcelona");

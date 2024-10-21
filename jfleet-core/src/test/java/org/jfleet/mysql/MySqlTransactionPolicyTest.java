@@ -33,8 +33,8 @@ import java.sql.SQLException;
 import org.jfleet.BulkInsert;
 import org.jfleet.JFleetException;
 import org.jfleet.entities.Employee;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class MySqlTransactionPolicyTest {
     private static Logger logger = LoggerFactory.getLogger(MySqlTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     @BeforeEach
     public void setup() throws SQLException, IOException {

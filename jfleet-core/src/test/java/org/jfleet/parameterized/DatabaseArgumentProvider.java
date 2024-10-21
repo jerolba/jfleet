@@ -18,16 +18,9 @@ package org.jfleet.parameterized;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
-import org.jfleet.util.Database;
-import org.jfleet.util.DatabaseContainers;
-import org.jfleet.util.JdbcMysqlDatabase;
-import org.jfleet.util.JdbcPostgresDatabase;
-import org.jfleet.util.MySqlDatabase;
-import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public class DatabaseArgumentProvider implements ArgumentsProvider {
 
@@ -45,23 +38,7 @@ public class DatabaseArgumentProvider implements ArgumentsProvider {
     }
 
     private Stream<? extends Arguments> getDatabases(Databases[] dbs) {
-        return Stream.of(dbs).map(DatabaseArgumentProvider::getDatabaseContainer).map(Arguments::of);
-    }
-
-    public static Database getDatabaseContainer(Databases enumValue) {
-        JdbcDatabaseContainer<?> container = DatabaseContainers.getContainer(enumValue);
-        switch (enumValue) {
-            case JdbcMySql:
-                return new JdbcMysqlDatabase(container);
-            case JdbcPosgres:
-                return new JdbcPostgresDatabase(container);
-            case MySql:
-                return new MySqlDatabase(container);
-            case Postgres:
-                return new PostgresDatabase(container);
-        }
-
-        return null;
+        return Stream.of(dbs).map(DatabaseProvider::getDatabase).map(Arguments::of);
     }
 
 }

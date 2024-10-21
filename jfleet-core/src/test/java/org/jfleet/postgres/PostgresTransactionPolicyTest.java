@@ -30,8 +30,8 @@ import java.sql.SQLException;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.PostgresDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class PostgresTransactionPolicyTest {
     private static final Logger logger = LoggerFactory.getLogger(PostgresTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private final PostgresDatabase database = (PostgresDatabase) DatabaseArgumentProvider.getDatabaseContainer(Postgres);
+    private final Database database = DatabaseProvider.getDatabase(Postgres);
 
     @BeforeEach
     public void setup() throws SQLException, IOException {

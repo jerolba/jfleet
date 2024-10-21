@@ -26,9 +26,9 @@ import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.jfleet.parameterized.DatabaseArgumentProvider;
+import org.jfleet.parameterized.DatabaseProvider;
 import org.jfleet.parameterized.IsMySql5Present;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.Test;
 
 import com.mysql.jdbc.Connection;
@@ -36,7 +36,7 @@ import com.mysql.jdbc.Statement;
 
 public class ConnectionTest {
 
-    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {

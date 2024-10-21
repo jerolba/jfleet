@@ -30,14 +30,14 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
 public class MySqlReservedWordTest {
 
-    private final MySqlDatabase database = (MySqlDatabase) DatabaseArgumentProvider.getDatabaseContainer(MySql);
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     @Entity
     @Table(name = "\"select\"")

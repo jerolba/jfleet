@@ -29,8 +29,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.jfleet.common.StringBuilderReader;
-import org.jfleet.parameterized.DatabaseArgumentProvider;
-import org.jfleet.util.PostgresDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.junit.jupiter.api.Test;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.jdbc.PgConnection;
@@ -38,7 +38,7 @@ import org.postgresql.util.PSQLException;
 
 public class ConnectionTest {
 
-    private final PostgresDatabase database = (PostgresDatabase) DatabaseArgumentProvider.getDatabaseContainer(Postgres);
+    private final Database database = DatabaseProvider.getDatabase(Postgres);
 
     @Test
     public void canConnectToTestDB() throws SQLException, IOException {
