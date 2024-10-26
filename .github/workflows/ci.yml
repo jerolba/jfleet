@@ -40,7 +40,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: Build with Gradle
-        run: ./gradlew test --console=plain -i
+        run: ./gradlew test -Pmysql8 --console=plain -i
       # Jacoco and codecov
       - name: Jacoco
         run: ./gradlew jacocoTestReport
