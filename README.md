@@ -1,6 +1,6 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
-[![Build Status](https://github.com/jerolba/jfleet/actions/workflows/ci.yml/badge.svg)](https://github.com/jerolba/jfleet/actions/workflows/ci.yml/badge.svg)
+[![Build Status](https://github.com/jerolba/jfleet/actions/workflows/ci.yml/badge.svg)](https://github.com/jerolba/jfleet/actions)
 [![codecov](https://codecov.io/gh/jerolba/jfleet/graph/badge.svg?token=RidwciHvFy)](https://codecov.io/gh/jerolba/jfleet)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
