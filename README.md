@@ -1,6 +1,6 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
-[![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet)
+[![Build Status](https://github.com/jerolba/jfleet/actions/workflows/ci.yml/badge.svg)](https://github.com/jerolba/jfleet/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/jerolba/jfleet/graph/badge.svg?token=RidwciHvFy)](https://codecov.io/gh/jerolba/jfleet)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
@@ -205,7 +205,7 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 ## Supported database versions
 
-JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 12.5** and **PostgreSQL 13.1**.
+JFleet is configured to execute continuous integration tests against with [GihubActions](https://github.com/jerolba/jfleet/actions/workflows/ci.yml), using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 12.5** and **PostgreSQL 13.1**.
 
 **JFleet is currently running in production against AWS Aurora MySQL and Aurora PostgreSQL**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.
 
@@ -234,7 +234,7 @@ To execute it with MySQL 8.0 driver, you must add a modifier to gradle command:
 $ .\gradlew test -Pmysql8
 ```
 
-You can also fork the project and test it in your [CircleCI](https://circleci.com/signup/) free account.
+You can also fork the project and test it in your own repository's [Github Actions](https://docs.github.com/en/actions).
 
 ## Contribute
 Feel free to dive in! [Open an issue](https://github.com/jerolba/jfleet/issues/new) or submit PRs.
