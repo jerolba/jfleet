@@ -7,6 +7,7 @@ import static org.jfleet.parameterized.Databases.Postgres;
 import static org.jfleet.parameterized.IsMySql5Condition.isMySql5Present;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jfleet.parameterized.Databases;
@@ -23,13 +24,14 @@ public class DatabaseContainers {
 
     private static final Map<Databases, JdbcDatabaseContainer<?>> map = new HashMap<>();
     static {
-        map.put(Postgres, createPostgresContainer());
-        map.put(JdbcPosgres, createPostgresContainer());
-        map.put(MySql, createMySqlContainer());
-        map.put(JdbcMySql, createMySqlContainer());
+        PostgreSQLContainer<?> postgresContainer = createPostgresContainer();
+        MySQLContainer<?> mysqlContainer = createMySqlContainer();
+        map.put(Postgres, postgresContainer);
+        map.put(JdbcPosgres, postgresContainer);
+        map.put(MySql, mysqlContainer);
+        map.put(JdbcMySql, mysqlContainer);
 
-        // Start all containers sequentially or some will not be properly initialized
-        map.values().forEach(GenericContainer::start);
+        List.of(postgresContainer, mysqlContainer).parallelStream().forEach(GenericContainer::start);
     }
 
     public static JdbcDatabaseContainer<?> getContainer(Databases database) {
