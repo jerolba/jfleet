@@ -15,6 +15,7 @@
  */
 package org.jfleet.postgres;
 
+import static org.jfleet.parameterized.Databases.Postgres;
 import static org.jfleet.postgres.PgCopyConfiguration.PgCopyConfigurationBuilder.from;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithConstraintError;
 import static org.jfleet.util.TransactionPolicyTestHelper.employeesWithOutErrors;
@@ -29,8 +30,8 @@ import java.sql.SQLException;
 
 import org.jfleet.BulkInsert;
 import org.jfleet.entities.Employee;
+import org.jfleet.parameterized.DatabaseProvider;
 import org.jfleet.util.Database;
-import org.jfleet.util.PostgresDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -38,13 +39,13 @@ import org.slf4j.LoggerFactory;
 
 public class PostgresTransactionPolicyTest {
 
-    private static Logger logger = LoggerFactory.getLogger(PostgresTransactionPolicyTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(PostgresTransactionPolicyTest.class);
     private static final int VERY_LOW_SIZE_TO_FREQUENT_LOAD_DATA = 10;
 
-    private Database database = new PostgresDatabase();
+    private final Database database = DatabaseProvider.getDatabase(Postgres);
 
     @BeforeEach
-    public void setup() throws IOException, SQLException {
+    public void setup() throws SQLException, IOException {
         try (Connection connection = database.getConnection()) {
             setupDatabase(connection);
         }

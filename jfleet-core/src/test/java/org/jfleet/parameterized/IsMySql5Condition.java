@@ -15,7 +15,6 @@
  */
 package org.jfleet.parameterized;
 
-import static org.jfleet.parameterized.DatabaseArgumentProvider.isMySql5Present;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
 
@@ -31,6 +30,15 @@ public class IsMySql5Condition implements ExecutionCondition {
             return enabled("MySql 5.x driver is present");
         }
         return disabled("MySql 5.x driver is not present");
+    }
+
+    public static boolean isMySql5Present() {
+        try {
+            Class.forName("com.mysql.jdbc.PreparedStatement");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
 }

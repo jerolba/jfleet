@@ -15,14 +15,12 @@
  */
 package org.jfleet.util;
 
+import org.testcontainers.containers.JdbcDatabaseContainer;
+
 public class JdbcMysqlDatabase extends JdbcDatabase {
 
-    public JdbcMysqlDatabase(String properties) {
-        super(properties);
-    }
-
-    public JdbcMysqlDatabase() {
-        super("mysql-test.properties");
+    public JdbcMysqlDatabase(JdbcDatabaseContainer<?> container) {
+        super(container);
     }
 
 }

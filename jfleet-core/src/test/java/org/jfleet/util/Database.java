@@ -19,23 +19,20 @@ import java.io.IOException;
 import java.sql.Connection;
 
 import org.jfleet.BulkInsert;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 public abstract class Database {
 
-    private String properties;
+    private final JdbcDatabaseContainer<?> container;
 
-    public Database(String properties) {
-        this.properties = properties;
-    }
-
-    public String getProperties() {
-        return properties;
+    public Database(JdbcDatabaseContainer<?> container) {
+        this.container = container;
     }
 
     public abstract <T> BulkInsert<T> getBulkInsert(Class<T> clazz);
 
     public Connection getConnection() throws IOException {
-        return new DatabaseTestConnectionProvider(getProperties()).get();
+        return new DatabaseTestConnectionProvider(container).get();
     }
 
     @Override

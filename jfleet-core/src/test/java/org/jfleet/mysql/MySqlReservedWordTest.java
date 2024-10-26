@@ -15,6 +15,7 @@
  */
 package org.jfleet.mysql;
 
+import static org.jfleet.parameterized.Databases.MySql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,11 +30,14 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.jfleet.BulkInsert;
-import org.jfleet.util.MySqlDatabase;
+import org.jfleet.parameterized.DatabaseProvider;
+import org.jfleet.util.Database;
 import org.jfleet.util.SqlUtil;
 import org.junit.jupiter.api.Test;
 
 public class MySqlReservedWordTest {
+
+    private final Database database = DatabaseProvider.getDatabase(MySql);
 
     @Entity
     @Table(name = "\"select\"")
@@ -65,7 +69,7 @@ public class MySqlReservedWordTest {
         Stream<ReservedWordEntity> stream = IntStream.range(0, times)
                 .mapToObj(i -> new ReservedWordEntity(i, "current_user_" + i));
 
-        try (Connection conn = new MySqlDatabase().getConnection()) {
+        try (Connection conn = database.getConnection()) {
             SqlUtil.createTableForEntity(conn, ReservedWordEntity.class);
             insert.insertAll(conn, stream);
 
