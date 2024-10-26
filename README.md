@@ -1,7 +1,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.jfleet/jfleet.svg)](https://maven-badges.herokuapp.com/maven-central/org.jfleet/jfleet)
-[![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet) 
-[![Codecov](https://codecov.io/gh/jerolba/jfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/jerolba/jfleet/)
+[![Build Status](https://circleci.com/gh/jerolba/jfleet.svg?style=shield)](https://circleci.com/gh/jerolba/jfleet)
+[![codecov](https://codecov.io/gh/jerolba/jfleet/graph/badge.svg?token=RidwciHvFy)](https://codecov.io/gh/jerolba/jfleet)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 # JFleet
@@ -26,12 +26,12 @@ despite being able to use JPA annotations to map Java objects to tables and colu
 ## Supported databases
 
 Each database provides some technique to insert a bulk of information bypassing standard JDBC commands, but accessible from Java:
- - **MySQL** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement. 
+ - **MySQL** : Using the [LOAD DATA](https://dev.mysql.com/doc/refman/5.7/en/load-data.html) statement.
  - **PostgreSQL**: Using the [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html) command.
 
 In both cases, and in unsupported databases, you can use the default implementation based on the standard [JDBC executeBatch](https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#executeBatch--) statement.
 
-## Benchmark 
+## Benchmark
 
 **JFleet performance is comparable to using the native database import tool, and is between 2.1X and 3.8X faster than using the JDBC driver directly.**
 
@@ -44,10 +44,10 @@ You can find all the benchmarks numbers and results [here](https://github.com/je
 
 JFleet needs to know how to map your Java objects or entities to a table. JFleet provides two mechanisms to map your objects to a table:
 
-- Using standard [JPA annotations](https://docs.oracle.com/javaee/6/api/javax/persistence/package-summary.html) like [@Entity](https://docs.oracle.com/javaee/6/api/javax/persistence/Entity.html), [@Column](https://docs.oracle.com/javaee/6/api/javax/persistence/Column.html) or [@ManyToOne](https://docs.oracle.com/javaee/6/api/javax/persistence/ManyToOne.html). 
-- Mapping manually each column to one object field or with a `Function`   
+- Using standard [JPA annotations](https://docs.oracle.com/javaee/6/api/javax/persistence/package-summary.html) like [@Entity](https://docs.oracle.com/javaee/6/api/javax/persistence/Entity.html), [@Column](https://docs.oracle.com/javaee/6/api/javax/persistence/Column.html) or [@ManyToOne](https://docs.oracle.com/javaee/6/api/javax/persistence/ManyToOne.html).
+- Mapping manually each column to one object field or with a `Function`
 
-### Using standard JPA annotations 
+### Using standard JPA annotations
 
 Using the usual JPA annotations, JFleet extract their information and creates a map between fields and columns:
 
@@ -62,35 +62,35 @@ public class Customer {
     private Long id;
 
     private String telephone;
-    
+
     @Column(name="customer_name")
     private String name;
-    
+
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
-    
+
     @Temporal(TemporalType.DATE)
     private Date birthDate;
-    
+
     //Getters and setters
 }
 
 @Entity
 @Table(name = "city")
 public class City {
-    
+
     @Id
     private Integer id;
-    
+
     private String name;
-    
+
     //Getters and setters
 }
 
 ```
 
-Like JPA, JFleet follows the convention of using the field name if no `@Column` name is provided, or the class name if no `@Table` name is provided. 
+Like JPA, JFleet follows the convention of using the field name if no `@Column` name is provided, or the class name if no `@Table` name is provided.
 
 Given a collection of objects Customer to persist in MySQL with the Load Data technique, you only need to provide a JDBC Connection:
 
@@ -103,8 +103,8 @@ Given a collection of objects Customer to persist in MySQL with the Load Data te
     }
 ```
 
-If you are using PostgreSQL the `BulkInsert` implementation is `PgCopyBulkInsert`. 
-JFleet prefers Streams to Collections because it does not force you to instantiate all objects in memory, and allows you to create them lazily in some stream process: 
+If you are using PostgreSQL the `BulkInsert` implementation is `PgCopyBulkInsert`.
+JFleet prefers Streams to Collections because it does not force you to instantiate all objects in memory, and allows you to create them lazily in some stream process:
 
 ```java
     try (Connection connection = dataSource.getConnection()){
@@ -117,10 +117,10 @@ JFleet prefers Streams to Collections because it does not force you to instantia
 More information about supported annotations and limitations can be found in the project [wiki page](https://github.com/jerolba/jfleet/wiki/Supported-JPA-annotations)
 
 ### Maping manually each column
- 
-If you have any problem using JPA annotations in your domain objects or directly you don't want to add `javax.persistence` dependency to your project, you can configure it manually mapping each column to a field path. If a field has a reference to other object, separate each field name in the path with `.`. 
 
-This mechanism is much more powerfull than JPA, and allows you also to map values that are not present in the object or transform it.    
+If you have any problem using JPA annotations in your domain objects or directly you don't want to add `javax.persistence` dependency to your project, you can configure it manually mapping each column to a field path. If a field has a reference to other object, separate each field name in the path with `.`.
+
+This mechanism is much more powerfull than JPA, and allows you also to map values that are not present in the object or transform it.
 
 Given a similar domain object, we need to persist the customer age. The object only have the country name, but not a needed country code:
 
@@ -134,7 +134,7 @@ public class Customer {
     private City city;
     private String countryName;
     private Date birthDate;
-    
+
     //Getters and setters
 }
 
@@ -207,16 +207,16 @@ JFleet has not been tested against all JDBC driver versions, but it is expected 
 
 JFleet is configured to execute continuous integration tests against [CircleCI](https://circleci.com/gh/jerolba/jfleet) service, using the latest stable release of **MySQL 5.7** and  **MySQL 8.0**, and the latest stable release of **PostgreSQL 12.5** and **PostgreSQL 13.1**.
 
-**JFleet is currently running in production against AWS Aurora MySQL and Aurora PostgreSQL**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.   
+**JFleet is currently running in production against AWS Aurora MySQL and Aurora PostgreSQL**, and has been tested for [benchmarks](https://github.com/jerolba/jfleet-benchmark#jfleet-benchmark) with the Google Cloud managed versions of MySQL and Postgres.
 
 Any database engine with a standard JDBC driver should be used with the `JdbcBulkInsert` implementation.
 
 ## Running the tests
 
 The tests utilize [TestContainers](https://testcontainers.com/) to create lightweight, temporary instances of common databases.
-TestContainers automatically handles downloading the required database images and managing their lifecycle. 
+TestContainers automatically handles downloading the required database images and managing their lifecycle.
 
-During test execution, two databases—MySQL and PostgreSQL—are instantiated and will automatically shut down once the tests complete. 
+During test execution, two databases—MySQL and PostgreSQL—are instantiated and will automatically shut down once the tests complete.
 For details on how these containers are configured, refer to the `DatabaseContainers` class in the `jfleet-core` module.
 
 To run the tests locally, ensure that Docker or a compatible Docker-API runtime is installed. For more information on configuring TestContainers, please consult the [System Requirements guide](https://java.testcontainers.org/supported_docker_environment/).
@@ -227,7 +227,7 @@ To execute all test you must execute the command:
 $ .\gradlew test
 ```
 
-Because gradle can not resolve both drivers version concurrently, by default tests are executed with the MySQL 5.X JDBC driver. 
+Because gradle can not resolve both drivers version concurrently, by default tests are executed with the MySQL 5.X JDBC driver.
 To execute it with MySQL 8.0 driver, you must add a modifier to gradle command:
 
 ```bash

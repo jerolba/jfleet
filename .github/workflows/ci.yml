@@ -22,8 +22,9 @@ jobs:
       # Jacoco and codecov
       - name: Jacoco
         run: ./gradlew jacocoTestReport
-      - name: codecov
-        run: bash <(curl -s https://codecov.io/bash)
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v4
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   build-latest:
     runs-on: ubuntu-latest
@@ -41,8 +42,4 @@ jobs:
           java-version: 17
       - name: Build with Gradle
         run: ./gradlew test -Pmysql8 --console=plain -i
-      # Jacoco and codecov
-      - name: Jacoco
-        run: ./gradlew jacocoTestReport
-      - name: codecov
-        run: bash <(curl -s https://codecov.io/bash)
+
