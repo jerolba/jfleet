@@ -24,7 +24,8 @@ jobs:
         run: ./gradlew jacocoTestReport
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v4
-        token: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-latest:
     runs-on: ubuntu-latest
